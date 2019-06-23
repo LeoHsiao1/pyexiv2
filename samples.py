@@ -9,3 +9,5 @@ for k, v in d.items():
 # modify the dict
 
 # .write(dict)
+
+d = read_exif(r"C:\Users\Leo\Desktop\1副本.jpg")

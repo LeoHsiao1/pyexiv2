@@ -2,6 +2,11 @@ import ctypes
 import json
 import os
 
+# if the filename contains Chinese characters:
+filename_encode = "gbk"
+# else:
+# filename_encode = "ascii"
+
 
 dll_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "lib")
 ctypes.CDLL(os.path.join(dll_dir, "exiv2.dll"))   # import it first
@@ -12,7 +17,7 @@ def read_exif(filename):
     """ return a dict """
 
     api.exif.restype = ctypes.c_char_p
-    buffer = api.exif(filename.encode())
+    buffer = api.exif(filename.encode(filename_encode))
     api.free_buffer()
 
     _buffer = buffer.decode()
