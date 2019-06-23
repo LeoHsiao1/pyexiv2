@@ -126,3 +126,4 @@
 /__pycache__
 /.vscode
 /core/__pycache__
+/core/tests/__pycache__

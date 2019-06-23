@@ -9,7 +9,7 @@ filename_encode = "gbk"
 
 
 dll_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "lib")
-ctypes.CDLL(os.path.join(dll_dir, "exiv2.dll"))   # import it first
+ctypes.CDLL(os.path.join(dll_dir, "exiv2.dll"))   # import it at first
 api = ctypes.CDLL(os.path.join(dll_dir, "api.dll"))
 
 
@@ -18,7 +18,7 @@ def read_exif(filename):
 
     api.exif.restype = ctypes.c_char_p
     buffer = api.exif(filename.encode(filename_encode))
-    api.free_buffer()
+    # api.free_buffer()     # C++ program can free the buffer automatically
 
     _buffer = buffer.decode()
     if _buffer.startswith("(Caught Exiv2 exception)"):

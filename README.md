@@ -5,9 +5,9 @@
 
 ## dependence
 
-Linux or Windows
-python3
-??
+Supported platforms: Linux 64bit , Windows 64bit
+
+<!-- Works with Python versions from 3.4 to 3.8+?? -->
 
 ## usage
 
