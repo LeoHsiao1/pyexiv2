@@ -10,14 +10,14 @@
 
 #define DLLEXPORT extern "C" __declspec(dllexport)
 
-char *buffer = NULL;
+char *buffer = 0;
 
 DLLEXPORT int free_buffer(void)
 {
-    if (buffer != NULL)
+    if (buffer)
     {
         free(buffer);
-        buffer = NULL;
+        buffer = 0;
     }
     return 0;
 }
@@ -25,10 +25,10 @@ DLLEXPORT int free_buffer(void)
 // Convert string to char array
 char *make_buffer(std::string str)
 {
-    if (buffer != NULL)
+    if (buffer)
         free_buffer(); // free it automatically
 
-    char *buffer = (char *)malloc(str.length()); // must free it later by free_buffer()
+    buffer = (char *)malloc(str.length()); // must free it later by free_buffer()
     memset(buffer, 0, str.length());
     strcpy(buffer, str.c_str());
     return buffer;

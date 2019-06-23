@@ -47,13 +47,17 @@ def test_out_of_memory():
     """ Should free the buffer automatically. """
     import psutil
     p = psutil.Process(os.getpid())
-    mem_before = p.memory_info().rss
+    m0 = p.memory_info().rss
 
-    for _ in range(1024):
+    for _ in range(100):
         d = read_exif(jpg_path)
+    m1 = p.memory_info().rss
 
-    mem_later = p.memory_info().rss
-    assert (mem_later - mem_before) < os.path.getsize(jpg_path)
+    for _ in range(100):
+        d = read_exif(jpg_path)
+    m2 = p.memory_info().rss
+
+    assert (m2 - m1) < (m1 - m0)*0.1, "memory increasing all the time"
 
 
 # 测试用例：

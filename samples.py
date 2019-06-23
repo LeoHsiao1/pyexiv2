@@ -7,15 +7,9 @@ import json
 
 ctypes.CDLL(r"D:\1\easy_exiv2\lib\exiv2.dll")
 api = ctypes.CDLL(r"D:\1\easy_exiv2\lib\api.dll")
+
 api.free_buffer()
 buffer = api.exif(os.path.abspath(r"core\tests\1.jpg").encode())
-
-# now there is a trouble, out of memory
-
-
-
-
-
 
 
 
