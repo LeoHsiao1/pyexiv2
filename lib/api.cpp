@@ -17,7 +17,7 @@ DLLEXPORT int free_buffer(void)
     if (buffer)
     {
         free(buffer);
-        buffer = 0;
+        buffer = NULL;
     }
     return 0;
 }
@@ -34,14 +34,13 @@ char *make_buffer(std::string str)
     return buffer;
 }
 
-DLLEXPORT char *exif(char *const file) try
+DLLEXPORT char *read_exif(char *const file) try
 {
-    // open the picture
+    // open the image
     Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(file);
-    assert(image.get() != 0);
     if (image.get() == 0)
     {
-        std::string error("Can not open the file");
+        std::string error("Can not open the file.");
         throw Exiv2::Error(Exiv2::kerErrorMessage, error);
     }
 
@@ -50,7 +49,7 @@ DLLEXPORT char *exif(char *const file) try
     Exiv2::ExifData &exifData = image->exifData();
     if (exifData.empty())
     {
-        std::string error("No Exif data found in file");
+        std::string error("No Exif data found in file.");
         throw Exiv2::Error(Exiv2::kerErrorMessage, error);
     }
 
@@ -62,7 +61,6 @@ DLLEXPORT char *exif(char *const file) try
     {
         const char *type = i->typeName();
         json << "\"" << i->key() << "\":"
-             // << "\""<< std::dec << i->value()<< "\" ,";
              << "\"" << i->value() << "\",";
     }
     json << "\"__status\":0"
@@ -76,3 +74,89 @@ catch (Exiv2::Error &e)
     error << "(Caught Exiv2 exception) " << e.what();
     return make_buffer(error.str());
 }
+
+
+DLLEXPORT char *read_iptc(char *const file) try
+{
+    // open the image
+    Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(file);
+    if (image.get() == 0)
+    {
+        std::string error(file);
+        error += ": Can not open the file.";
+        throw Exiv2::Error(Exiv2::kerErrorMessage, error);
+    }
+
+    // read metadata
+    image->readMetadata();
+    Exiv2::IptcData &iptcData = image->iptcData();
+    if (iptcData.empty()){
+        std::string error(file);
+        error += ": No IPTC Metadata found in the file.";
+        throw Exiv2::Error(Exiv2::kerErrorMessage, error);
+    }
+
+    // make the data to JSON format
+    std::stringstream json;
+    json << "{";
+    Exiv2::IptcData::iterator end = iptcData.end();
+	for (Exiv2::IptcData::iterator i = iptcData.begin(); i != end; ++i)
+    {
+        json << "\"" << i->key() << "\":"
+             << "\"" << i->value() << "\",";
+    }
+    json << "\"__status\":0"
+         << "}";
+
+    return make_buffer(json.str());
+}
+catch (Exiv2::Error &e)
+{
+    std::stringstream error;
+    error << "(Caught Exiv2 exception) " << e.what();
+    return make_buffer(error.str());
+}
+
+
+DLLEXPORT char *read_xmp(char *const file) try
+{
+    // open the image
+    Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(file);
+    if (image.get() == 0)
+    {
+        std::string error(file);
+        error += ": Can not open the file.";
+        throw Exiv2::Error(Exiv2::kerErrorMessage, error);
+    }
+
+    // read metadata
+    image->readMetadata();
+    Exiv2::XmpData &xmpData = image->xmpData();
+    if (xmpData.empty()) {
+        std::string error(file);
+        error += ": No XMP Metadata found in the file.";
+        throw Exiv2::Error(Exiv2::kerErrorMessage, error);
+    }
+
+    // make the data to JSON format
+    std::stringstream json;
+    json << "{";
+    Exiv2::XmpData::const_iterator end = xmpData.end();
+	for (Exiv2::XmpData::const_iterator i = xmpData.begin(); i != end; ++i)
+    {
+        const char *type = i->typeName();
+        json << "\"" << i->key() << "\":"
+             << "\"" << i->value() << "\",";
+    }
+    json << "\"__status\":0"
+         << "}";
+
+    return make_buffer(json.str());
+}
+catch (Exiv2::Error &e)
+{
+    std::stringstream error;
+    error << "(Caught Exiv2 exception) " << e.what();
+    return make_buffer(error.str());
+}
+
