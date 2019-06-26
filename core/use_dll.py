@@ -13,17 +13,33 @@ def encode(s):
     return s.encode("gbk")  # or "ascii"
 
 
+def into_dict(buffer):
+    if buffer.startswith("(Caught Exiv2 exception)"):
+        raise RuntimeError(buffer)
+    else:
+        _dict = {}
+        for line in buffer.split("<<EOL>>\n")[:-1]:
+            k, v = line.split("<<;>>", 1)
+            _dict[k] = v
+        return _dict
+
+
 def read_exif(filename):
     """ return a dict """
+    api.read_exif.restype = ctypes.c_char_p
+    buffer = api.read_exif(encode(filename))
+    return into_dict(buffer.decode())
 
-    api.exif.restype = ctypes.c_char_p
-    buffer = api.exif(encode(filename))
-    # api.free_buffer()     # C++ program can free the buffer automatically
 
-    _buffer = buffer.decode()
-    if _buffer.startswith("(Caught Exiv2 exception)"):
-        raise RuntimeError(_buffer)
-    else:
-        _dict = json.loads(_buffer)
-        _dict.pop("__status")
-        return _dict
+def read_iptc(filename):
+    """ return a dict """
+    api.read_iptc.restype = ctypes.c_char_p
+    buffer = api.read_iptc(encode(filename))
+    return into_dict(buffer.decode())
+
+
+def read_xmp(filename):
+    """ return a dict """
+    api.read_xmp.restype = ctypes.c_char_p
+    buffer = api.read_xmp(encode(filename))
+    return into_dict(buffer.decode())

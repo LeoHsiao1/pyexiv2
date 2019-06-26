@@ -1,40 +1,54 @@
 import os
-from ..use_dll import read_exif
+from ..use_dll import read_exif, read_iptc, read_xmp
 
 
 current_dir = os.path.dirname(__file__)
-jpg_path = os.path.join(current_dir, "1.jpg")
 chinese_path = os.path.join(current_dir, "1 - 副本.jpg")
+jpg_path = os.path.join(current_dir, "1.jpg")
 
 
-def test_nonexistent_file():
+def test_nonexistent_path():
     """ Should report an error. """
     try:
-        d = read_exif(os.path.abspath("./00.jpg"))
+        read_exif(os.path.join(current_dir, "0--0.jpg"))
         assert 0
     except RuntimeError:
         pass
 
 
-def test_not_pic():
+def test_not_image_path():
     """ Should report an error. """
     try:
-        d = read_exif(os.path.join(current_dir, "test_0.py"))
+        read_exif(os.path.join(current_dir, "__init__.py"))
         assert 0
     except RuntimeError:
         pass
 
 
-def test_valid_pic():
+def test_chinese_path():
+    """ Now this can support Chinese path, just encode filename by "gbk". """
+    d = read_exif(chinese_path)
+    assert isinstance(d, dict)
+    assert len(d)
+
+
+def test_read_exif():
     """ Should read the metadata successfully. """
     d = read_exif(jpg_path)
     assert isinstance(d, dict)
     assert len(d)
 
 
-def test_chinese_path():
-    """ Now this can support Chinese path, just encode filename by "gbk". """
-    d = read_exif(chinese_path)
+def test_read_iptc():
+    """ Should read the metadata successfully. """
+    d = read_iptc(jpg_path)
+    assert isinstance(d, dict)
+    assert len(d)
+
+
+def test_read_xmp():
+    """ Should read the metadata successfully. """
+    d = read_xmp(jpg_path)
     assert isinstance(d, dict)
     assert len(d)
 
@@ -50,11 +64,11 @@ def test_out_of_memory():
     m0 = p.memory_info().rss
 
     for _ in range(100):
-        d = read_exif(jpg_path)
+        read_exif(jpg_path)
     m1 = p.memory_info().rss
 
     for _ in range(100):
-        d = read_exif(jpg_path)
+        read_exif(jpg_path)
     m2 = p.memory_info().rss
 
     assert (m2 - m1) < (m1 - m0)*0.1, "memory increasing all the time"
@@ -66,3 +80,4 @@ def test_out_of_memory():
 # 读取不存在的元数据时
 # 写入不存在的元数据时
 # 保存图片时，原图片被删除
+# 创建几个基本测试用例，比如读取exif、iptc、xmp验证返回值不能为空，把这些基本测试用例交叉混合

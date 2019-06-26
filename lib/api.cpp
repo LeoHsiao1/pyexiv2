@@ -53,20 +53,14 @@ DLLEXPORT char *read_exif(char *const file) try
         throw Exiv2::Error(Exiv2::kerErrorMessage, error);
     }
 
-    // make the data to JSON format
-    std::stringstream json;
-    json << "{";
+    std::stringstream data;
     Exiv2::ExifData::const_iterator end = exifData.end();
     for (Exiv2::ExifData::const_iterator i = exifData.begin(); i != end; ++i)
     {
-        const char *type = i->typeName();
-        json << "\"" << i->key() << "\":"
-             << "\"" << i->value() << "\",";
+        data << i->key() << "<<;>>" << i->value() << "<<EOL>>\n";  //add some delimiters
     }
-    json << "\"__status\":0"
-         << "}";
 
-    return make_buffer(json.str());
+    return make_buffer(data.str());
 }
 catch (Exiv2::Error &e)
 {
@@ -96,19 +90,14 @@ DLLEXPORT char *read_iptc(char *const file) try
         throw Exiv2::Error(Exiv2::kerErrorMessage, error);
     }
 
-    // make the data to JSON format
-    std::stringstream json;
-    json << "{";
+    std::stringstream data;
     Exiv2::IptcData::iterator end = iptcData.end();
 	for (Exiv2::IptcData::iterator i = iptcData.begin(); i != end; ++i)
     {
-        json << "\"" << i->key() << "\":"
-             << "\"" << i->value() << "\",";
+        data << i->key() << "<<;>>" << i->value() << "<<EOL>>\n";  //add some delimiters
     }
-    json << "\"__status\":0"
-         << "}";
 
-    return make_buffer(json.str());
+    return make_buffer(data.str());
 }
 catch (Exiv2::Error &e)
 {
@@ -139,19 +128,14 @@ DLLEXPORT char *read_xmp(char *const file) try
     }
 
     // make the data to JSON format
-    std::stringstream json;
-    json << "{";
+    std::stringstream data;
     Exiv2::XmpData::const_iterator end = xmpData.end();
 	for (Exiv2::XmpData::const_iterator i = xmpData.begin(); i != end; ++i)
     {
-        const char *type = i->typeName();
-        json << "\"" << i->key() << "\":"
-             << "\"" << i->value() << "\",";
+        data << i->key() << "<<;>>" << i->value() << "<<EOL>>\n";  //add some delimiters
     }
-    json << "\"__status\":0"
-         << "}";
 
-    return make_buffer(json.str());
+    return make_buffer(data.str());
 }
 catch (Exiv2::Error &e)
 {
