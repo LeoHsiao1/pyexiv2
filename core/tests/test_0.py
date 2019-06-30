@@ -10,7 +10,7 @@ jpg_path = os.path.join(current_dir, "1.jpg")
 def test_nonexistent_path():
     """ Should report an error. """
     try:
-        image(os.path.join(current_dir, "0--0.jpg"))
+        image(os.path.join(current_dir, "0--0.jpg")).read_all()
         assert 0
     except RuntimeError:
         pass
@@ -19,60 +19,118 @@ def test_nonexistent_path():
 def test_not_image_path():
     """ Should report an error. """
     try:
-        image(os.path.join(current_dir, "__init__.py"))
+        image(os.path.join(current_dir, "__init__.py")).read_all()
         assert 0
     except RuntimeError:
         pass
 
 
 def test_chinese_path():
-    d = image(chinese_path).exif_dict
-    assert d["Exif.Image.DateTime"]
+    i = image(chinese_path)
+    i.read_all()
+    assert i.exif_dict["Exif.Image.DateTime"]
 
 
 def test_read_exif():
-    """ Should read the metadata successfully. """
-    d = image(jpg_path).exif_dict
-    assert d["Exif.Image.DateTime"]
+    i = image(jpg_path)
+    i._open_image()
+    i._read_exif()
+    assert i.exif_dict["Exif.Image.DateTime"]
 
 
 def test_read_iptc():
-    """ Should read the metadata successfully. """
-    d = image(jpg_path).iptc_dict
-    assert d["Iptc.Application2.TimeCreated"]
+    i = image(jpg_path)
+    i._open_image()
+    i._read_iptc()
+    assert i.iptc_dict["Iptc.Application2.TimeCreated"]
 
 
 def test_read_xmp():
-    """ Should read the metadata successfully. """
-    d = image(jpg_path).xmp_dict
-    assert d["Xmp.xmp.CreateDate"]
+    i = image(jpg_path)
+    i._open_image()
+    i._read_xmp()
+    assert i.xmp_dict["Xmp.xmp.CreateDate"]
 
 
-# def test_stack_overflow():
-#     ...
+def test_modify_exif():
+    i = image(jpg_path)
+    i._open_image()
+    dict1 = {"Exif.Image.ImageDescription": "test-中文-",
+             "Exif.Image.Orientation": "1"}
+    i.modify_exif(dict1)
+    i._open_image()
+    i._read_exif()
+    for k, v in dict1.items():
+        assert v == i.exif_dict[k], "failed to set value"
+
+    dict2 = dict1.copy()
+    for k in dict2.keys():
+        dict2[k] = ""
+    i.modify_exif(dict2)
+    i._open_image()
+    i._read_exif()
+    for k in dict2.keys():
+        assert not i.exif_dict.get(k, None), "failed to delete key"
 
 
-def test_out_of_memory():
+def test_modify_iptc():
+    i = image(jpg_path)
+    i._open_image()
+    dict1 = {"Iptc.Application2.ObjectName": "test-中文-",
+             "Iptc.Application2.Keywords": "test-中文-"}
+    i.modify_iptc(dict1)
+    i._open_image()
+    i._read_iptc()
+    for k, v in dict1.items():
+        assert v == i.iptc_dict[k], "failed to set value"
+
+    dict2 = dict1.copy()
+    for k in dict2.keys():
+        dict2[k] = ""
+    i.modify_iptc(dict2)
+    i._open_image()
+    i._read_iptc()
+    for k in dict2.keys():
+        assert not i.iptc_dict.get(k, None), "failed to delete key"
+
+
+def test_modify_xmp():
+    i = image(jpg_path)
+    i._open_image()
+    dict1 = {"Xmp.xmp.Rating": "5",
+             "Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834"}
+    i.modify_xmp(dict1)
+    i._open_image()
+    i._read_xmp()
+    for k, v in dict1.items():
+        assert v == i.xmp_dict[k], "failed to set value"
+
+    dict2 = dict1.copy()
+    for k in dict2.keys():
+        dict2[k] = ""
+    i.modify_xmp(dict2)
+    i._open_image()
+    i._read_xmp()
+    for k in dict2.keys():
+        assert not i.xmp_dict.get(k, None), "failed to delete key"
+
+
+def test_out_of_memory_when_reading():
     """ Should free the buffer automatically. """
     import psutil
     p = psutil.Process(os.getpid())
     # m0 = p.memory_info().rss
 
     for _ in range(1000):
-        image(jpg_path)
+        image(jpg_path).read_all()
     m1 = p.memory_info().rss
 
     for _ in range(1000):
-        image(jpg_path)
+        image(jpg_path).read_all()
     m2 = p.memory_info().rss
 
     assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
 
 
-# 测试用例：
-
-# 图片元数据中包含中文字符时（目前可以显示。exiv2能提取Unicode字符，但是不会解码，直接显示会乱码，需要用python解码）
-# 读取不存在的元数据时
-# 写入不存在的元数据时
-# 保存图片时，原图片被删除
-# 创建几个基本测试用例，比如读取exif、iptc、xmp验证返回值不能为空，把这些基本测试用例交叉混合
+# def test_stack_overflow():
+#     ...
