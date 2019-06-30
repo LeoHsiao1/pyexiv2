@@ -1,5 +1,5 @@
 import os
-from ..use_dll import read_exif, read_iptc, read_xmp
+from ..use_dll import image
 
 
 current_dir = os.path.dirname(__file__)
@@ -10,7 +10,7 @@ jpg_path = os.path.join(current_dir, "1.jpg")
 def test_nonexistent_path():
     """ Should report an error. """
     try:
-        read_exif(os.path.join(current_dir, "0--0.jpg"))
+        image(os.path.join(current_dir, "0--0.jpg"))
         assert 0
     except RuntimeError:
         pass
@@ -19,32 +19,32 @@ def test_nonexistent_path():
 def test_not_image_path():
     """ Should report an error. """
     try:
-        read_exif(os.path.join(current_dir, "__init__.py"))
+        image(os.path.join(current_dir, "__init__.py"))
         assert 0
     except RuntimeError:
         pass
 
 
 def test_chinese_path():
-    d = read_exif(chinese_path)
+    d = image(chinese_path).exif_dict
     assert d["Exif.Image.DateTime"]
 
 
 def test_read_exif():
     """ Should read the metadata successfully. """
-    d = read_exif(jpg_path)
+    d = image(jpg_path).exif_dict
     assert d["Exif.Image.DateTime"]
 
 
 def test_read_iptc():
     """ Should read the metadata successfully. """
-    d = read_iptc(jpg_path)
+    d = image(jpg_path).iptc_dict
     assert d["Iptc.Application2.TimeCreated"]
 
 
 def test_read_xmp():
     """ Should read the metadata successfully. """
-    d = read_xmp(jpg_path)
+    d = image(jpg_path).xmp_dict
     assert d["Xmp.xmp.CreateDate"]
 
 
@@ -59,11 +59,11 @@ def test_out_of_memory():
     # m0 = p.memory_info().rss
 
     for _ in range(1000):
-        read_exif(jpg_path)
+        image(jpg_path)
     m1 = p.memory_info().rss
 
     for _ in range(1000):
-        read_exif(jpg_path)
+        image(jpg_path)
     m2 = p.memory_info().rss
 
     assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
