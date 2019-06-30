@@ -26,31 +26,26 @@ def test_not_image_path():
 
 
 def test_chinese_path():
-    """ Now this can support Chinese path, just encode filename by "gbk". """
     d = read_exif(chinese_path)
-    assert isinstance(d, dict)
-    assert len(d)
+    assert d["Exif.Image.DateTime"]
 
 
 def test_read_exif():
     """ Should read the metadata successfully. """
     d = read_exif(jpg_path)
-    assert isinstance(d, dict)
-    assert len(d)
+    assert d["Exif.Image.DateTime"]
 
 
 def test_read_iptc():
     """ Should read the metadata successfully. """
     d = read_iptc(jpg_path)
-    assert isinstance(d, dict)
-    assert len(d)
+    assert d["Iptc.Application2.TimeCreated"]
 
 
 def test_read_xmp():
     """ Should read the metadata successfully. """
     d = read_xmp(jpg_path)
-    assert isinstance(d, dict)
-    assert len(d)
+    assert d["Xmp.xmp.CreateDate"]
 
 
 # def test_stack_overflow():
@@ -61,17 +56,17 @@ def test_out_of_memory():
     """ Should free the buffer automatically. """
     import psutil
     p = psutil.Process(os.getpid())
-    m0 = p.memory_info().rss
+    # m0 = p.memory_info().rss
 
-    for _ in range(100):
+    for _ in range(1000):
         read_exif(jpg_path)
     m1 = p.memory_info().rss
 
-    for _ in range(100):
+    for _ in range(1000):
         read_exif(jpg_path)
     m2 = p.memory_info().rss
 
-    assert (m2 - m1) < (m1 - m0)*0.1, "memory increasing all the time"
+    assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
 
 
 # 测试用例：

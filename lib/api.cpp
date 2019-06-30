@@ -12,7 +12,7 @@
 
 char *buffer = 0;
 
-DLLEXPORT int free_buffer(void)
+int free_buffer(void)
 {
     if (buffer)
     {
@@ -28,7 +28,7 @@ char *make_buffer(std::string str)
     if (buffer)
         free_buffer(); // free it automatically
 
-    buffer = (char *)malloc(str.length()); // must free it later by free_buffer()
+    buffer = (char *)malloc(str.length());
     memset(buffer, 0, str.length());
     strcpy(buffer, str.c_str());
     return buffer;
@@ -57,7 +57,10 @@ DLLEXPORT char *read_exif(char *const file) try
     Exiv2::ExifData::const_iterator end = exifData.end();
     for (Exiv2::ExifData::const_iterator i = exifData.begin(); i != end; ++i)
     {
-        data << i->key() << "<<;>>" << i->value() << "<<EOL>>\n";  //add some delimiters
+        //add data with separators
+        data << i->key() << "\t"
+             << i->typeName() << "\t"
+             << i->value() << "<<SEPARATOR>>\n";
     }
 
     return make_buffer(data.str());
@@ -68,7 +71,6 @@ catch (Exiv2::Error &e)
     error << "(Caught Exiv2 exception) " << e.what();
     return make_buffer(error.str());
 }
-
 
 DLLEXPORT char *read_iptc(char *const file) try
 {
@@ -84,7 +86,8 @@ DLLEXPORT char *read_iptc(char *const file) try
     // read metadata
     image->readMetadata();
     Exiv2::IptcData &iptcData = image->iptcData();
-    if (iptcData.empty()){
+    if (iptcData.empty())
+    {
         std::string error(file);
         error += ": No IPTC Metadata found in the file.";
         throw Exiv2::Error(Exiv2::kerErrorMessage, error);
@@ -92,9 +95,12 @@ DLLEXPORT char *read_iptc(char *const file) try
 
     std::stringstream data;
     Exiv2::IptcData::iterator end = iptcData.end();
-	for (Exiv2::IptcData::iterator i = iptcData.begin(); i != end; ++i)
+    for (Exiv2::IptcData::iterator i = iptcData.begin(); i != end; ++i)
     {
-        data << i->key() << "<<;>>" << i->value() << "<<EOL>>\n";  //add some delimiters
+        //add data with separators
+        data << i->key() << "\t"
+             << i->typeName() << "\t"
+             << i->value() << "<<SEPARATOR>>\n";
     }
 
     return make_buffer(data.str());
@@ -105,7 +111,6 @@ catch (Exiv2::Error &e)
     error << "(Caught Exiv2 exception) " << e.what();
     return make_buffer(error.str());
 }
-
 
 DLLEXPORT char *read_xmp(char *const file) try
 {
@@ -121,7 +126,8 @@ DLLEXPORT char *read_xmp(char *const file) try
     // read metadata
     image->readMetadata();
     Exiv2::XmpData &xmpData = image->xmpData();
-    if (xmpData.empty()) {
+    if (xmpData.empty())
+    {
         std::string error(file);
         error += ": No XMP Metadata found in the file.";
         throw Exiv2::Error(Exiv2::kerErrorMessage, error);
@@ -130,9 +136,12 @@ DLLEXPORT char *read_xmp(char *const file) try
     // make the data to JSON format
     std::stringstream data;
     Exiv2::XmpData::const_iterator end = xmpData.end();
-	for (Exiv2::XmpData::const_iterator i = xmpData.begin(); i != end; ++i)
+    for (Exiv2::XmpData::const_iterator i = xmpData.begin(); i != end; ++i)
     {
-        data << i->key() << "<<;>>" << i->value() << "<<EOL>>\n";  //add some delimiters
+        //add data with separators
+        data << i->key() << "\t"
+             << i->typeName() << "\t"
+             << i->value() << "<<SEPARATOR>>\n";
     }
 
     return make_buffer(data.str());
@@ -143,4 +152,3 @@ catch (Exiv2::Error &e)
     error << "(Caught Exiv2 exception) " << e.what();
     return make_buffer(error.str());
 }
-
