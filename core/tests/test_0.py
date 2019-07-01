@@ -1,5 +1,5 @@
 import os
-from ..use_dll import image
+from ..core import image
 
 
 current_dir = os.path.dirname(__file__)
@@ -54,12 +54,10 @@ def test_read_xmp():
 
 def test_modify_exif():
     i = image(jpg_path)
-    i._open_image()
     dict1 = {"Exif.Image.ImageDescription": "test-中文-",
              "Exif.Image.Orientation": "1"}
     i.modify_exif(dict1)
-    i._open_image()
-    i._read_exif()
+    i.read_all()
     for k, v in dict1.items():
         assert v == i.exif_dict[k], "failed to set value"
 
@@ -67,20 +65,18 @@ def test_modify_exif():
     for k in dict2.keys():
         dict2[k] = ""
     i.modify_exif(dict2)
-    i._open_image()
-    i._read_exif()
+    i.read_all()
     for k in dict2.keys():
         assert not i.exif_dict.get(k, None), "failed to delete key"
+    i.modify_exif(dict1)
 
 
 def test_modify_iptc():
     i = image(jpg_path)
-    i._open_image()
     dict1 = {"Iptc.Application2.ObjectName": "test-中文-",
              "Iptc.Application2.Keywords": "test-中文-"}
     i.modify_iptc(dict1)
-    i._open_image()
-    i._read_iptc()
+    i.read_all()
     for k, v in dict1.items():
         assert v == i.iptc_dict[k], "failed to set value"
 
@@ -88,20 +84,18 @@ def test_modify_iptc():
     for k in dict2.keys():
         dict2[k] = ""
     i.modify_iptc(dict2)
-    i._open_image()
-    i._read_iptc()
+    i.read_all()
     for k in dict2.keys():
         assert not i.iptc_dict.get(k, None), "failed to delete key"
+    i.modify_iptc(dict1)
 
 
 def test_modify_xmp():
     i = image(jpg_path)
-    i._open_image()
     dict1 = {"Xmp.xmp.Rating": "5",
              "Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834"}
     i.modify_xmp(dict1)
-    i._open_image()
-    i._read_xmp()
+    i.read_all()
     for k, v in dict1.items():
         assert v == i.xmp_dict[k], "failed to set value"
 
@@ -109,10 +103,11 @@ def test_modify_xmp():
     for k in dict2.keys():
         dict2[k] = ""
     i.modify_xmp(dict2)
-    i._open_image()
-    i._read_xmp()
+    i.read_all()
     for k in dict2.keys():
         assert not i.xmp_dict.get(k, None), "failed to delete key"
+    i.modify_xmp(dict1)
+
 
 
 def test_out_of_memory_when_reading():

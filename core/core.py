@@ -3,10 +3,10 @@ import json
 import os
 
 
-dll_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "lib")
+dll_dir = os.path.join(os.path.dirname(__file__), "lib")
 ctypes.CDLL(os.path.join(dll_dir, "exiv2.dll"))   # import it at first
 api = ctypes.CDLL(os.path.join(dll_dir, "api.dll"))
-SEP = "\t"        # separator
+SEP = "\t"  # separator
 EOL = "<<SEPARATOR>>\n"  # end of line
 
 
@@ -18,7 +18,7 @@ class image:
         self.filename = filename.encode("gbk")
 
     def read_all(self):
-        """ read all the metadata """
+        """ read all the metadata(including EXIF, IPTC, XMP). """
         self._open_image()
         self._read_exif()
         self._read_iptc()
@@ -69,7 +69,7 @@ class image:
         for k, v in dict_.items():
             text += k + SEP + v + EOL
         return text
-    
+
     def modify_exif(self, exif_dict):
         text = self._dumps(exif_dict)
         buffer = ctypes.create_string_buffer(text.encode())
