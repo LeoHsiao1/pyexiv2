@@ -23,6 +23,18 @@ class image:
         self._read_exif()
         self._read_iptc()
         self._read_xmp()
+    
+    def read_exif(self):
+        self._open_image()
+        self._read_exif()
+    
+    def read_iptc(self):
+        self._open_image()
+        self._read_iptc()
+
+    def read_xmp(self):
+        self._open_image()
+        self._read_xmp()
 
     def _open_image(self):
         """ Let C++ program open an image and read its metadata,
@@ -33,19 +45,19 @@ class image:
             raise RuntimeError(ret)
 
     def _read_exif(self):
-        """ call _open_image() first """
+        """ call self._open_image() first """
         api.read_exif.restype = ctypes.c_char_p
         text = api.read_exif(self.filename).decode()
         self.exif_list, self.exif_dict = self._loads(text)
 
     def _read_iptc(self):
-        """ call _open_image() first """
+        """ call self._open_image() first """
         api.read_iptc.restype = ctypes.c_char_p
         text = api.read_iptc(self.filename).decode()
         self.iptc_list, self.iptc_dict = self._loads(text)
 
     def _read_xmp(self):
-        """ call _open_image() first """
+        """ call self._open_image() first """
         api.read_xmp.restype = ctypes.c_char_p
         text = api.read_xmp(self.filename).decode()
         self.xmp_list, self.xmp_dict = self._loads(text)

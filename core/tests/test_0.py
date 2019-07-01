@@ -33,22 +33,19 @@ def test_chinese_path():
 
 def test_read_exif():
     i = image(jpg_path)
-    i._open_image()
-    i._read_exif()
+    i.read_exif()
     assert i.exif_dict["Exif.Image.DateTime"]
 
 
 def test_read_iptc():
     i = image(jpg_path)
-    i._open_image()
-    i._read_iptc()
+    i.read_iptc()
     assert i.iptc_dict["Iptc.Application2.TimeCreated"]
 
 
 def test_read_xmp():
     i = image(jpg_path)
-    i._open_image()
-    i._read_xmp()
+    i.read_xmp()
     assert i.xmp_dict["Xmp.xmp.CreateDate"]
 
 
