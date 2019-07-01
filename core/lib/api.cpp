@@ -167,18 +167,13 @@ DLLEXPORT char *modify_exif(char *const buffer) try
 		value = text.substr(i, EOL_pos - i);
 		i = EOL_pos + EOL.length();
 
-		// delete the key if the value is empty
-		if (value == "")
-		{
-			Exiv2::ExifData::iterator pos = exifData.findKey(Exiv2::ExifKey(key));
-			if (pos != exifData.end())
-				exifData.erase(pos);
-			else
-				; // throw Exiv2::Error(Exiv2::kerErrorMessage, "Key not found");
-			continue;
-		}
-
-		exifData[key] = value;
+		Exiv2::ExifData::iterator pos = exifData.findKey(Exiv2::ExifKey(key));
+		if (pos != exifData.end())
+			exifData.erase(pos);
+		// else
+		// throw Exiv2::Error(Exiv2::kerErrorMessage, "Key not found");
+		if (value != "")
+			exifData[key] = value;
 	}
 
 	image->setExifData(exifData);
@@ -216,18 +211,11 @@ DLLEXPORT char *modify_iptc(char *const buffer) try
 		value = text.substr(i, EOL_pos - i);
 		i = EOL_pos + EOL.length();
 
-		// delete the key if the value is empty
-		if (value == "")
-		{
-			Exiv2::IptcData::iterator pos = iptcData.findKey(Exiv2::IptcKey(key));
-			if (pos != iptcData.end())
-				iptcData.erase(pos);
-			else
-				; // throw Exiv2::Error(Exiv2::kerErrorMessage, "Key not found");
-			continue;
-		}
-
-		iptcData[key] = value;
+		Exiv2::IptcData::iterator pos = iptcData.findKey(Exiv2::IptcKey(key));
+		if (pos != iptcData.end())
+			iptcData.erase(pos);
+		if (value != "")
+			iptcData[key] = value;
 	}
 
 	image->setIptcData(iptcData);
@@ -265,18 +253,11 @@ DLLEXPORT char *modify_xmp(char *const buffer) try
 		value = text.substr(i, EOL_pos - i);
 		i = EOL_pos + EOL.length();
 
-		// delete the key if the value is empty
-		if (value == "")
-		{
-			Exiv2::XmpData::iterator pos = xmpData.findKey(Exiv2::XmpKey(key));
-			if (pos != xmpData.end())
-				xmpData.erase(pos);
-			else
-				; // throw Exiv2::Error(Exiv2::kerErrorMessage, "Key not found");
-			continue;
-		}
-
-		xmpData[key] = value;
+		Exiv2::XmpData::iterator pos = xmpData.findKey(Exiv2::XmpKey(key));
+		if (pos != xmpData.end())
+			xmpData.erase(pos);
+		if (value != "")
+			xmpData[key] = value;
 	}
 
 	image->setXmpData(xmpData);
