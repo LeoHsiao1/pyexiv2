@@ -1,4 +1,7 @@
 import os
+
+import psutil
+
 from ..core import image
 
 
@@ -106,10 +109,7 @@ def test_modify_xmp():
     i.modify_xmp(dict1)
 
 
-
 def test_out_of_memory_when_reading():
-    """ Should free the buffer automatically. """
-    import psutil
     p = psutil.Process(os.getpid())
     # m0 = p.memory_info().rss
 
@@ -124,5 +124,35 @@ def test_out_of_memory_when_reading():
     assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
 
 
-# def test_stack_overflow():
-#     ...
+def test_out_of_memory_when_writing():
+    p = psutil.Process(os.getpid())
+    dict1 = {"Exif.Image.ImageDescription": "test-中文-",
+             "Exif.Image.Orientation": "1"}
+    # m0 = p.memory_info().rss
+
+    for _ in range(1000):
+        image(jpg_path).modify_exif(dict1)
+    m1 = p.memory_info().rss
+
+    for _ in range(1000):
+        image(jpg_path).modify_exif(dict1)
+    m2 = p.memory_info().rss
+
+    assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
+
+
+def test_stack_overflow():
+    p = psutil.Process(os.getpid())
+    dict1 = {"Exif.Image.ImageDescription": "(test_stack_overflow)" * 1000,
+             "Exif.Image.Orientation": "0123456789"* 1000}
+    # m0 = p.memory_info().rss
+
+    for _ in range(10):
+        image(jpg_path).modify_exif(dict1)
+    m1 = p.memory_info().rss
+
+    for _ in range(10):
+        image(jpg_path).modify_exif(dict1)
+    m2 = p.memory_info().rss
+
+    assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
