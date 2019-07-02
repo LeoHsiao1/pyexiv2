@@ -1,21 +1,32 @@
 import ctypes
 import json
 import os
+import sys
 
 
 dll_dir = os.path.join(os.path.dirname(__file__), "lib")
-ctypes.CDLL(os.path.join(dll_dir, "exiv2.dll"))   # import it at first
-api = ctypes.CDLL(os.path.join(dll_dir, "api.dll"))
+
+if sys.platform.startswith("linux"):
+    ctypes.CDLL(os.path.join(dll_dir, "libexiv2.so"))  # import it at first
+    api = ctypes.CDLL(os.path.join(dll_dir, "api.so"))
+    # Unicode characters need to be handled, because char array can only contain ASCII characters.
+    ENCODING = "utf-8"
+
+elif sys.platform.startswith("win"):
+    ctypes.CDLL(os.path.join(dll_dir, "exiv2.dll"))
+    api = ctypes.CDLL(os.path.join(dll_dir, "api.dll"))
+    ENCODING = "gbk"
+
+else:
+    raise RuntimeError("Unknown platform. This module should run on Windows or Linux systems.")
+
 SEP = "\t"  # separator
 EOL = "<<SEPARATOR>>\n"  # end of line
 
 
 class image:
     def __init__(self, filename):
-
-        # Convert str to char array, so that can be received by C functions.
-        # Unicode characters need to be handled, because bytes can only contain ASCII characters.
-        self.filename = filename.encode("gbk")
+        self.filename = filename.encode(ENCODING)
 
     def read_all(self):
         """ read all the metadata(including EXIF, IPTC, XMP). """

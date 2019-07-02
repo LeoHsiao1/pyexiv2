@@ -8,7 +8,8 @@
 #include <string>
 #include <sstream>
 
-#define DLLEXPORT extern "C" __declspec(dllexport)
+#define API extern "C"	// on Linux
+//#define API extern "C" __declspec(dllexport) // on Windows
 
 char *buffer = 0;
 Exiv2::Image::AutoPtr image;
@@ -38,7 +39,7 @@ char *make_buffer(std::string str)
 	return buffer;
 }
 
-DLLEXPORT char *open_image(char *const file) try
+API char *open_image(char *const file) try
 {
 	image = Exiv2::ImageFactory::open(file);
 	if (image.get() == 0)
@@ -58,7 +59,7 @@ catch (Exiv2::Error &e)
 	return make_buffer(error.str());
 }
 
-DLLEXPORT char *read_exif(void) try
+API char *read_exif(void) try
 {
 	Exiv2::ExifData &exifData = image->exifData();
 	if (exifData.empty())
@@ -86,7 +87,7 @@ catch (Exiv2::Error &e)
 	return make_buffer(error.str());
 }
 
-DLLEXPORT char *read_iptc(void) try
+API char *read_iptc(void) try
 {
 	Exiv2::IptcData &iptcData = image->iptcData();
 	if (iptcData.empty())
@@ -114,7 +115,7 @@ catch (Exiv2::Error &e)
 	return make_buffer(error.str());
 }
 
-DLLEXPORT char *read_xmp(void) try
+API char *read_xmp(void) try
 {
 	Exiv2::XmpData &xmpData = image->xmpData();
 	if (xmpData.empty())
@@ -142,7 +143,7 @@ catch (Exiv2::Error &e)
 	return make_buffer(error.str());
 }
 
-DLLEXPORT char *modify_exif(char *const buffer) try
+API char *modify_exif(char *const buffer) try
 {
 	Exiv2::ExifData &exifData = image->exifData();
 	// Exiv2::ExifData exifData;	// an empty container for exif metadata
@@ -187,7 +188,7 @@ catch (Exiv2::Error &e)
 	return make_buffer(error.str());
 }
 
-DLLEXPORT char *modify_iptc(char *const buffer) try
+API char *modify_iptc(char *const buffer) try
 {
 	Exiv2::IptcData &iptcData = image->iptcData();
 
@@ -229,7 +230,7 @@ catch (Exiv2::Error &e)
 	return make_buffer(error.str());
 }
 
-DLLEXPORT char *modify_xmp(char *const buffer) try
+API char *modify_xmp(char *const buffer) try
 {
 	Exiv2::XmpData &xmpData = image->xmpData();
 
