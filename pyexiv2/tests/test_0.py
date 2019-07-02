@@ -1,8 +1,9 @@
+# -*- coding: utf-8 -*-
 import os
 
 import psutil
 
-from ..core import image
+from .. import image
 
 
 current_dir = os.path.dirname(__file__)
