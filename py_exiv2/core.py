@@ -25,28 +25,30 @@ SEP = "\t"  # separator
 EOL = "<<SEPARATOR>>\n"  # end of line
 
 
-class image:
+class Image:
     def __init__(self, filename):
         self.filename = filename.encode(ENCODING)
+    
+    def read_exif(self):
+        self._open_image()
+        return self._read_exif()
+    
+    def read_iptc(self):
+        self._open_image()
+        return self._read_iptc()
+
+    def read_xmp(self):
+        self._open_image()
+        return self._read_xmp()
 
     def read_all(self):
         """ read all the metadata(including EXIF, IPTC, XMP). """
         self._open_image()
-        self._read_exif()
-        self._read_iptc()
-        self._read_xmp()
-    
-    def read_exif(self):
-        self._open_image()
-        self._read_exif()
-    
-    def read_iptc(self):
-        self._open_image()
-        self._read_iptc()
-
-    def read_xmp(self):
-        self._open_image()
-        self._read_xmp()
+        _dict = {"EXIF": self._read_exif(),
+                 "IPTC": self._read_iptc(),
+                 "XMP": self._read_xmp()
+                 }
+        return _dict
 
     def _open_image(self):
         """ Let C++ program open an image and read its metadata,
@@ -60,33 +62,33 @@ class image:
         """ call self._open_image() first """
         api.read_exif.restype = ctypes.c_char_p
         text = api.read_exif(self.filename).decode()
-        self.exif_list, self.exif_dict = self._loads(text)
+        return self._loads(text)
 
     def _read_iptc(self):
         """ call self._open_image() first """
         api.read_iptc.restype = ctypes.c_char_p
         text = api.read_iptc(self.filename).decode()
-        self.iptc_list, self.iptc_dict = self._loads(text)
+        return self._loads(text)
 
     def _read_xmp(self):
         """ call self._open_image() first """
         api.read_xmp.restype = ctypes.c_char_p
         text = api.read_xmp(self.filename).decode()
-        self.xmp_list, self.xmp_dict = self._loads(text)
+        return self._loads(text)
 
     def _loads(self, text):
         if text.startswith("(Caught Exiv2 exception)"):
             raise RuntimeError(text)
-        _list = []  # save all the data
+        # _list = []  # save all the data
         _dict = {}  # only save the key and value
         lines = text.split(EOL)[:-1]  # the last line is empty
         for line in lines:
             # There are 3 fields: key, typeName, value
             # split with an exact count, watch out for extra '\t' in the last field
             fields = line.split(SEP, 2)
-            _list.append(fields)
+            # _list.append(fields)
             _dict[fields[0]] = fields[-1]
-        return _list, _dict
+        return _dict
 
     def _dumps(self, dict_):
         text = ""

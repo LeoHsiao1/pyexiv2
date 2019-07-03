@@ -3,6 +3,6 @@ read and modify metadata of electronic image, including EXIF, IPTC, XMP.
 """
 
 
-from .core import image
+from .core import Image
 
-__all__ = ["image"]
+__all__ = ["Image"]

@@ -5,7 +5,7 @@ with open("README.md") as f:
 
 setuptools.setup(
     name="py_exiv2",
-    version="1.0.1",
+    version="1.1.0",
     author="LeoHsiao",
     author_email="leohsiao@foxmail.com",
     description="Read and modify metadata of digital image, including EXIF, IPTC, XMP.",
@@ -19,3 +19,8 @@ setuptools.setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
     ],
 )
+
+
+# upload to pypi.org:
+#   python setup.py sdist bdist_wheel
+#   python -m twine upload dist/*
