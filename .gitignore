@@ -127,9 +127,9 @@
 /.vscode
 /core/__pycache__
 /core/tests/__pycache__
-/py_exiv2.egg-info
+/pyexiv2.egg-info
 /dist
 /build
 /.pytest_cache
-/py_exiv2/__pycache__
-/py_exiv2/tests/__pycache__
+/pyexiv2/__pycache__
+/pyexiv2/tests/__pycache__

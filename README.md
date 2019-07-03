@@ -1,10 +1,10 @@
-# py_exiv2
+# pyexiv2
 
 Read and modify metadata of digital image, including EXIF, IPTC, XMP.
 It runs on C++ API of [exiv2](https://www.exiv2.org/index.html).
 
-- install: `pip install py_exiv2`
-- [source code on github](https://github.com/LeoHsiao1/py_exiv2)
+- install: `pip install pyexiv2`
+- [source code on github](https://github.com/LeoHsiao1/pyexiv2)
 
 ## Features
 
@@ -18,7 +18,7 @@ It runs on C++ API of [exiv2](https://www.exiv2.org/index.html).
 - read metadata
 
     ```python
-    >>> from py_exiv2 import Image
+    >>> from pyexiv2 import Image
 
     >>> i = Image("tests/1.jpg")
     >>> i.read_exif()
@@ -59,7 +59,7 @@ It runs on C++ API of [exiv2](https://www.exiv2.org/index.html).
 
 ## Tests
 
-There are some test cases in folder "py_exiv2/tests". Run them by pytest:
+There are some test cases in folder "pyexiv2/tests". Run them by pytest:
 
 ```shell
 pip install pytest psutil
