@@ -58,6 +58,12 @@ def test_read_xmp():
     assert _dict["Xmp.xmp.CreateDate"]
 
 
+def test_read_all():
+    i = Image(jpg_path)
+    for v in i.read_all().values():
+        assert v
+
+
 def test_modify_exif():
     i = Image(jpg_path)
     dict1 = {"Exif.Image.ImageDescription": "test-中文-",
@@ -161,4 +167,24 @@ def test_stack_overflow():
         Image(jpg_path).modify_exif(dict1)
     m2 = p.memory_info().rss
 
+    # revert
+    dict1 = {"Exif.Image.ImageDescription": "test-中文-",
+             "Exif.Image.Orientation": "1"}
+    Image(jpg_path).modify_exif(dict1)
+
     assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
+
+
+# def test_clear_and_revert():
+#     i = Image(jpg_path)
+#     all_dict = i.read_all()
+#     i.clear_all()
+#     for v in i.read_all().values():  # This is also a test to read empty data
+#         assert not v
+
+#     # revert
+#     i.modify_all(all_dict)
+#     new_dict = i.read_all()
+#     for sort in all_dict.keys():
+#         for key in all_dict[sort].keys():
+#             assert all_dict[sort][key] == new_dict[sort][key]

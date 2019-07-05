@@ -8,8 +8,8 @@
 #include <string>
 #include <sstream>
 
-//#define API extern "C" // on Linux
-#define API extern "C" __declspec(dllexport) // on Windows
+#define API extern "C" // on Linux
+//#define API extern "C" __declspec(dllexport) // on Windows
 
 char *buffer = 0;
 Exiv2::Image::AutoPtr image;
