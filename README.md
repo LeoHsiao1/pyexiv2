@@ -34,7 +34,7 @@ It runs on C++ API of [exiv2](https://www.exiv2.org/index.html).
     ```python
     >>> # prepare the XMP data you want to modify
     >>> _dict = {"Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834",   # this will overwrite its original value, or add it if it doesn't exist
-    ...          "Xmp.xmp.Rating": ""}  # this will delete the datum in the image
+    ...          "Xmp.xmp.Rating": ""}  # set an empty str explicitly to delete the datum
     }
 
     >>> i.modify_xmp(_dict)
