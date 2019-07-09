@@ -5,7 +5,7 @@ with open("README.md") as f:
 
 setuptools.setup(
     name="pyexiv2",
-    version="1.2.0",
+    version="1.2.1",
     author="LeoHsiao",
     author_email="leohsiao@foxmail.com",
     description="Read and modify metadata of digital image, including EXIF, IPTC, XMP.",

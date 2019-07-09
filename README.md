@@ -10,7 +10,8 @@ It runs on C++ API of [exiv2](https://www.exiv2.org/index.html).
 
 - Supports running on Linux 64bit, with GLIBC_2.27.
 - Supports running on Windows 64bit, with Python3(64bit).
-- Supports Unicode characters that can be used in image paths and data.
+- [Supports various formats](https://dev.exiv2.org/projects/exiv2/wiki/Supported_image_formats)
+- Supports Unicode characters that contained in image paths and data.
 - Not thread-safe, because some global variables have been used in api.cpp.
 
 ## Usage
