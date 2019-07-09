@@ -165,15 +165,13 @@ class Image:
     def _loads(self, text):
         if text.startswith("(Caught Exiv2 exception)"):
             raise RuntimeError(text)
-        # _list = []  # save all the data
         _dict = {}  # only save the key and value
         lines = text.split(EOL)[:-1]  # the last line is empty
         for line in lines:
-            # There are 3 fields: key, typeName, value
+            # There are 2 fields: key, value
             # split with an exact count, watch out for extra '\t' in the last field
-            fields = line.split(SEP, 2)
-            # _list.append(fields)
-            _dict[fields[0]] = fields[-1]
+            fields = line.split(SEP, 1)
+            _dict[fields[0]] = fields[1]
         return _dict
 
     def _dumps(self, dict_):

@@ -65,8 +65,8 @@ API char *read_exif(void) try
 	{
 		//add data with separators
 		data << i->key() << "\t"
-			 << i->typeName() << "\t"
 			 << i->value() << "<<SEPARATOR>>\n";
+			 //<< i->typeName() << "\t"	// Some metadata does not have this property, causing the program to crash
 	}
 	return make_buffer(data.str());
 }
@@ -85,7 +85,6 @@ API char *read_iptc(void) try
 	for (Exiv2::IptcData::iterator i = iptcData.begin(); i != end; ++i)
 	{
 		data << i->key() << "\t"
-			 << i->typeName() << "\t"
 			 << i->value() << "<<SEPARATOR>>\n";
 	}
 	return make_buffer(data.str());
@@ -105,7 +104,6 @@ API char *read_xmp(void) try
 	for (Exiv2::XmpData::iterator i = xmpData.begin(); i != end; ++i)
 	{
 		data << i->key() << "\t"
-			 << i->typeName() << "\t"
 			 << i->value() << "<<SEPARATOR>>\n";
 	}
 	return make_buffer(data.str());
