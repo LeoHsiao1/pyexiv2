@@ -10,7 +10,8 @@ It runs on C++ API of [exiv2](https://www.exiv2.org/index.html).
 
 - Supports running on Linux 64bit, with GLIBC_2.27.
 - Supports running on Windows 64bit, with Python3(64bit).
-- [Supports various formats](https://dev.exiv2.org/projects/exiv2/wiki/Supported_image_formats)
+- [Supports various metadata](https://www.exiv2.org/metadata.html)
+- [Supports various image formats](https://dev.exiv2.org/projects/exiv2/wiki/Supported_image_formats)
 - Supports Unicode characters that contained in image paths and data.
 - Not thread-safe, because some global variables have been used in api.cpp.
 
@@ -47,8 +48,6 @@ It runs on C++ API of [exiv2](https://www.exiv2.org/index.html).
 
     # use i.modify_exif() and i.modify_iptc() in the same way
     ```
-
-- Metadata reference tables: <https://www.exiv2.org/metadata.html>
 
 - You may be interested in these metadata on Windows:
 

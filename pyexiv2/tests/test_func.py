@@ -1,71 +1,88 @@
 # -*- coding: utf-8 -*-
 import os
+import hashlib
 
 import psutil
+import pytest
 
 from .. import Image
 
 
 current_dir = os.path.dirname(__file__)
-chinese_path = os.path.join(current_dir, "1 - 副本.jpg")
+img_path = os.path.join(current_dir, "tmp.jpg")
 jpg_path = os.path.join(current_dir, "1.jpg")
+
+
+def setup_function():
+    if os.path.exists(img_path):
+        os.remove(img_path)
+    os.link(jpg_path, img_path)
+
+
+def teardown_function():
+    try:
+        assert compare(jpg_path, img_path), "The file has been changed"
+    finally:
+        os.remove(img_path)
+
+
+def compare(file1, file2):
+    """ Determine whether the  two files are identical """
+    with open(file1, "rb") as f1:
+        with open(file2, "rb") as f2:
+            return hashlib.md5(f1.read()).digest() == hashlib.md5(f2.read()).digest()
 
 
 def test_nonexistent_path():
     """ Should report an error. """
-    try:
+    with pytest.raises(RuntimeError):
         Image(os.path.join(current_dir, "0--0.jpg")).read_all()
-        assert 0
-    except RuntimeError:
-        pass
 
 
 def test_not_image_path():
     """ Should report an error. """
-    try:
+    with pytest.raises(RuntimeError):
         Image(os.path.join(current_dir, "__init__.py")).read_all()
-        assert 0
-    except RuntimeError:
-        pass
 
 
 def test_chinese_path():
-    os.rename(jpg_path, chinese_path)
+    chinese_path = os.path.join(current_dir, "1 - 副本.jpg")
+    os.link(jpg_path, chinese_path)
     _dict = {}
     try:
         i = Image(chinese_path)
         _dict = i.read_all()
     finally:
-        os.rename(chinese_path, jpg_path)
+        os.remove(chinese_path)
         assert _dict
 
 
 def test_read_exif():
-    i = Image(jpg_path)
+    i = Image(img_path)
     _dict = i.read_exif()
     assert _dict["Exif.Image.DateTime"]
 
 
 def test_read_iptc():
-    i = Image(jpg_path)
+    i = Image(img_path)
     _dict = i.read_iptc()
     assert _dict["Iptc.Application2.TimeCreated"]
 
 
 def test_read_xmp():
-    i = Image(jpg_path)
+    i = Image(img_path)
     _dict = i.read_xmp()
     assert _dict["Xmp.xmp.CreateDate"]
 
 
 def test_read_all():
-    i = Image(jpg_path)
+    i = Image(img_path)
     for v in i.read_all().values():
         assert v
 
 
 def test_modify_exif():
-    i = Image(jpg_path)
+    i = Image(img_path)
     dict1 = {"Exif.Image.ImageDescription": "test-中文-",
              "Exif.Image.Orientation": "1"}
     i.modify_exif(dict1)
@@ -84,7 +101,7 @@ def test_modify_exif():
 
 
 def test_modify_iptc():
-    i = Image(jpg_path)
+    i = Image(img_path)
     dict1 = {"Iptc.Application2.ObjectName": "test-中文-",
              "Iptc.Application2.Keywords": "test-中文-"}
     i.modify_iptc(dict1)
@@ -103,7 +120,7 @@ def test_modify_iptc():
 
 
 def test_modify_xmp():
-    i = Image(jpg_path)
+    i = Image(img_path)
     dict1 = {"Xmp.xmp.Rating": "5",
              "Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834"}
     i.modify_xmp(dict1)
@@ -121,70 +138,3 @@ def test_modify_xmp():
     i.modify_xmp(dict1)
 
 
-def test_out_of_memory_when_reading():
-    p = psutil.Process(os.getpid())
-    # m0 = p.memory_info().rss
-
-    for _ in range(1000):
-        Image(jpg_path).read_all()
-    m1 = p.memory_info().rss
-
-    for _ in range(1000):
-        Image(jpg_path).read_all()
-    m2 = p.memory_info().rss
-
-    assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
-
-
-def test_out_of_memory_when_writing():
-    p = psutil.Process(os.getpid())
-    dict1 = {"Exif.Image.ImageDescription": "test-中文-",
-             "Exif.Image.Orientation": "1"}
-    # m0 = p.memory_info().rss
-
-    for _ in range(1000):
-        Image(jpg_path).modify_exif(dict1)
-    m1 = p.memory_info().rss
-
-    for _ in range(1000):
-        Image(jpg_path).modify_exif(dict1)
-    m2 = p.memory_info().rss
-
-    assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
-
-
-def test_stack_overflow():
-    p = psutil.Process(os.getpid())
-    dict1 = {"Exif.Image.ImageDescription": "(test_stack_overflow)" * 1000,
-             "Exif.Image.Orientation": "0123456789" * 1000}
-    # m0 = p.memory_info().rss
-
-    for _ in range(10):
-        Image(jpg_path).modify_exif(dict1)
-    m1 = p.memory_info().rss
-
-    for _ in range(10):
-        Image(jpg_path).modify_exif(dict1)
-    m2 = p.memory_info().rss
-
-    # revert
-    dict1 = {"Exif.Image.ImageDescription": "test-中文-",
-             "Exif.Image.Orientation": "1"}
-    Image(jpg_path).modify_exif(dict1)
-
-    assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
-
-
-# def test_clear_and_revert():
-#     i = Image(jpg_path)
-#     all_dict = i.read_all()
-#     i.clear_all()
-#     for v in i.read_all().values():  # This is also a test to read empty data
-#         assert not v
-
-#     # revert
-#     i.modify_all(all_dict)
-#     new_dict = i.read_all()
-#     for sort in all_dict.keys():
-#         for key in all_dict[sort].keys():
-#             assert all_dict[sort][key] == new_dict[sort][key]
