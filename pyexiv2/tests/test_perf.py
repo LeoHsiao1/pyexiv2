@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from .test_func import *
+import psutil
+from .test_func import Image, os, path, jpg_path, setup_function, teardown_function, check_md5
 
 
 def test_out_of_memory_when_reading():
@@ -7,14 +8,15 @@ def test_out_of_memory_when_reading():
     # m0 = p.memory_info().rss
 
     for _ in range(1000):
-        Image(img_path).read_all()
+        Image(path).read_all()
     m1 = p.memory_info().rss
 
     for _ in range(1000):
-        Image(img_path).read_all()
+        Image(path).read_all()
     m2 = p.memory_info().rss
 
-    assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
+    assert ((m2 - m1) / m1) < 0.1, "memory increasing endlessly when reading"
+    assert check_md5(path, jpg_path), "The file has been changed when reading"
 
 
 def test_out_of_memory_when_writing():
@@ -24,14 +26,14 @@ def test_out_of_memory_when_writing():
     # m0 = p.memory_info().rss
 
     for _ in range(1000):
-        Image(img_path).modify_exif(dict1)
+        Image(path).modify_exif(dict1)
     m1 = p.memory_info().rss
 
     for _ in range(1000):
-        Image(img_path).modify_exif(dict1)
+        Image(path).modify_exif(dict1)
     m2 = p.memory_info().rss
 
-    assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
+    assert ((m2 - m1) / m1) < 0.1, "memory increasing endlessly when writing"
 
 
 def test_stack_overflow():
@@ -41,31 +43,33 @@ def test_stack_overflow():
     # m0 = p.memory_info().rss
 
     for _ in range(10):
-        Image(img_path).modify_exif(dict1)
+        Image(path).modify_exif(dict1)
     m1 = p.memory_info().rss
 
     for _ in range(10):
-        Image(img_path).modify_exif(dict1)
+        Image(path).modify_exif(dict1)
     m2 = p.memory_info().rss
 
     # revert
     dict1 = {"Exif.Image.ImageDescription": "test-中文-",
              "Exif.Image.Orientation": "1"}
-    Image(img_path).modify_exif(dict1)
+    Image(path).modify_exif(dict1)
 
-    assert ((m2 - m1) / m1) < 0.1, "memory increasing all the time"
+    assert ((m2 - m1) / m1) < 0.1, "memory increasing endlessly when reading"
 
 
-def __test_clear_and_revert():
-    i = Image(img_path)
+def _test_recover():
+    """ a strict test """
+    i = Image(path)
     all_dict = i.read_all()
     i.clear_all()
-    for v in i.read_all().values():  # This is also a test that reading empty data
+    for v in i.read_all().values():
         assert not v
 
-    # revert the image
+    # recover the metadata
     i.modify_all(all_dict)
     new_dict = i.read_all()
     for sort in all_dict.keys():
         for key in all_dict[sort].keys():
-            assert all_dict[sort][key] == new_dict[sort][key], "{} not reverted".format(key)
+            assert all_dict[sort][key] == new_dict[sort][key], "{} not recover".format(
+                key)
