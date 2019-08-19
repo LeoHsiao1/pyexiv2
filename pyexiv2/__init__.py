@@ -1,5 +1,6 @@
 """
-read and modify metadata of electronic image, including EXIF, IPTC, XMP.
+Read and modify metadata of digital image, including EXIF, IPTC, XMP.
+Please use the class `Image`.
 """
 
 

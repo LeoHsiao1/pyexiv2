@@ -9,6 +9,7 @@ dll_dir = os.path.join(os.path.dirname(__file__), "lib")
 SEP = "\t"  # separator
 EOL = "<<SEPARATOR>>\n"  # end of line
 
+# Recognize the system
 if sys.platform.startswith("linux"):
     ctypes.CDLL(os.path.join(dll_dir, "libexiv2.so"))  # import it at first
     api = ctypes.CDLL(os.path.join(dll_dir, "api.so"))
@@ -24,7 +25,7 @@ else:
 
 
 class Image:
-    """ Call the public methods and properties of this class. """
+    """ Call the public methods of this class. """
 
     def __init__(self, filename):
         self.filename = filename.encode(ENCODING)
@@ -45,36 +46,13 @@ class Image:
         return self._read_xmp()
 
     def read_all(self):
-        """ read all the metadata(including EXIF, IPTC, XMP). """
+        """ read all the metadata, return = {"EXIF":{...}, "IPTC":{...}, "XMP":{...}} """
         self._open_image()
         _dict = {"EXIF": self._read_exif(),
                  "IPTC": self._read_iptc(),
                  "XMP": self._read_xmp()
                  }
         return _dict
-
-    def clear_exif(self):
-        """ Once cleared, you may not be able to modify it. """
-        self._open_image()
-        self._clear_exif()
-
-    def clear_iptc(self):
-        """ Once cleared, you may never recover it. """
-        self._open_image()
-        self._clear_iptc()
-
-    def clear_xmp(self):
-        """ Once cleared, you will never be able to modify it.
-        Because the data about "history" was deleted. """
-        self._open_image()
-        self._clear_xmp()
-
-    def clear_all(self):
-        """ Once cleared, you may never recover it. """
-        self._open_image()
-        self._clear_exif()
-        self._clear_iptc()
-        self._clear_xmp()
 
     def modify_exif(self, exif_dict):
         self._open_image()
@@ -85,7 +63,8 @@ class Image:
         self._modify_iptc(iptc_dict)
 
     def modify_xmp(self, xmp_dict):
-        """ Keys that cannot be modified: 
+        """
+        Keys that cannot be modified: 
          - "Xmp.xmpMM.History"
         """
         self._open_image()
@@ -97,6 +76,28 @@ class Image:
         self._modify_exif(all_dict["EXIF"])
         self._modify_iptc(all_dict["IPTC"])
         self._modify_xmp(all_dict["XMP"])
+
+    def clear_exif(self):
+        """ Delete all EXIF data. Once cleared, pyexiv2 may not be able to recover it. """
+        self._open_image()
+        self._clear_exif()
+
+    def clear_iptc(self):
+        """ Delete all IPTC data. Once cleared, pyexiv2 may not be able to recover it. """
+        self._open_image()
+        self._clear_iptc()
+
+    def clear_xmp(self):
+        """ Delete all XMP data. Once cleared, pyexiv2 may not be able to recover it. """
+        self._open_image()
+        self._clear_xmp()
+
+    def clear_all(self):
+        """ Delete all the metadata. Once cleared, pyexiv2 may not be able to recover it. """
+        self._open_image()
+        self._clear_exif()
+        self._clear_iptc()
+        self._clear_xmp()
 
     def _char_API_void(self, api_name):
         exec("api.{}.restype = ctypes.c_char_p".format(api_name))
@@ -129,15 +130,6 @@ class Image:
         text = api.read_xmp().decode()
         return self._loads(text)
 
-    def _clear_exif(self):
-        self._char_API_void("clear_exif")
-
-    def _clear_iptc(self):
-        self._char_API_void("clear_iptc")
-
-    def _clear_xmp(self):
-        self._char_API_void("clear_xmp")
-
     def _modify_exif(self, exif_dict):
         text = self._dumps(exif_dict)
         buffer = ctypes.create_string_buffer(text.encode())
@@ -161,6 +153,15 @@ class Image:
         ret = api.modify_xmp(buffer).decode()
         if ret != '0':
             raise RuntimeError(ret)
+
+    def _clear_exif(self):
+        self._char_API_void("clear_exif")
+
+    def _clear_iptc(self):
+        self._char_API_void("clear_iptc")
+
+    def _clear_xmp(self):
+        self._char_API_void("clear_xmp")
 
     def _loads(self, text):
         if text.startswith("(Caught Exiv2 exception)"):

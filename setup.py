@@ -1,11 +1,12 @@
+# -*- coding: utf-8 -*-
 import setuptools
 
-with open("README.md") as f:
+with open("README.md", encoding="utf-8") as f:
     long_description = f.read()
 
 setuptools.setup(
     name="pyexiv2",
-    version="1.2.1",
+    version="1.2.2",
     author="LeoHsiao",
     author_email="leohsiao@foxmail.com",
     description="Read and modify metadata of digital image, including EXIF, IPTC, XMP.",
