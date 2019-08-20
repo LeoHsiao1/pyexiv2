@@ -13,7 +13,7 @@ path = os.path.join(current_dir, "tmp.jpg")
 
 
 def setup_function():
-    shutil.copyfile(jpg_path, path)
+    shutil.copy(jpg_path, path)
 
 
 def teardown_function():
@@ -46,7 +46,7 @@ def test_not_image_path():
 
 def test_chinese_path():
     chinese_path = os.path.join(current_dir, "1 - 副本.jpg")
-    os.link(path, chinese_path)
+    shutil.copy(path, chinese_path)
     _dict = {}
     try:
         i = Image(chinese_path)
