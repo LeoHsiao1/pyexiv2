@@ -3,7 +3,7 @@ import psutil
 from .test_func import Image, os, path, jpg_path, setup_function, teardown_function, check_md5
 
 
-def test_out_of_memory_when_reading():
+def test_memory_leak_when_reading():
     p = psutil.Process(os.getpid())
     # m0 = p.memory_info().rss
 
@@ -15,11 +15,11 @@ def test_out_of_memory_when_reading():
         Image(path).read_all()
     m2 = p.memory_info().rss
 
-    assert ((m2 - m1) / m1) < 0.1, "memory increasing endlessly when reading"
+    assert ((m2 - m1) / m1) < 0.1, "memory leaks when reading"
     assert check_md5(path, jpg_path), "The file has been changed when reading"
 
 
-def test_out_of_memory_when_writing():
+def test_memory_leak_when_writing():
     p = psutil.Process(os.getpid())
     dict1 = {"Exif.Image.ImageDescription": "test-中文-",
              "Exif.Image.Orientation": "1"}
@@ -33,7 +33,7 @@ def test_out_of_memory_when_writing():
         Image(path).modify_exif(dict1)
     m2 = p.memory_info().rss
 
-    assert ((m2 - m1) / m1) < 0.1, "memory increasing endlessly when writing"
+    assert ((m2 - m1) / m1) < 0.1, "memory leaks when writing"
 
 
 def test_stack_overflow():

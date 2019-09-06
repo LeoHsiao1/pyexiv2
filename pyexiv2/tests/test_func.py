@@ -17,7 +17,7 @@ def setup_function():
 
 
 def teardown_function():
-    # assert check_md5(path, jpg_path), "The file has been changed when reading"
+    # assert check_md5(path, jpg_path), "The file has been changed"
     os.remove(path)
 
 
@@ -54,28 +54,27 @@ def test_chinese_path():
     finally:
         os.remove(chinese_path)
         assert _dict
-        assert check_md5(
-            path, jpg_path), "The file has been changed when reading"
+        assert check_md5(path, jpg_path), "The file has been changed when reading"
 
 
 def test_read_exif():
     i = Image(path)
     _dict = i.read_exif()
-    assert _dict["Exif.Image.DateTime"]
+    assert _dict.get("Exif.Image.DateTime") == "2019:08:12 19:44:04"
     assert check_md5(path, jpg_path), "The file has been changed when reading"
 
 
 def test_read_iptc():
     i = Image(path)
     _dict = i.read_iptc()
-    assert _dict["Iptc.Application2.TimeCreated"]
+    assert _dict.get("Iptc.Application2.TimeCreated") == "19:44:04+00:00"
     assert check_md5(path, jpg_path), "The file has been changed when reading"
 
 
 def test_read_xmp():
     i = Image(path)
     _dict = i.read_xmp()
-    assert _dict["Xmp.xmp.CreateDate"]
+    assert _dict.get("Xmp.xmp.CreateDate") == "2019-08-12T19:44:04.176"
     assert check_md5(path, jpg_path), "The file has been changed when reading"
 
 
@@ -89,58 +88,31 @@ def test_read_all():
 def test_modify_exif():
     i = Image(path)
     dict1 = {"Exif.Image.ImageDescription": "test-中文-",
-             "Exif.Image.Orientation": "1"}
+             "Exif.Image.Artist": ""}
     i.modify_exif(dict1)
     _dict = i.read_exif()
-    for k, v in dict1.items():
-        assert v == _dict[k], "failed to set value"
-
-    dict2 = dict1.copy()
-    for k in dict2.keys():
-        dict2[k] = ""
-    i.modify_exif(dict2)
-    _dict = i.read_exif()
-    for k in dict2.keys():
-        assert not _dict.get(k, None), "failed to delete key"
-    i.modify_exif(dict1)
+    assert _dict.get("Exif.Image.ImageDescription", "") == "test-中文-"
+    assert _dict.get("Exif.Image.Artist", "") == ""
 
 
 def test_modify_iptc():
     i = Image(path)
     dict1 = {"Iptc.Application2.ObjectName": "test-中文-",
-             "Iptc.Application2.Keywords": "test-中文-"}
+             "Iptc.Application2.Keywords": ""}
     i.modify_iptc(dict1)
     _dict = i.read_iptc()
-    for k, v in dict1.items():
-        assert v == _dict[k], "failed to set value"
-
-    dict2 = dict1.copy()
-    for k in dict2.keys():
-        dict2[k] = ""
-    i.modify_iptc(dict2)
-    _dict = i.read_iptc()
-    for k in dict2.keys():
-        assert not _dict.get(k, None), "failed to delete key"
-    i.modify_iptc(dict1)
+    assert _dict.get("Iptc.Application2.ObjectName", "") == "test-中文-"
+    assert _dict.get("Iptc.Application2.Keywords", "") == ""
 
 
 def test_modify_xmp():
     i = Image(path)
-    dict1 = {"Xmp.xmp.Rating": "5",
-             "Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834"}
+    dict1 = {"Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834",
+             "Xmp.xmp.Rating": ""}
     i.modify_xmp(dict1)
     _dict = i.read_xmp()
-    for k, v in dict1.items():
-        assert v == _dict[k], "failed to set value"
-
-    dict2 = dict1.copy()
-    for k in dict2.keys():
-        dict2[k] = ""
-    i.modify_xmp(dict2)
-    _dict = i.read_xmp()
-    for k in dict2.keys():
-        assert not _dict.get(k, None), "failed to delete key"
-    i.modify_xmp(dict1)
+    assert _dict.get("Xmp.xmp.CreateDate", "") == "2019-06-23T19:45:17.834"
+    assert _dict.get("Xmp.xmp.Rating", "") == ""
 
 
 def test_clear_all():
