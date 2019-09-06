@@ -54,27 +54,28 @@ def test_chinese_path():
     finally:
         os.remove(chinese_path)
         assert _dict
-        assert check_md5(path, jpg_path), "The file has been changed when reading"
+        assert check_md5(
+            path, jpg_path), "The file has been changed when reading"
 
 
 def test_read_exif():
     i = Image(path)
     _dict = i.read_exif()
-    assert _dict.get("Exif.Image.DateTime") == "2019:08:12 19:44:04"
+    assert _dict.get("Exif.Image.DateTime", None) == "2019:08:12 19:44:04"
     assert check_md5(path, jpg_path), "The file has been changed when reading"
 
 
 def test_read_iptc():
     i = Image(path)
     _dict = i.read_iptc()
-    assert _dict.get("Iptc.Application2.TimeCreated") == "19:44:04+00:00"
+    assert _dict.get("Iptc.Application2.TimeCreated", None) == "19:44:04+00:00"
     assert check_md5(path, jpg_path), "The file has been changed when reading"
 
 
 def test_read_xmp():
     i = Image(path)
     _dict = i.read_xmp()
-    assert _dict.get("Xmp.xmp.CreateDate") == "2019-08-12T19:44:04.176"
+    assert _dict.get("Xmp.xmp.CreateDate", None) == "2019-08-12T19:44:04.176"
     assert check_md5(path, jpg_path), "The file has been changed when reading"
 
 
@@ -91,8 +92,8 @@ def test_modify_exif():
              "Exif.Image.Artist": ""}
     i.modify_exif(dict1)
     _dict = i.read_exif()
-    assert _dict.get("Exif.Image.ImageDescription", "") == "test-中文-"
-    assert _dict.get("Exif.Image.Artist", "") == ""
+    assert _dict.get("Exif.Image.ImageDescription", None) == "test-中文-"
+    assert _dict.get("Exif.Image.Artist", None) == None
 
 
 def test_modify_iptc():
@@ -101,8 +102,8 @@ def test_modify_iptc():
              "Iptc.Application2.Keywords": ""}
     i.modify_iptc(dict1)
     _dict = i.read_iptc()
-    assert _dict.get("Iptc.Application2.ObjectName", "") == "test-中文-"
-    assert _dict.get("Iptc.Application2.Keywords", "") == ""
+    assert _dict.get("Iptc.Application2.ObjectName", None) == "test-中文-"
+    assert _dict.get("Iptc.Application2.Keywords", None) == None
 
 
 def test_modify_xmp():
@@ -111,8 +112,8 @@ def test_modify_xmp():
              "Xmp.xmp.Rating": ""}
     i.modify_xmp(dict1)
     _dict = i.read_xmp()
-    assert _dict.get("Xmp.xmp.CreateDate", "") == "2019-06-23T19:45:17.834"
-    assert _dict.get("Xmp.xmp.Rating", "") == ""
+    assert _dict.get("Xmp.xmp.CreateDate", None) == "2019-06-23T19:45:17.834"
+    assert _dict.get("Xmp.xmp.Rating", None) == None
 
 
 def test_clear_all():
