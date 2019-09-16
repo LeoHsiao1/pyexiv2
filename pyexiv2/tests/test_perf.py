@@ -59,7 +59,7 @@ def test_stack_overflow():
 
 
 def _test_recover():
-    """ a strict test """
+    """ a strict test, for whether it can delete metadata and recover it completely. """
     i = Image(path)
     all_dict = i.read_all()
     i.clear_all()

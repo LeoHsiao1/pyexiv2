@@ -9,7 +9,7 @@ setuptools.setup(
     version="1.2.2",
     author="LeoHsiao",
     author_email="leohsiao@foxmail.com",
-    description="Read and modify metadata of digital image, including EXIF, IPTC, XMP.",
+    description="Read/Write metadata of digital image, including EXIF, IPTC, XMP.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/LeoHsiao1/pyexiv2",

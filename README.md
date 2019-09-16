@@ -1,13 +1,13 @@
 # pyexiv2
 
-Read and modify metadata of digital image, including EXIF, IPTC, XMP.
+Read/Write metadata of digital image, including EXIF, IPTC, XMP.
 
 - install: `pip install pyexiv2`
 - [source code on github](https://github.com/LeoHsiao1/pyexiv2)
 
 ## Features
 
-- Runs on C++ API of [exiv2](https://www.exiv2.org/index.html).
+- Runs on C++ API of [Exiv2](https://www.exiv2.org/index.html).
 - Supports running on Linux 64bit.
 - Supports running on Windows 64bit, with Python3(64bit).
 - [Supports various metadata](https://www.exiv2.org/metadata.html)
@@ -21,7 +21,6 @@ Read and modify metadata of digital image, including EXIF, IPTC, XMP.
 
     ```python
     >>> from pyexiv2 import Image
-
     >>> i = Image("tests/1.jpg")
     >>> i.read_exif()
     {'Exif.Image.DateTime': '2019:06:23 19:45:17', 'Exif.Image.Artist': 'TEST', 'Exif.Image.Rating': '4', ...}
@@ -37,10 +36,9 @@ Read and modify metadata of digital image, including EXIF, IPTC, XMP.
     >>> # prepare the XMP data you want to modify
     >>> _dict = {"Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834",   # this will overwrite its original value, or add it if it doesn't exist
     ...          "Xmp.xmp.Rating": ""}  # set an empty str explicitly to delete the datum
-    }
-
     >>> i.modify_xmp(_dict)
-    >>> xmp_dict = i.read_xmp()         # read it again
+    >>> # check the result
+    >>> xmp_dict = i.read_xmp()
     >>> xmp_dict["Xmp.xmp.CreateDate"]
     '2019-06-23T19:45:17.834'           # it has been set
     >>> xmp_dict["Xmp.xmp.Rating"]
