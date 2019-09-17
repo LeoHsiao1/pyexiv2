@@ -8,13 +8,14 @@
 #include <string>
 #include <sstream>
 
-#define API extern "C" // on Linux
-//#define API extern "C" __declspec(dllexport) // on Windows
+// #define API extern "C" // on Linux
+#define API extern "C" __declspec(dllexport) // on Windows
 
 char *buffer = 0;
 Exiv2::Image::AutoPtr image;
-std::string SEP("\t"); // separator
-std::string EOL("<<SEPARATOR>>\n");
+std::string SEP = "\t";
+std::string EOL = "\v \r";	
+std::string EOL_replaced = "\v  \r";
 char ZERO = '0';
 
 int free_buffer(void)
@@ -38,6 +39,20 @@ char *make_buffer(std::string str)
 	return buffer;
 }
 
+// replace the substring repeatedly
+std::string &replace_all(std::string &str, const std::string &src, const std::string &dest)
+{
+	while (true)
+	{
+		std::string::size_type pos(0);
+		if ((pos = str.find(src)) != std::string::npos)
+			str.replace(pos, src.length(), dest);
+		else
+			break;
+	}
+	return str;
+}
+
 API char *open_image(char *const file) try
 {
 	image = Exiv2::ImageFactory::open(file);
@@ -59,14 +74,15 @@ catch (Exiv2::Error &e)
 API char *read_exif(void) try
 {
 	Exiv2::ExifData &exifData = image->exifData();
-	std::stringstream data;
+	std::stringstream data, value;
 	Exiv2::ExifData::iterator end = exifData.end();
 	for (Exiv2::ExifData::iterator i = exifData.begin(); i != end; ++i)
 	{
-		//add data with separators
-		data << i->key() << "\t"
-			 << i->value() << "<<SEPARATOR>>\n";
-			 //<< i->typeName() << "\t"	// Some metadata does not have this property, causing the program to crash
+		std::stringstream ss;
+		ss << i->value();
+		std::string value = ss.str();
+		data << i->key() << SEP
+			 << replace_all(value, EOL, EOL_replaced) << EOL;
 	}
 	return make_buffer(data.str());
 }
@@ -84,8 +100,11 @@ API char *read_iptc(void) try
 	Exiv2::IptcData::iterator end = iptcData.end();
 	for (Exiv2::IptcData::iterator i = iptcData.begin(); i != end; ++i)
 	{
-		data << i->key() << "\t"
-			 << i->value() << "<<SEPARATOR>>\n";
+		std::stringstream ss;
+		ss << i->value();
+		std::string value = ss.str();
+		data << i->key() << SEP
+			 << replace_all(value, EOL, EOL_replaced) << EOL;
 	}
 	return make_buffer(data.str());
 }
@@ -103,8 +122,11 @@ API char *read_xmp(void) try
 	Exiv2::XmpData::iterator end = xmpData.end();
 	for (Exiv2::XmpData::iterator i = xmpData.begin(); i != end; ++i)
 	{
-		data << i->key() << "\t"
-			 << i->value() << "<<SEPARATOR>>\n";
+		std::stringstream ss;
+		ss << i->value();
+		std::string value = ss.str();
+		data << i->key() << SEP
+			 << replace_all(value, EOL, EOL_replaced) << EOL;
 	}
 	return make_buffer(data.str());
 }

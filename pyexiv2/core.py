@@ -7,7 +7,8 @@ import sys
 
 dll_dir = os.path.join(os.path.dirname(__file__), "lib")
 SEP = "\t"  # separator
-EOL = "<<SEPARATOR>>\n"  # end of line
+EOL = "\v \r"  # use a weird symbol as EOL
+EOL_replaced = "\v  \r" # If the original metadata contains EOL, replace it with this symbol
 
 # Recognize the system
 if sys.platform.startswith("linux"):
@@ -166,17 +167,24 @@ class Image:
     def _loads(self, text):
         if text.startswith("(Caught Exiv2 exception)"):
             raise RuntimeError(text)
-        _dict = {}  # only save the key and value
+        _dict = {}
         lines = text.split(EOL)[:-1]  # the last line is empty
         for line in lines:
             # There are 2 fields: key, value
-            # split with an exact count, watch out for extra '\t' in the last field
             fields = line.split(SEP, 1)
             _dict[fields[0]] = fields[1]
         return _dict
 
-    def _dumps(self, dict_):
+    def _dumps(self, _dict):
         text = ""
-        for k, v in dict_.items():
+        for k, v in _dict.items():
+            v = replace_all(v, EOL, EOL_replaced)
             text += k + SEP + v + EOL
         return text
+
+
+def replace_all(text, src, dest):
+    result = text
+    while src in result:
+        result = result.replace(src, dest)
+    return result
