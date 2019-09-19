@@ -8,7 +8,7 @@ import sys
 dll_dir = os.path.join(os.path.dirname(__file__), "lib")
 SEP = "\t"  # separator
 EOL = "\v\n\r"  # use a weird symbol as EOL
-EOL_replaced = "\v \n\r"  # If the original metadata contains EOL, replace it with this symbol
+EOL_replaced = "\v \n\r"  # If the metadata contains EOL, replace it with this symbol
 EXCEPTION_HINT = "(Caught Exiv2 exception) "
 OK = "OK"
 
@@ -66,10 +66,6 @@ class Image:
         self._modify_iptc(iptc_dict)
 
     def modify_xmp(self, xmp_dict):
-        """
-        Keys that cannot be modified: 
-         - "Xmp.xmpMM.History"
-        """
         self._open_image()
         self._modify_xmp(xmp_dict)
 

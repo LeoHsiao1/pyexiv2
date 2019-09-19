@@ -13,7 +13,6 @@ Read/Write metadata of digital image, including EXIF, IPTC, XMP.
 - [Supports various metadata](https://www.exiv2.org/metadata.html)
 - [Supports various image formats](https://dev.exiv2.org/projects/exiv2/wiki/Supported_image_formats)
 - Supports Unicode characters that contained in image paths and data.
-- Not thread-safe, because some global variables have been used.
 
 ## Usage
 
@@ -46,7 +45,6 @@ Read/Write metadata of digital image, including EXIF, IPTC, XMP.
     ```
 
     - Use i.modify_exif() and i.modify_iptc() in the same way.
-    - Can't modify some special metadata.
 
 - In short, please call the public methods of class `pyexiv2.Image` :
 
@@ -65,6 +63,8 @@ Read/Write metadata of digital image, including EXIF, IPTC, XMP.
     i.clear_xmp()
     i.clear_all()
     ```
+
+- [More Details](./MoreDetails.md)
 
 ## Tests
 
