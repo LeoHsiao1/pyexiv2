@@ -7,8 +7,10 @@ import sys
 
 dll_dir = os.path.join(os.path.dirname(__file__), "lib")
 SEP = "\t"  # separator
-EOL = "\v \r"  # use a weird symbol as EOL
-EOL_replaced = "\v  \r" # If the original metadata contains EOL, replace it with this symbol
+EOL = "\v\n\r"  # use a weird symbol as EOL
+EOL_replaced = "\v \n\r"  # If the original metadata contains EOL, replace it with this symbol
+EXCEPTION_HINT = "(Caught Exiv2 exception) "
+OK = "OK"
 
 # Recognize the system
 if sys.platform.startswith("linux"):
@@ -103,14 +105,14 @@ class Image:
     def _char_API_void(self, api_name):
         exec("api.{}.restype = ctypes.c_char_p".format(api_name))
         exec("ret = api.{}().decode()".format(api_name))
-        exec("if ret != '0': raise RuntimeError(ret)")
+        exec("if ret != OK: raise RuntimeError(ret)")
 
     def _open_image(self):
         """ Let C++ program open an image and read its metadata,
         save as a global variable in C + +program. """
         api.open_image.restype = ctypes.c_char_p
         ret = api.open_image(self.filename).decode()
-        if ret != '0':
+        if ret != OK:
             raise RuntimeError(ret)
 
     def _read_exif(self):
@@ -136,7 +138,7 @@ class Image:
         buffer = ctypes.create_string_buffer(text.encode())
         api.modify_exif.restype = ctypes.c_char_p
         ret = api.modify_exif(buffer).decode()
-        if ret != '0':
+        if ret != OK:
             raise RuntimeError(ret)
 
     def _modify_iptc(self, iptc_dict):
@@ -144,7 +146,7 @@ class Image:
         buffer = ctypes.create_string_buffer(text.encode())
         api.modify_iptc.restype = ctypes.c_char_p
         ret = api.modify_iptc(buffer).decode()
-        if ret != '0':
+        if ret != OK:
             raise RuntimeError(ret)
 
     def _modify_xmp(self, xmp_dict):
@@ -152,20 +154,29 @@ class Image:
         buffer = ctypes.create_string_buffer(text.encode())
         api.modify_xmp.restype = ctypes.c_char_p
         ret = api.modify_xmp(buffer).decode()
-        if ret != '0':
+        if ret != OK:
             raise RuntimeError(ret)
 
     def _clear_exif(self):
-        self._char_API_void("clear_exif")
+        api.clear_exif.restype = ctypes.c_char_p
+        ret = api.clear_exif().decode()
+        if ret != OK:
+            raise RuntimeError(ret)
 
     def _clear_iptc(self):
-        self._char_API_void("clear_iptc")
+        api.clear_iptc.restype = ctypes.c_char_p
+        ret = api.clear_iptc().decode()
+        if ret != OK:
+            raise RuntimeError(ret)
 
     def _clear_xmp(self):
-        self._char_API_void("clear_xmp")
+        api.clear_xmp.restype = ctypes.c_char_p
+        ret = api.clear_xmp().decode()
+        if ret != OK:
+            raise RuntimeError(ret)
 
     def _loads(self, text):
-        if text.startswith("(Caught Exiv2 exception)"):
+        if text.startswith(EXCEPTION_HINT):
             raise RuntimeError(text)
         _dict = {}
         lines = text.split(EOL)[:-1]  # the last line is empty

@@ -1,43 +1,18 @@
 #include <exiv2/exiv2.hpp>
 
-#include <iostream>
-#include <iomanip>
-#include <cassert>
-
-#include <stdlib.h>
 #include <string>
 #include <sstream>
 
 // #define API extern "C" // on Linux
 #define API extern "C" __declspec(dllexport) // on Windows
 
-char *buffer = 0;
+const std::string SEP = "\t";
+const std::string EOL = "\v\n\r";
+const std::string EOL_replaced = "\v \n\r";
+const char *EXCEPTION_HINT = "(Caught Exiv2 exception) ";
+const char *OK = "OK";
 Exiv2::Image::AutoPtr image;
-std::string SEP = "\t";
-std::string EOL = "\v \r";	
-std::string EOL_replaced = "\v  \r";
-char ZERO = '0';
-
-int free_buffer(void)
-{
-	if (buffer)
-	{
-		free(buffer);
-		buffer = NULL;
-	}
-	return 0;
-}
-
-// Convert string to char array
-char *make_buffer(std::string str)
-{
-	if (buffer)
-		free_buffer(); // free it automatically
-	buffer = (char *)malloc(str.length());
-	memset(buffer, 0, str.length());
-	strcpy(buffer, str.c_str());
-	return buffer;
-}
+std::string ret;
 
 // replace the substring repeatedly
 std::string &replace_all(std::string &str, const std::string &src, const std::string &dest)
@@ -53,7 +28,7 @@ std::string &replace_all(std::string &str, const std::string &src, const std::st
 	return str;
 }
 
-API char *open_image(char *const file) try
+API const char *open_image(const char *file) try
 {
 	image = Exiv2::ImageFactory::open(file);
 	if (image.get() == 0)
@@ -62,124 +37,137 @@ API char *open_image(char *const file) try
 		throw Exiv2::Error(Exiv2::kerErrorMessage, error);
 	}
 	image->readMetadata();
-	return &ZERO;
+	return OK;
 }
 catch (Exiv2::Error &e)
 {
-	std::stringstream error;
-	error << "(Caught Exiv2 exception) " << e.what();
-	return make_buffer(error.str());
+	std::stringstream ss;
+	ss << EXCEPTION_HINT << e.what();
+	ret = ss.str();
+	return ret.c_str();
 }
 
-API char *read_exif(void) try
+API const char *read_exif(void) try
 {
-	Exiv2::ExifData &exifData = image->exifData();
-	std::stringstream data, value;
-	Exiv2::ExifData::iterator end = exifData.end();
-	for (Exiv2::ExifData::iterator i = exifData.begin(); i != end; ++i)
+	Exiv2::ExifData &data = image->exifData();
+	Exiv2::ExifData::iterator i = data.begin();
+	Exiv2::ExifData::iterator end = data.end();
+	std::stringstream ss;
+	for (; i != end; ++i)
 	{
-		std::stringstream ss;
-		ss << i->value();
-		std::string value = ss.str();
-		data << i->key() << SEP
-			 << replace_all(value, EOL, EOL_replaced) << EOL;
+		std::stringstream _ss;
+		_ss << i->value();
+		std::string _str = _ss.str();	// convert to string
+		ss << i->key() << SEP
+		   << replace_all(_str, EOL, EOL_replaced) << EOL;
 	}
-	return make_buffer(data.str());
+	ret = ss.str();
+	return ret.c_str();
 }
 catch (Exiv2::Error &e)
 {
-	std::stringstream error;
-	error << "(Caught Exiv2 exception) " << e.what();
-	return make_buffer(error.str());
+	std::stringstream ss;
+	ss << EXCEPTION_HINT << e.what();
+	ret = ss.str();
+	return ret.c_str();
 }
 
-API char *read_iptc(void) try
+API const char *read_iptc(void) try
 {
-	Exiv2::IptcData &iptcData = image->iptcData();
-	std::stringstream data;
-	Exiv2::IptcData::iterator end = iptcData.end();
-	for (Exiv2::IptcData::iterator i = iptcData.begin(); i != end; ++i)
+	Exiv2::IptcData &data = image->iptcData();
+	Exiv2::IptcData::iterator i = data.begin();
+	Exiv2::IptcData::iterator end = data.end();
+	std::stringstream ss;
+	for (; i != end; ++i)
 	{
-		std::stringstream ss;
-		ss << i->value();
-		std::string value = ss.str();
-		data << i->key() << SEP
-			 << replace_all(value, EOL, EOL_replaced) << EOL;
+		std::stringstream _ss;
+		_ss << i->value();
+		std::string _str = _ss.str();
+		ss << i->key() << SEP
+		   << replace_all(_str, EOL, EOL_replaced) << EOL;
 	}
-	return make_buffer(data.str());
+	ret = ss.str();
+	return ret.c_str();
 }
 catch (Exiv2::Error &e)
 {
-	std::stringstream error;
-	error << "(Caught Exiv2 exception) " << e.what();
-	return make_buffer(error.str());
+	std::stringstream ss;
+	ss << EXCEPTION_HINT << e.what();
+	ret = ss.str();
+	return ret.c_str();
 }
 
-API char *read_xmp(void) try
+API const char *read_xmp(void) try
 {
-	Exiv2::XmpData &xmpData = image->xmpData();
-	std::stringstream data;
-	Exiv2::XmpData::iterator end = xmpData.end();
-	for (Exiv2::XmpData::iterator i = xmpData.begin(); i != end; ++i)
+	Exiv2::XmpData &data = image->xmpData();
+	Exiv2::XmpData::iterator i = data.begin();
+	Exiv2::XmpData::iterator end = data.end();
+	std::stringstream ss;
+	for (; i != end; ++i)
 	{
-		std::stringstream ss;
-		ss << i->value();
-		std::string value = ss.str();
-		data << i->key() << SEP
-			 << replace_all(value, EOL, EOL_replaced) << EOL;
+		std::stringstream _ss;
+		_ss << i->value();
+		std::string _str = _ss.str();
+		ss << i->key() << SEP
+		   << replace_all(_str, EOL, EOL_replaced) << EOL;
 	}
-	return make_buffer(data.str());
+	ret = ss.str();
+	return ret.c_str();
 }
 catch (Exiv2::Error &e)
 {
-	std::stringstream error;
-	error << "(Caught Exiv2 exception) " << e.what();
-	return make_buffer(error.str());
+	std::stringstream ss;
+	ss << EXCEPTION_HINT << e.what();
+	ret = ss.str();
+	return ret.c_str();
 }
 
-API char *clear_exif(void) try
+API const char *clear_exif(void) try
 {
 	Exiv2::ExifData exifData; // an empty container for exif metadata
 	image->setExifData(exifData);
 	image->writeMetadata();
-	return &ZERO;
+	return OK;
 }
 catch (Exiv2::Error &e)
 {
-	std::stringstream error;
-	error << "(Caught Exiv2 exception) " << e.what();
-	return make_buffer(error.str());
+	std::stringstream ss;
+	ss << EXCEPTION_HINT << e.what();
+	ret = ss.str();
+	return ret.c_str();
 }
 
-API char *clear_iptc(void) try
+API const char *clear_iptc(void) try
 {
 	Exiv2::IptcData iptcData;
 	image->setIptcData(iptcData);
 	image->writeMetadata();
-	return &ZERO;
+	return OK;
 }
 catch (Exiv2::Error &e)
 {
-	std::stringstream error;
-	error << "(Caught Exiv2 exception) " << e.what();
-	return make_buffer(error.str());
+	std::stringstream ss;
+	ss << EXCEPTION_HINT << e.what();
+	ret = ss.str();
+	return ret.c_str();
 }
 
-API char *clear_xmp(void) try
+API const char *clear_xmp(void) try
 {
 	Exiv2::XmpData xmpData;
 	image->setXmpData(xmpData);
 	image->writeMetadata();
-	return &ZERO;
+	return OK;
 }
 catch (Exiv2::Error &e)
 {
-	std::stringstream error;
-	error << "(Caught Exiv2 exception) " << e.what();
-	return make_buffer(error.str());
+	std::stringstream ss;
+	ss << EXCEPTION_HINT << e.what();
+	ret = ss.str();
+	return ret.c_str();
 }
 
-API char *modify_exif(char *const buffer) try
+API const char *modify_exif(const char *buffer) try
 {
 	Exiv2::ExifData &exifData = image->exifData();
 	std::string text(buffer);
@@ -214,16 +202,17 @@ API char *modify_exif(char *const buffer) try
 	}
 	image->setExifData(exifData);
 	image->writeMetadata();
-	return &ZERO;
+	return OK;
 }
 catch (Exiv2::Error &e)
 {
-	std::stringstream error;
-	error << "(Caught Exiv2 exception) " << e.what();
-	return make_buffer(error.str());
+	std::stringstream ss;
+	ss << EXCEPTION_HINT << e.what();
+	ret = ss.str();
+	return ret.c_str();
 }
 
-API char *modify_iptc(char *const buffer) try
+API const char *modify_iptc(const char *buffer) try
 {
 	Exiv2::IptcData &iptcData = image->iptcData();
 	std::string text(buffer);
@@ -253,16 +242,17 @@ API char *modify_iptc(char *const buffer) try
 	}
 	image->setIptcData(iptcData);
 	image->writeMetadata();
-	return &ZERO;
+	return OK;
 }
 catch (Exiv2::Error &e)
 {
-	std::stringstream error;
-	error << "(Caught Exiv2 exception) " << e.what();
-	return make_buffer(error.str());
+	std::stringstream ss;
+	ss << EXCEPTION_HINT << e.what();
+	ret = ss.str();
+	return ret.c_str();
 }
 
-API char *modify_xmp(char *const buffer) try
+API const char *modify_xmp(const char *buffer) try
 {
 	Exiv2::XmpData &xmpData = image->xmpData();
 	std::string text(buffer);
@@ -292,11 +282,12 @@ API char *modify_xmp(char *const buffer) try
 	}
 	image->setXmpData(xmpData);
 	image->writeMetadata();
-	return &ZERO;
+	return OK;
 }
 catch (Exiv2::Error &e)
 {
-	std::stringstream error;
-	error << "(Caught Exiv2 exception) " << e.what();
-	return make_buffer(error.str());
+	std::stringstream ss;
+	ss << EXCEPTION_HINT << e.what();
+	ret = ss.str();
+	return ret.c_str();
 }

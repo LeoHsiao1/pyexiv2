@@ -37,7 +37,7 @@ TODO:
     g++ -std=c++98 api.cpp -o api.so -shared -fPIC -I $PWD/include -L $PWD/lib -l Exiv2
     ```
 
-5. Copy `lib/libexiv2.so` and `api.so` to here.
+5. Copy `lib/libexiv2.so` and `api.so` to the this folder.
 
 ---
 
@@ -75,4 +75,4 @@ TODO:
     cl /MD /LD api.cpp /EHsc -I include /link lib/exiv2.lib
     ```
 
-7. Copy `bin/exiv2.dll` and `api.dll` to here.
+7. Copy `bin/exiv2.dll` and `api.dll` to the this folder.

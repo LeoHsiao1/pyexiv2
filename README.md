@@ -43,9 +43,10 @@ Read/Write metadata of digital image, including EXIF, IPTC, XMP.
     '2019-06-23T19:45:17.834'           # it has been set
     >>> xmp_dict["Xmp.xmp.Rating"]
     KeyError: 'Xmp.xmp.Rating'          # it has been deleted
-
-    # use i.modify_exif() and i.modify_iptc() in the same way
     ```
+
+    - Use i.modify_exif() and i.modify_iptc() in the same way.
+    - Can't modify some special metadata.
 
 - In short, please call the public methods of class `pyexiv2.Image` :
 
