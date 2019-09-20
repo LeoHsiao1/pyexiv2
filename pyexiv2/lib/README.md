@@ -1,8 +1,9 @@
-# About These Libraries
+# About The Library
 
 - `api.cpp` : wrote by the programmer.
 - `api.so` , `api.dll` : compiled from api.cpp, will be called by Python program.
-- `libexiv2.so` , `exiv2.dll` : copied from the release version of Exiv2 project.(The current version is 0.27.2)
+- `libexiv2.so` , `exiv2.dll` : copied from the release version of Exiv2 project.
+  - The current version is Exiv2 0.27.2.
 
 ---
 
@@ -12,7 +13,6 @@ TODO:
 
 - Remove some duplicate code
 - Do not use global variables, to become thread-safe
-- Maybe use some C++ classes, callback functions
 
 ---
 
@@ -37,7 +37,7 @@ TODO:
     g++ -std=c++98 api.cpp -o api.so -shared -fPIC -I $PWD/include -L $PWD/lib -l Exiv2
     ```
 
-5. Copy `lib/libexiv2.so` and `api.so` to the this folder.
+5. Copy `lib/libexiv2.so` and `api.so` to the this folder `pyexiv2/lib/`.
 
 ---
 
@@ -75,4 +75,4 @@ TODO:
     cl /MD /LD api.cpp /EHsc -I include /link lib/exiv2.lib
     ```
 
-7. Copy `bin/exiv2.dll` and `api.dll` to the this folder.
+7. Copy `bin/exiv2.dll` and `api.dll` to the this folder `pyexiv2/lib/`.

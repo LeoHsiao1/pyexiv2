@@ -81,8 +81,10 @@ def test_read_xmp():
 
 def test_read_all():
     i = Image(path)
-    for v in i.read_all().values():
-        assert v
+    all_dict = i.read_all()
+    assert all_dict["EXIF"].get("Exif.Image.DateTime") == "2019:08:12 19:44:04"
+    assert all_dict["IPTC"].get("Iptc.Application2.TimeCreated") == "19:44:04+00:00"
+    assert all_dict["XMP"].get("Xmp.xmp.CreateDate") == "2019-08-12T19:44:04.176"
     assert check_md5(path, jpg_path), "The file has been changed when reading"
 
 
@@ -92,8 +94,8 @@ def test_modify_exif():
              "Exif.Image.Artist": ""}
     i.modify_exif(dict1)
     _dict = i.read_exif()
-    assert _dict.get("Exif.Image.ImageDescription") == "test-中文-"
-    assert _dict.get("Exif.Image.Artist") == None
+    for k, v in dict1.items():
+        assert _dict.get(k, "") == v
 
 
 def test_modify_iptc():
@@ -102,8 +104,8 @@ def test_modify_iptc():
              "Iptc.Application2.Keywords": ""}
     i.modify_iptc(dict1)
     _dict = i.read_iptc()
-    assert _dict.get("Iptc.Application2.ObjectName") == "test-中文-"
-    assert _dict.get("Iptc.Application2.Keywords") == None
+    for k, v in dict1.items():
+        assert _dict.get(k, "") == v
 
 
 def test_modify_xmp():
@@ -112,8 +114,23 @@ def test_modify_xmp():
              "Xmp.xmp.Rating": ""}
     i.modify_xmp(dict1)
     _dict = i.read_xmp()
-    assert _dict.get("Xmp.xmp.CreateDate") == "2019-06-23T19:45:17.834"
-    assert _dict.get("Xmp.xmp.Rating") == None
+    for k, v in dict1.items():
+        assert _dict.get(k, "") == v
+
+
+def test_modify_all():
+    i = Image(path)
+    all_dict = {"EXIF": {"Exif.Image.ImageDescription": "test-中文-",
+                         "Exif.Image.Artist": ""},
+                "IPTC": {"Iptc.Application2.ObjectName": "test-中文-",
+                         "Iptc.Application2.Keywords": ""},
+                "XMP": {"Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834",
+                        "Xmp.xmp.Rating": ""}}
+    i.modify_all(all_dict)
+    new_dict = i.read_all()
+    for sort in ["EXIF", "IPTC", "XMP"]:
+        for k, v in all_dict[sort].items():
+            assert new_dict[sort].get(k, "") == v
 
 
 def test_clear_all():
