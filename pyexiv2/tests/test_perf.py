@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import psutil
-import os
-from .test_func import Image, path, jpg_path, setup_function, teardown_function, check_md5
+
+from .common import *
 from . import test_func
 
 
+@check_md5
 def test_memory_leak_when_reading():
     p = psutil.Process(os.getpid())
 
@@ -17,7 +18,6 @@ def test_memory_leak_when_reading():
     m2 = p.memory_info().rss
 
     assert ((m2 - m1) / m1) < 0.01, "memory leaks when reading"
-    assert check_md5(path, jpg_path), "The file has been changed when reading"
 
 
 def test_memory_leak_when_writing():

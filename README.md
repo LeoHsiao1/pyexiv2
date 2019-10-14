@@ -64,7 +64,7 @@ Read/Write metadata of digital image, including EXIF, IPTC, XMP.
     i.clear_all()
     ```
 
-- [More Details](./MoreDetails.md)
+- [More Details](https://github.com/LeoHsiao1/pyexiv2/blob/master/MoreDetails.md)
 
 ## Tests
 
