@@ -20,5 +20,5 @@ Here are some details that have been identified.
 
 - Not thread-safe, because some global variables are used.
 - Some special metadata couldn't be converted to string type, making it uneditable.
-- If the metadata contains "\v\n\r", it will be replaced with "\v \n\r".
+- If the metadata contains "\v\f", it will be replaced with "\v\b".
 - if the XMP metadata contains '\v' or '\f', it will be replaced with space ' '.

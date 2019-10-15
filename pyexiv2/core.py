@@ -7,8 +7,8 @@ import sys
 
 dll_dir = os.path.join(os.path.dirname(__file__), "lib")
 SEP = "\t"  # separator
-EOL = "\v\n\r"  # use a weird symbol as EOL
-EOL_replaced = "\v \n\r"  # If the metadata contains EOL, replace it with this symbol
+EOL = "\v\f"  # use a weird symbol as EOL
+EOL_replaced = "\v\b"  # If the metadata contains EOL, replace it with this symbol
 EXCEPTION_HINT = "(Caught Exiv2 exception) "
 OK = "OK"
 
@@ -23,28 +23,27 @@ elif sys.platform.startswith("win"):
     api = ctypes.CDLL(os.path.join(dll_dir, "api.dll"))
     ENCODING = "gbk"
 else:
-    raise RuntimeError(
-        "Unknown platform. This module should run on Windows or Linux systems.")
+    raise RuntimeError("Unknown platform. This module should run on Linux or Windows.")
 
 
 class Image:
-    """ Call the public methods of this class. """
+    """ 
+    Creating an Image object just means recording the filename, not the actual operation.\n
+    Please call the public methods of class Image.
+    """
 
-    def __init__(self, filename):
+    def __init__(self, filename:str):
         self.filename = filename.encode(ENCODING)
 
-    def read_exif(self):
-        """ returns a dict """
+    def read_exif(self) -> dict:
         self._open_image()
         return self._read_exif()
 
-    def read_iptc(self):
-        """ returns a dict """
+    def read_iptc(self) -> dict:
         self._open_image()
         return self._read_iptc()
 
-    def read_xmp(self):
-        """ returns a dict """
+    def read_xmp(self) -> dict:
         self._open_image()
         return self._read_xmp()
 
@@ -172,21 +171,26 @@ class Image:
             raise RuntimeError(ret)
 
     def _loads(self, text):
+        """ Parses the return value of C++ API. """
         if text.startswith(EXCEPTION_HINT):
             raise RuntimeError(text)
         _dict = {}
         lines = text.split(EOL)[:-1]  # the last line is empty
         for line in lines:
-            # There are 2 fields: key, value
-            fields = line.split(SEP, 1)
-            _dict[fields[0]] = fields[1]
+            key, typename, value = line.split(SEP, 2)
+            if typename in ["XmpBag", "XmpSeq"]:
+                value = value.split(',')
+            _dict[key] = value
         return _dict
 
     def _dumps(self, _dict):
+        """ Converts the metadata to a text. """
         text = ""
-        for k, v in _dict.items():
-            v = replace_all(v, EOL, EOL_replaced)
-            text += k + SEP + v + EOL
+        for key, value in _dict.items():
+            value = replace_all(value, EOL, EOL_replaced)
+            if isinstance(value, (list, tuple)):
+                value = ','.join(value) # convert list to str
+            text += key + SEP + value + EOL
         return text
 
 
@@ -195,3 +199,4 @@ def replace_all(text, src, dest):
     while src in result:
         result = result.replace(src, dest)
     return result
+

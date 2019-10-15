@@ -21,10 +21,12 @@
 		std::stringstream ss;                                  \
 		for (; i != end; ++i)                                  \
 		{                                                      \
+			const char *typeName = i->typeName();              \
 			std::stringstream _ss;                             \
 			_ss << i->value();                                 \
 			std::string _str = _ss.str();                      \
 			ss << i->key() << SEP                              \
+			   << (typeName ? typeName : "Unknown") << SEP     \
 			   << replace_all(_str, EOL, EOL_replaced) << EOL; \
 		}                                                      \
 		ret = ss.str();                                        \
@@ -32,8 +34,8 @@
 	}
 
 const std::string SEP = "\t";
-const std::string EOL = "\v\n\r";
-const std::string EOL_replaced = "\v \n\r";
+const std::string EOL = "\v\f";
+const std::string EOL_replaced = "\v\b";
 const char *EXCEPTION_HINT = "(Caught Exiv2 exception) ";
 const char *OK = "OK";
 Exiv2::Image::AutoPtr image;
