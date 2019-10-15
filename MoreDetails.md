@@ -5,15 +5,12 @@ Here are some details that have been identified.
 ## Advantages
 
 - It is safe to use pyexiv2.Image.read_*(). These methods does not affect the image in any way. (md5 unchanged)
-- If you try to access a non-standard key, an exception may be reported.
+- If you try to access a non-standard key, an exception will be raised.
 
     ```python
     >>> i = Image(r"pyexiv2/tests/1.jpg")
     >>> i.modify_exif({"Exif.Image.myflag001": "test"})       # Unallowed
     RuntimeError: (Caught Exiv2 exception) Invalid tag name or ifdId `myflag001', ifdId 1
-    >>> i.modify_xmp({"Xmp.dc.myflag001": "test"})            # Allowed
-    >>> i.read_xmp().get("Xmp.dc.myflag001")
-    'test'
     ```
 
 ## Defects

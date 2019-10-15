@@ -48,6 +48,7 @@ def test_read_xmp():
     i = Image(path)
     _dict = i.read_xmp()
     assert _dict.get("Xmp.xmp.CreateDate") == "2019-08-12T19:44:04.176"
+    assert _dict.get("Xmp.dc.subject") == ["flag1", "flag2", "flag3"]
 
 
 @check_md5
@@ -57,6 +58,7 @@ def test_read_all():
     assert all_dict["EXIF"].get("Exif.Image.DateTime") == "2019:08:12 19:44:04"
     assert all_dict["IPTC"].get("Iptc.Application2.TimeCreated") == "19:44:04+00:00"
     assert all_dict["XMP"].get("Xmp.xmp.CreateDate") == "2019-08-12T19:44:04.176"
+    assert all_dict["XMP"].get("Xmp.dc.subject") == ["flag1", "flag2", "flag3"]
 
 
 def test_modify_exif():
@@ -82,7 +84,8 @@ def test_modify_iptc():
 def test_modify_xmp():
     i = Image(path)
     dict1 = {"Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834",
-             "Xmp.xmp.Rating": ""}
+             "Xmp.xmp.Rating": "",
+             "Xmp.dc.subject": ["flag1", "flag2", "flag3"]}
     i.modify_xmp(dict1)
     _dict = i.read_xmp()
     for k, v in dict1.items():
@@ -96,7 +99,9 @@ def test_modify_all():
                 "IPTC": {"Iptc.Application2.ObjectName": "test-中文-",
                          "Iptc.Application2.Keywords": ""},
                 "XMP": {"Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834",
-                        "Xmp.xmp.Rating": ""}}
+                        "Xmp.xmp.Rating": "",
+                        "Xmp.dc.subject": ["flag1", "flag2", "flag3"]}
+                }
     i.modify_all(all_dict)
     new_dict = i.read_all()
     for sort in ["EXIF", "IPTC", "XMP"]:

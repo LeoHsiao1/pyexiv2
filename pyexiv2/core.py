@@ -9,6 +9,7 @@ dll_dir = os.path.join(os.path.dirname(__file__), "lib")
 SEP = "\t"  # separator
 EOL = "\v\f"  # use a weird symbol as EOL
 EOL_replaced = "\v\b"  # If the metadata contains EOL, replace it with this symbol
+COMMA = ", "
 EXCEPTION_HINT = "(Caught Exiv2 exception) "
 OK = "OK"
 
@@ -171,7 +172,7 @@ class Image:
             raise RuntimeError(ret)
 
     def _loads(self, text):
-        """ Parses the return value of C++ API. """
+        """ Parses the return text of C++ API. """
         if text.startswith(EXCEPTION_HINT):
             raise RuntimeError(text)
         _dict = {}
@@ -179,7 +180,7 @@ class Image:
         for line in lines:
             key, typename, value = line.split(SEP, 2)
             if typename in ["XmpBag", "XmpSeq"]:
-                value = value.split(',')
+                value = value.split(COMMA)
             _dict[key] = value
         return _dict
 
@@ -187,10 +188,12 @@ class Image:
         """ Converts the metadata to a text. """
         text = ""
         for key, value in _dict.items():
+            typename = "str"
             value = replace_all(value, EOL, EOL_replaced)
             if isinstance(value, (list, tuple)):
-                value = ','.join(value) # convert list to str
-            text += key + SEP + value + EOL
+                typename = "array"
+                value = COMMA.join(value) # convert list to str
+            text += key + SEP + typename + SEP + value + EOL
         return text
 
 

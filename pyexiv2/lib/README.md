@@ -7,15 +7,6 @@
 
 ---
 
-## edit api.cpp
-
-TODO:
-
-- Remove some duplicate code
-- Do not use global variables, to become thread-safe
-
----
-
 ## compile steps of api.so on Linux
 
 1. Download the release version of Exiv2 project.

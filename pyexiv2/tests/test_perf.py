@@ -61,9 +61,8 @@ def test_transfer_various_values():
     values = (string.digits * 5,
               string.ascii_letters * 5,
               string.punctuation * 5,
-              string.whitespace * 5,
+              ' \t\n\r\v \f' * 5,
               "test-中文-" * 5,
-              (SEP + EOL_replaced) * 5,
               )
     for v in values:
         i.modify_exif({"Exif.Image.ImageDescription": v})
@@ -73,9 +72,9 @@ def test_transfer_various_values():
         assert i.read_iptc().get("Iptc.Application2.ObjectName") == v
 
         # A known problem: XMP text does not support \v \f
-        _v = v.replace("\v", "").replace("\f", "")
-        i.modify_xmp({"Xmp.dc.creator": _v})
-        assert i.read_xmp().get("Xmp.dc.creator") == _v
+        _v = v.replace('\v', ' ').replace('\f', ' ')
+        i.modify_xmp({"Xmp.MicrosoftPhoto.LensModel": _v})
+        assert i.read_xmp().get("Xmp.MicrosoftPhoto.LensModel") == _v
 
 
 def _test_recover():
