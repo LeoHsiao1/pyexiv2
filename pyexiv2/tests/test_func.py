@@ -50,6 +50,10 @@ def test_read_xmp():
     assert _dict.get("Xmp.xmp.CreateDate") == "2019-08-12T19:44:04.176"
     assert _dict.get("Xmp.dc.subject") == ["flag1", "flag2", "flag3"]
 
+@check_md5
+def test_read_raw_xmp():
+    i = Image(path)
+    assert i.read_raw_xmp().startswith('<?xpacket begin="\ufeff" id="W5M0MpCehiHzreSzNTczkc9d"?> ')
 
 @check_md5
 def test_read_all():
@@ -59,7 +63,6 @@ def test_read_all():
     assert all_dict["IPTC"].get("Iptc.Application2.TimeCreated") == "19:44:04+00:00"
     assert all_dict["XMP"].get("Xmp.xmp.CreateDate") == "2019-08-12T19:44:04.176"
     assert all_dict["XMP"].get("Xmp.dc.subject") == ["flag1", "flag2", "flag3"]
-
 
 def test_modify_exif():
     i = Image(path)
@@ -114,3 +117,19 @@ def test_clear_all():
     i.clear_all()
     for v in i.read_all().values():
         assert not v
+
+
+@check_md5
+def _test_recovery():
+    """ a strict test, for whether it can delete metadata and recover it completely. """
+    i = Image(path)
+    all_dict = i.read_all()
+    test_clear_all()
+
+    # recover the metadata
+    i.modify_all(all_dict)
+    new_dict = i.read_all()
+    for kind in all_dict.keys():
+        assert len(all_dict[kind]) == len(new_dict[kind])
+        for key in all_dict[kind].keys():
+            assert all_dict[kind][key] == new_dict[kind][key], "{} didn't recover".format(key)

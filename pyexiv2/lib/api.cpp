@@ -63,10 +63,10 @@ const std::string EOL_replaced = "\v\b";
 const std::string COMMA = ", ";
 const char *EXCEPTION_HINT = "(Caught Exiv2 exception) ";
 const char *OK = "OK";
-Exiv2::Image::AutoPtr image;
-std::string ret; // to cache the return valu
+Exiv2::Image::AutoPtr image;  // Cache the image, to avoid the time it takes to open it repeatedly
+std::string ret; // Cache the return value
 
-// replace the substring repeatedly
+// Replace the substring repeatedly
 std::string &replace_all(std::string &str, const std::string &src, const std::string &dest)
 {
 	while (true)
@@ -110,7 +110,17 @@ API const char *read_iptc(void) try
 }
 catch_block;
 
+
 API const char *read_xmp(void) try
+{
+	Exiv2::XmpData &data = image->xmpData();
+	Exiv2::XmpData::iterator i = data.begin();
+	Exiv2::XmpData::iterator end = data.end();
+	read_block;
+}
+catch_block;
+
+API const char *read_raw_xmp(void) try
 {
 	ret = image->xmpPacket();
 	if (ret.empty())

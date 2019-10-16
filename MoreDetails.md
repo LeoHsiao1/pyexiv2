@@ -1,21 +1,60 @@
 # More Details
 
-Here are some details that have been identified.
+- pyexiv2 is not thread-safe, because some global variables are used to store data.
 
-## Advantages
+## About read_*()
 
-- It is safe to use pyexiv2.Image.read_*(). These methods does not affect the image in any way. (md5 unchanged)
-- If you try to access a non-standard key, an exception will be raised.
+- It is safe to use pyexiv2.Image.read_*(). These methods never affect image files. (md5 unchanged)
+- The value of the metadata might be of type Short, Long, Ascii, Time, and so on. Most of them will be converted to String type when reading.
+- Some of the XMP metadata is a list of multiple strings. For example:
 
     ```python
-    >>> i = Image(r"pyexiv2/tests/1.jpg")
-    >>> i.modify_exif({"Exif.Image.myflag001": "test"})       # Unallowed
-    RuntimeError: (Caught Exiv2 exception) Invalid tag name or ifdId `myflag001', ifdId 1
+    >>> i.modify_xmp({"Xmp.dc.subject": ["flag1", "flag2", "flag3"]})
+    >>> i.read_xmp()["Xmp.dc.subject"]
+    ['flag1', 'flag2', 'flag3']
     ```
 
-## Defects
+    The process pyexiv2 reading a value of list type is just like this:
 
-- Not thread-safe, because some global variables are used.
-- Some special metadata couldn't be converted to string type, making it uneditable.
+    ```python
+    buffer = ', '.join(raw_value)
+    value = buffer.split(', ')
+    ```
+
+    Therefore, if the raw value contains `', '` , the final value will be wrong.
+
+    In addition, calling `i.read_raw_xmp()` will return the raw XMP metadata.
+
+
+## About modify_*()
+
 - If the metadata contains "\v\f", it will be replaced with "\v\b".
-- if the XMP metadata contains '\v' or '\f', it will be replaced with space ' '.
+- If the XMP metadata contains '\v' or '\f', it will be replaced with space ' '.
+- If you try to modify a non-standard tag, it may be rejected. Such as below.
+
+    ```python
+    >>> i.modify_exif({"Exif.Image.myflag001": "test"})       # Unallowed
+    RuntimeError: (Caught Exiv2 exception) Invalid tag name or ifdId `myflag001', ifdId 1
+    >>> i.modify_xmp({"Xmp.dc.myflag001": "test"})            # Allowed
+    >>> i.read_xmp()["Xmp.dc.myflag001"]
+    'test'
+    ```
+
+- Some special tags cannot be modified. Therefore, you should check if your tag has been successfully modified.
+
+    ```python
+    >>> i.read_exif()['Exif.Image.ExifTag']
+    '4860'
+    >>> i.modify_exif({'Exif.Image.ExifTag': '1000'})
+    >>> i.read_exif()['Exif.Image.ExifTag']
+    '4860'      # Not modified
+
+    >>> i.read_xmp()['Xmp.xmpMM.History']
+    'type="Seq"'
+    >>> i.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
+    Error: XMP Toolkit error 102: Indexing applied to non-array
+    Error: Failed to encode XMP metadata.
+    ```
+
+
+

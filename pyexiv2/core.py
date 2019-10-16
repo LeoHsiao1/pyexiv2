@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-import ctypes
-import json
 import os
 import sys
+import ctypes
 
 
 dll_dir = os.path.join(os.path.dirname(__file__), "lib")
@@ -48,7 +47,12 @@ class Image:
         self._open_image()
         return self._read_xmp()
 
-    def read_all(self):
+    def read_raw_xmp(self) -> str:
+        """ The raw XMP data is in XML format. """
+        self._open_image()
+        return self._read_raw_xmp()
+
+    def read_all(self) -> dict:
         """ read all the metadata, return = {"EXIF":{...}, "IPTC":{...}, "XMP":{...}} """
         self._open_image()
         _dict = {"EXIF": self._read_exif(),
@@ -105,29 +109,30 @@ class Image:
 
     def _open_image(self):
         """ Let C++ program open an image and read its metadata,
-        save as a global variable in C + +program. """
+        save as a global variable in C++ program. """
         api.open_image.restype = ctypes.c_char_p
         ret = api.open_image(self.filename).decode()
         if ret != OK:
             raise RuntimeError(ret)
 
     def _read_exif(self):
-        """ call self._open_image() first """
         api.read_exif.restype = ctypes.c_char_p
         text = api.read_exif().decode()
         return self._loads(text)
 
     def _read_iptc(self):
-        """ call self._open_image() first """
         api.read_iptc.restype = ctypes.c_char_p
         text = api.read_iptc().decode()
         return self._loads(text)
 
     def _read_xmp(self):
-        """ call self._open_image() first """
         api.read_xmp.restype = ctypes.c_char_p
         text = api.read_xmp().decode()
         return self._loads(text)
+
+    def _read_raw_xmp(self):
+        api.read_raw_xmp.restype = ctypes.c_char_p
+        return api.read_raw_xmp().decode()
 
     def _modify_exif(self, exif_dict):
         text = self._dumps(exif_dict)
@@ -189,17 +194,16 @@ class Image:
         text = ""
         for key, value in _dict.items():
             typename = "str"
-            value = replace_all(value, EOL, EOL_replaced)
             if isinstance(value, (list, tuple)):
                 typename = "array"
                 value = COMMA.join(value) # convert list to str
+            value = replace_all(value, EOL, EOL_replaced)
             text += key + SEP + typename + SEP + value + EOL
         return text
 
 
-def replace_all(text, src, dest):
+def replace_all(text:str, src: str, dest: str):
     result = text
     while src in result:
         result = result.replace(src, dest)
     return result
-
