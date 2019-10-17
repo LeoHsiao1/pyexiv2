@@ -8,55 +8,47 @@ from . import test_func
 @check_md5
 def test_memory_leak_when_reading():
     p = psutil.Process(os.getpid())
+    m0 = p.memory_info().rss
 
     for _ in range(1000):
         test_func.test_read_all()
     m1 = p.memory_info().rss
 
-    for _ in range(1000):
-        test_func.test_read_all()
-    m2 = p.memory_info().rss
-
-    assert ((m2 - m1) / m1) < 0.01, "memory leaks when reading"
+    delta = (m1 - m0) / 1024
+    assert delta < 500, "Memory grew by {}KB, possibly due to the memory leak.".format(
+        delta)
 
 
 def test_memory_leak_when_writing():
     p = psutil.Process(os.getpid())
+    m0 = p.memory_info().rss
 
     for _ in range(1000):
         test_func.test_modify_all()
     m1 = p.memory_info().rss
 
-    for _ in range(1000):
-        test_func.test_modify_all()
-    m2 = p.memory_info().rss
-
-    assert ((m2 - m1) / m1) < 0.01, "memory leaks when writing"
+    delta = (m1 - m0) / 1024
+    assert delta < 100, "Memory grew by {}KB, possibly due to the memory leak.".format(
+        delta)
 
 
 def test_stack_overflow():
-    p = psutil.Process(os.getpid())
+    i = Image(path)
     dict1 = {"Exif.Image.ImageDescription": "(test_stack_overflow)" * 1000,
-             "Exif.Image.Orientation": "0123456789"* 1000}
-
+             "Exif.Image.Artist": "0123456789 hello!" * 1000}
     for _ in range(10):
-        Image(path).modify_exif(dict1)
-    m1 = p.memory_info().rss
-
-    for _ in range(10):
-        Image(path).modify_exif(dict1)
-    m2 = p.memory_info().rss
-
-    assert ((m2 - m1) / m1) < 0.1, "memory leaks when writing"
+        i.modify_exif(dict1)
+        _dict = i.read_exif()
+        for k, v in dict1.items():
+            assert _dict.get(k, "") == v
 
 
-def test_transfer_various_values():
+def test_transmit_various_characters():
     """
-    Test whether various values can be transfered correctly between Python and C++ API.
+    Test whether various characters can be transmitted correctly between Python and C++ API.
     Even if a value is correctly transmitted, it does not mean that it will be successfully saved by C++ API.
     """
     import string
-    from ..core import SEP, EOL, EOL_replaced
     i = Image(path)
     values = (string.digits * 5,
               string.ascii_letters * 5,
@@ -75,5 +67,3 @@ def test_transfer_various_values():
         _v = v.replace('\v', ' ').replace('\f', ' ')
         i.modify_xmp({"Xmp.MicrosoftPhoto.LensModel": _v})
         assert i.read_xmp().get("Xmp.MicrosoftPhoto.LensModel") == _v
-
-

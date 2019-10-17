@@ -84,9 +84,7 @@ API const char *open_image(const char *file) try
 {
 	image = Exiv2::ImageFactory::open(file);
 	if (image.get() == 0)
-	{
-		throw Exiv2::Error(Exiv2::kerErrorMessage, "Can not open the file.");
-	}
+		throw Exiv2::Error(Exiv2::kerErrorMessage, "Can not open this file.");
 	image->readMetadata();
 	return OK;
 }
@@ -226,7 +224,7 @@ catch_block;
 
 API const char *clear_exif(void) try
 {
-	Exiv2::ExifData exifData; // an empty container for exif metadata
+	Exiv2::ExifData exifData; // an empty container of exif metadata
 	image->setExifData(exifData);
 	image->writeMetadata();
 	return OK;

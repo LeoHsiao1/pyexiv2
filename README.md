@@ -1,6 +1,6 @@
 # pyexiv2
 
-Read/Write metadata of digital image, including EXIF, IPTC, XMP.
+Read/Write metadata of digital image, including [EXIF](https://en.wikipedia.org/wiki/Exif), [IPTC](https://en.wikipedia.org/wiki/International_Press_Telecommunications_Council), [XMP](https://en.wikipedia.org/wiki/Extensible_Metadata_Platform).
 
 - install: `pip install pyexiv2`
 - [source code on github](https://github.com/LeoHsiao1/pyexiv2)
@@ -8,11 +8,9 @@ Read/Write metadata of digital image, including EXIF, IPTC, XMP.
 ## Features
 
 - Runs on C++ API of [Exiv2](https://www.exiv2.org/index.html).
-- Supports running on Linux 64bit.
-- Supports running on Windows 64bit, with Python3(64bit).
+- Supports running on Linux and Windows, with Python3(64bit).
 - [Supports various metadata](https://www.exiv2.org/metadata.html)
 - [Supports various image formats](https://dev.exiv2.org/projects/exiv2/wiki/Supported_image_formats)
-- Supports Unicode characters that contained in image paths and data.
 
 ## Usage
 

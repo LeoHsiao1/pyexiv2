@@ -61,42 +61,46 @@ class Image:
                  }
         return _dict
 
-    def modify_exif(self, exif_dict):
+    def modify_exif(self, _dict) -> None:
         self._open_image()
-        self._modify_exif(exif_dict)
+        self._modify_exif(_dict)
 
-    def modify_iptc(self, iptc_dict):
+    def modify_iptc(self, _dict) -> None:
         self._open_image()
-        self._modify_iptc(iptc_dict)
+        self._modify_iptc(_dict)
 
-    def modify_xmp(self, xmp_dict):
+    def modify_xmp(self, _dict) -> None:
         self._open_image()
-        self._modify_xmp(xmp_dict)
+        self._modify_xmp(_dict)
 
-    def modify_all(self, all_dict):
+    def modify_all(self, all_dict) -> None:
         """ all_dict = {"EXIF":{...}, "IPTC":{...}, "XMP":{...}} """
         self._open_image()
         self._modify_exif(all_dict["EXIF"])
         self._modify_iptc(all_dict["IPTC"])
         self._modify_xmp(all_dict["XMP"])
 
-    def clear_exif(self):
-        """ Delete all EXIF data. Once cleared, pyexiv2 may not be able to recover it. """
+    def clear_exif(self) -> None:
+        """ Delete all EXIF metadata.\n
+        Once cleared, pyexiv2 may not be able to recover it. """
         self._open_image()
         self._clear_exif()
 
-    def clear_iptc(self):
-        """ Delete all IPTC data. Once cleared, pyexiv2 may not be able to recover it. """
+    def clear_iptc(self) -> None:
+        """ Delete all IPTC metadata.\n
+        Once cleared, pyexiv2 may not be able to recover it. """
         self._open_image()
         self._clear_iptc()
 
-    def clear_xmp(self):
-        """ Delete all XMP data. Once cleared, pyexiv2 may not be able to recover it. """
+    def clear_xmp(self) -> None:
+        """ Delete all XMP metadata.\n
+        Once cleared, pyexiv2 may not be able to recover it. """
         self._open_image()
         self._clear_xmp()
 
-    def clear_all(self):
-        """ Delete all the metadata. Once cleared, pyexiv2 may not be able to recover it. """
+    def clear_all(self) -> None:
+        """ Delete all metadata of EXIF, IPTC and XMP.\n
+        Once cleared, pyexiv2 may not be able to recover it. """
         self._open_image()
         self._clear_exif()
         self._clear_iptc()

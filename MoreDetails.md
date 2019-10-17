@@ -1,5 +1,6 @@
 # More Details
 
+- Supports Unicode characters that contained in image paths and metadata.
 - pyexiv2 is not thread-safe, because some global variables are used to store data.
 
 ## About read_*()
@@ -14,7 +15,7 @@
     ['flag1', 'flag2', 'flag3']
     ```
 
-    The process pyexiv2 reading a value of list type is just like this:
+    The principle that pyexiv2 handling a value of list type is just like this:
 
     ```python
     buffer = ', '.join(raw_value)
@@ -24,7 +25,6 @@
     Therefore, if the raw value contains `', '` , the final value will be wrong.
 
     In addition, calling `i.read_raw_xmp()` will return the raw XMP metadata.
-
 
 ## About modify_*()
 
@@ -40,14 +40,14 @@
     'test'
     ```
 
-- Some special tags cannot be modified. Therefore, you should check if your tag has been successfully modified.
+- Some special tags cannot be modified by pyexiv2. Therefore, you should check if your tag has been successfully modified.
 
     ```python
     >>> i.read_exif()['Exif.Image.ExifTag']
     '4860'
     >>> i.modify_exif({'Exif.Image.ExifTag': '1000'})
     >>> i.read_exif()['Exif.Image.ExifTag']
-    '4860'      # Not modified
+    '4860'      # Not changed
 
     >>> i.read_xmp()['Xmp.xmpMM.History']
     'type="Seq"'
@@ -55,6 +55,3 @@
     Error: XMP Toolkit error 102: Indexing applied to non-array
     Error: Failed to encode XMP metadata.
     ```
-
-
-
