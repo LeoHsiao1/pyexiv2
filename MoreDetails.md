@@ -6,8 +6,8 @@
 ## About read_*()
 
 - It is safe to use pyexiv2.Image.read_*(). These methods never affect image files. (md5 unchanged)
-- The value of the metadata might be of type Short, Long, Ascii, Time, and so on. Most of them will be converted to String type when reading.
-- Some of the XMP metadata is a list of multiple strings. For example:
+- The value of the metadata might be of type Short, Long, byte, Ascii, and so on. Most of them will be converted to String type by pyexiv2 when reading.
+- Some of the XMP metadata is a list of strings. For example:
 
     ```python
     >>> i.modify_xmp({"Xmp.dc.subject": ["flag1", "flag2", "flag3"]})

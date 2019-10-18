@@ -38,9 +38,9 @@ def test_stack_overflow():
              "Exif.Image.Artist": "0123456789 hello!" * 1000}
     for _ in range(10):
         i.modify_exif(dict1)
-        _dict = i.read_exif()
+        dict2 = i.read_exif()
         for k, v in dict1.items():
-            assert _dict.get(k, "") == v
+            assert dict2.get(k, "") == v
 
 
 def test_transmit_various_characters():

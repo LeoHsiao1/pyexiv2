@@ -35,6 +35,15 @@ def check_md5(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         ret = func(*args, **kwargs)
-        assert _check_md5(path, jpg_path), "The file has been changed after {}().".format(func.__name__)
+        assert _check_md5(
+            path, jpg_path), "The file has been changed after {}().".format(func.__name__)
         return ret
     return wrapper
+
+
+def compare_dict(d1, d2):
+    """ Compare two dictionaries to see if they are the same. """
+    assert len(d1) == len(d2)
+    for k in d1.keys():
+        assert d1[k] == d2[k], "['{}'] is different.".format(k)
+
