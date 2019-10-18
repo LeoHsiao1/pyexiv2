@@ -57,9 +57,9 @@
 		pos = EOL_pos + EOL.length();               \
 	}
 
-const std::string SEP = "\t";
-const std::string EOL = "\v\f";
-const std::string EOL_replaced = "\v\b";
+const std::string SEP = "\x1F";
+const std::string EOL = "\x1E\x1E";
+const std::string EOL_replaced = "\x1E\x1F";
 const std::string COMMA = ", ";
 const char *EXCEPTION_HINT = "(Caught Exiv2 exception) ";
 const char *OK = "OK";

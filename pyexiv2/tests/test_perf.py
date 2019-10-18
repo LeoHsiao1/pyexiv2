@@ -53,7 +53,7 @@ def test_transmit_various_characters():
     values = (string.digits * 5,
               string.ascii_letters * 5,
               string.punctuation * 5,
-              ' \t\n\r\v \f' * 5,
+              string.whitespace * 5,
               "test-中文-" * 5,
               )
     for v in values:

@@ -5,9 +5,9 @@ import ctypes
 
 
 dll_dir = os.path.join(os.path.dirname(__file__), "lib")
-SEP = "\t"  # separator
-EOL = "\v\f"  # use a weird symbol as EOL
-EOL_replaced = "\v\b"  # If the metadata contains EOL, replace it with this symbol
+SEP = "\x1F"  # field separator
+EOL = "\x1E\x1E"  # separator of each line
+EOL_replaced = '\x1E\x1F'  # If the metadata contains EOL, replace it with this symbol
 COMMA = ", "
 EXCEPTION_HINT = "(Caught Exiv2 exception) "
 OK = "OK"
@@ -198,6 +198,11 @@ class Image:
         text = ""
         for key, value in _dict.items():
             typename = "str"
+
+# TODO：把三种元数据的modify分别dumps
+
+
+
             if isinstance(value, (list, tuple)):
                 typename = "array"
                 value = COMMA.join(value) # convert list to str

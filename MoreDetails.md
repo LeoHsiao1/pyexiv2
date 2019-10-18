@@ -28,7 +28,7 @@
 
 ## About modify_*()
 
-- If the metadata contains "\v\f", it will be replaced with "\v\b".
+- If the metadata contains "\x1E\x1E", it will be replaced with "\x1E\x1F".
 - If the XMP metadata contains '\v' or '\f', it will be replaced with space ' '.
 - If you try to modify a non-standard tag, it may be rejected. Such as below.
 
