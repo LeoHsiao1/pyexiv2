@@ -8,7 +8,7 @@
 
 // Define some duplicate code
 #define catch_block                       \
-	catch (Exiv2::Error & e)              \
+	catch (std::exception & e)            \
 	{                                     \
 		std::stringstream ss;             \
 		ss << EXCEPTION_HINT << e.what(); \
