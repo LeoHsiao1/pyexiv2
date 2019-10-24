@@ -23,11 +23,10 @@ def teardown_function():
 
 def _check_md5(file1, file2):
     """ check whether the two files are the same """
-    with open(file1, "rb") as f1:
+    with open(file1, "rb") as f1, open(file2, "rb") as f2:
         h1 = hashlib.md5(f1.read()).digest()
-    with open(file2, "rb") as f2:
         h2 = hashlib.md5(f2.read()).digest()
-    return h1 == h2
+        return h1 == h2
 
 
 def check_md5(func):
