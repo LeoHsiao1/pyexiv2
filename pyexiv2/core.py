@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-import sys
+import platform
 import ctypes
 
 
@@ -12,18 +12,27 @@ COMMA = ", "
 EXCEPTION_HINT = "(Caught Exiv2 exception) "
 OK = "OK"
 
+
+# Check the Python interpreter
+if not platform.python_version().startswith('3.'):
+    raise RuntimeError("pyexiv2 can only run by Python3(64bit).")
+if platform.architecture()[0] != '64bit':
+    raise RuntimeError("pyexiv2 can only run by Python3(64bit).")
+
 # Recognize the system
-if sys.platform.startswith("linux"):
+sys_name = platform.system() or 'Unknown'
+if sys_name == 'Linux':
     ctypes.CDLL(os.path.join(dll_dir, "libexiv2.so"))  # import it at first
     api = ctypes.CDLL(os.path.join(dll_dir, "api.so"))
     # Unicode characters need to be handled, because char array can only contain ASCII characters.
     ENCODING = "utf-8"
-elif sys.platform.startswith("win"):
+elif sys_name == 'Windows':
     ctypes.CDLL(os.path.join(dll_dir, "exiv2.dll"))
     api = ctypes.CDLL(os.path.join(dll_dir, "api.dll"))
     ENCODING = "gbk"
 else:
-    raise RuntimeError("Unknown platform. This module should run on Linux or Windows.")
+    raise RuntimeError(
+        "pyexiv2 can only run on Linux or Windows, but your system is {}.".format(sys_name))
 
 
 class Image:
@@ -32,7 +41,7 @@ class Image:
     Please call the public methods of class Image.
     """
 
-    def __init__(self, filename:str):
+    def __init__(self, filename: str):
         self.filename = filename.encode(ENCODING)
 
     def read_exif(self) -> dict:
@@ -201,17 +210,15 @@ class Image:
 
 # TODO：把三种元数据的modify分别dumps
 
-
-
             if isinstance(value, (list, tuple)):
                 typename = "array"
-                value = COMMA.join(value) # convert list to str
+                value = COMMA.join(value)  # convert list to str
             value = replace_all(value, EOL, EOL_replaced)
             text += key + SEP + typename + SEP + value + EOL
         return text
 
 
-def replace_all(text:str, src: str, dest: str):
+def replace_all(text: str, src: str, dest: str):
     result = text
     while src in result:
         result = result.replace(src, dest)
