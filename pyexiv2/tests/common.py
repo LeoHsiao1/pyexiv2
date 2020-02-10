@@ -9,12 +9,12 @@ import pytest
 from .. import Image
 
 current_dir = os.path.dirname(__file__)
-jpg_path = os.path.join(current_dir, "1.jpg")
+original_path = os.path.join(current_dir, "1.jpg")
 path = os.path.join(current_dir, "tmp.jpg")
 
 
 def setup_function():
-    shutil.copy(jpg_path, path)
+    shutil.copy(original_path, path)
 
 
 def teardown_function():
@@ -34,8 +34,7 @@ def check_md5(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         ret = func(*args, **kwargs)
-        assert _check_md5(
-            path, jpg_path), "The file has been changed after {}().".format(func.__name__)
+        assert _check_md5(path, original_path), "The file has been changed after {}().".format(func.__name__)
         return ret
     return wrapper
 
@@ -45,4 +44,3 @@ def compare_dict(d1, d2):
     assert len(d1) == len(d2)
     for k in d1.keys():
         assert d1[k] == d2[k], "['{}'] is different.".format(k)
-
