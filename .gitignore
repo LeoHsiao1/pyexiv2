@@ -123,13 +123,12 @@
  # PyBuilder
 
 
-/__pycache__
+__pycache__/
 /.vscode
-/core/__pycache__
-/core/tests/__pycache__
 /pyexiv2.egg-info
 /dist
 /build
 /.pytest_cache
-/pyexiv2/__pycache__
-/pyexiv2/tests/__pycache__
+/pyexiv2/lib/win64/*.exp
+/pyexiv2/lib/win64/*.lib
+/pyexiv2/lib/win64/*.obj
