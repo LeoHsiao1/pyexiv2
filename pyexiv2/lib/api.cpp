@@ -72,21 +72,21 @@ py::object read_raw_xmp(Exiv2::Image::AutoPtr *img)
 	return py::bytes((*img)->xmpPacket());
 }
 
-py::object modify_exif(Exiv2::Image::AutoPtr *img, py::list table)
+py::object modify_exif(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
 {
 	Exiv2::ExifData &exifData = (*img)->exifData();
     for (auto _line : table){
         py::list line;
         for (auto item : _line)
-            line.append(item);
-        std::string key = std::string(py::bytes(line[0]));
-        std::string value = std::string(py::bytes(line[1]));
+            line.append(item);  // can't use item[0] here, so convert to py::list
+        std::string key = py::bytes(line[0].attr("encode")(encoding));
+        std::string value = py::bytes(line[1].attr("encode")(encoding));
 
         Exiv2::ExifData::iterator key_pos = exifData.findKey(Exiv2::ExifKey(key));
 		if (key_pos != exifData.end())
 			exifData.erase(key_pos);
 		if (value == "")
-			continue;   // delete the tag if value == ""
+			continue;   // delete the key if value == ""
 		exifData[key] = value;
 	}
 	(*img)->setExifData(exifData);
@@ -94,15 +94,15 @@ py::object modify_exif(Exiv2::Image::AutoPtr *img, py::list table)
 	return OK;
 }
 
-py::object modify_iptc(Exiv2::Image::AutoPtr *img, py::list table)
+py::object modify_iptc(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
 {
 	Exiv2::IptcData &iptcData = (*img)->iptcData();
     for (auto _line : table){
         py::list line;
         for (auto item : _line)
             line.append(item);
-        std::string key = std::string(py::bytes(line[0]));
-        std::string value = std::string(py::bytes(line[1]));
+        std::string key = py::bytes(line[0].attr("encode")(encoding));
+        std::string value = py::bytes(line[1].attr("encode")(encoding));
 
         Exiv2::IptcData::iterator key_pos = iptcData.findKey(Exiv2::IptcKey(key));
 		if (key_pos != iptcData.end())
@@ -116,16 +116,16 @@ py::object modify_iptc(Exiv2::Image::AutoPtr *img, py::list table)
 	return OK;
 }
 
-py::object modify_xmp(Exiv2::Image::AutoPtr *img, py::list table)
+py::object modify_xmp(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
 {
 	Exiv2::XmpData &xmpData = (*img)->xmpData();
     for (auto _line : table){
         py::list line;
         for (auto item : _line)
             line.append(item);
-        std::string key = std::string(py::bytes(line[0]));
-        std::string value = std::string(py::bytes(line[1]));
-        std::string typeName = std::string(py::bytes(line[2]));
+        std::string key = py::bytes(line[0].attr("encode")(encoding));
+        std::string value = py::bytes(line[1].attr("encode")(encoding));
+        std::string typeName = py::bytes(line[2].attr("encode")(encoding));
         
         Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
 		if (key_pos != xmpData.end())
@@ -133,9 +133,9 @@ py::object modify_xmp(Exiv2::Image::AutoPtr *img, py::list table)
 		if (value == "")
 			continue;
 
-        // Handling the value of array types
-		if (typeName == "array")
+        if (typeName == "array")
 		{
+            // Handling the value of array types
             int pos = 0;
 			int COMMA_pos = 0;
 			while (COMMA_pos != std::string::npos)

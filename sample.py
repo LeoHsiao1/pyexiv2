@@ -14,9 +14,8 @@ img.clear_exif()
 img.read_exif()
 
 dict1 = {"Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834",
-            "Xmp.xmp.Rating": "",
-            "Xmp.dc.subject": ["flag1中文", "flag2中文", "flag3中文"]}
+         "Xmp.xmp.Rating": "",
+         "Xmp.dc.subject": ["flag1中文", "flag2中文", "flag3中文"]}
 img.modify_xmp(dict1)
 
-# from pyexiv2.lib import api
-# dir(api)
+img.close()

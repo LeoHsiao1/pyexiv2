@@ -1,4 +1,4 @@
-# README
+# lib
 
 ## File lists
 
@@ -58,4 +58,4 @@
     cl /MD /LD ..\api.cpp /EHsc -I %EXIV2_DIR%\include -I C:\Users\Leo\AppData\Local\Programs\Python\Python37\include /link %EXIV2_DIR%\lib\exiv2.lib C:\Users\Leo\AppData\Local\Programs\Python\Python37\libs\python37.lib /OUT:api.pyd
     del api.exp api.obj api.lib
     ```
-    - Modify the path here according to your installation location.
+    Modify the path here according to your installation location.

@@ -95,8 +95,15 @@ def test_not_image_path():
 def test_chinese_path():
     chinese_path = os.path.join(current_dir, "1 - 副本.jpg")
     shutil.copy(path, chinese_path)
+
+    from ..lib import sys_name
+    if sys_name == 'Windows':
+        encoding = 'gbk'
+    else:
+        encoding = 'utf-8'
+    
     try:
-        with Image(chinese_path, 'gbk') as img:
+        with Image(chinese_path, encoding) as img:
             compare_dict(testdata.EXIF, img.read_exif())
     finally:
         os.remove(chinese_path)

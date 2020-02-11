@@ -13,7 +13,7 @@ class Image:
     """
     
     def __init__(self, filename, encoding='utf-8'):
-        # Open an image and load its metadata
+        """ Open an image and load its metadata. """
         self.img = api.open_image(filename.encode(encoding))
 
     def __enter__(self):
@@ -23,6 +23,7 @@ class Image:
         self.close()
 
     def close(self):
+        """ Frees the memory for storing image data. """
         api.close_image(self.img)
         def closed_warning():
             raise RuntimeError('Do not operate on the closed image.')
@@ -47,13 +48,13 @@ class Image:
         return self._raw_xmp.decode(encoding)
 
     def modify_exif(self, _dict, encoding='utf-8'):
-        api.modify_exif(self.img, self._dumps(_dict, encoding))
+        api.modify_exif(self.img, self._dumps(_dict), encoding)
 
     def modify_iptc(self, _dict, encoding='utf-8'):
-        api.modify_iptc(self.img, self._dumps(_dict, encoding))
+        api.modify_iptc(self.img, self._dumps(_dict), encoding)
 
     def modify_xmp(self, _dict, encoding='utf-8'):
-        api.modify_xmp(self.img, self._dumps(_dict, encoding))
+        api.modify_xmp(self.img, self._dumps(_dict), encoding)
     
     def _parse(self, table: list, encoding='utf-8') -> dict:
         """ Parse the table returned by C++ API into a dict. """
@@ -66,7 +67,7 @@ class Image:
             _dict[key] = value
         return _dict
     
-    def _dumps(self, _dict, encoding='utf-8') -> list:
+    def _dumps(self, _dict) -> list:
         """ Convert the metadata dict into a table that the C++ API can read. """
         table = []
         for key, value in _dict.items():
@@ -75,8 +76,7 @@ class Image:
                 typeName = 'array'
                 value = COMMA.join(value)
             line = [key, value, typeName]
-            encoded_line = [i.encode(encoding) for i in line]
-            table.append(encoded_line)
+            table.append(line)
         return table
 
     def clear_exif(self):

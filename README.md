@@ -70,9 +70,4 @@ i.clear_all()
 
 ## Tests
 
-There are some test cases in folder "pyexiv2/tests". Run them by pytest:
-
-```shell
-pip install pytest psutil
-pytest -v
-```
+There are some test cases in folder "pyexiv2/tests". 
