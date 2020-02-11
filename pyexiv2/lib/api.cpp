@@ -86,7 +86,7 @@ py::object modify_exif(Exiv2::Image::AutoPtr *img, py::list table, py::str encod
 		if (key_pos != exifData.end())
 			exifData.erase(key_pos);
 		if (value == "")
-			continue;   // delete the key if value == ""
+			continue;   // delete the tag if value == ""
 		exifData[key] = value;
 	}
 	(*img)->setExifData(exifData);

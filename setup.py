@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 import setuptools
 
-with open("README.md", encoding="utf-8") as f:
+with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="pyexiv2",
-    version="1.3.0",
-    author="LeoHsiao",
-    author_email="leohsiao@foxmail.com",
-    description="Read/Write metadata of digital image, including EXIF, IPTC, XMP.",
+    name='pyexiv2',
+    version='2.0.0',
+    author='LeoHsiao',
+    author_email='leohsiao@foxmail.com',
+    description='Read/Write metadata of digital image, including EXIF, IPTC, XMP.',
     long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/LeoHsiao1/pyexiv2",
+    long_description_content_type='text/markdown',
+    url='https://github.com/LeoHsiao1/pyexiv2',
+    # install_requires=["docutils>=0.3"],
     packages=setuptools.find_packages(),
-    package_data={"pyexiv2": ["lib/*", "tests/*"]},
+    package_data={'': ['*.py', '*.so', '*.dll', '*.pyd']},
     classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+        'Programming Language :: Python :: 3',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'
     ],
 )
 

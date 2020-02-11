@@ -30,8 +30,8 @@ def test_read_raw_xmp():
 
 def test_modify_exif():
     with Image(path) as img:
-        dict1 = {"Exif.Image.ImageDescription": "test-中文-",
-                "Exif.Image.Artist": ''}
+        dict1 = {'Exif.Image.ImageDescription': 'test-中文-',
+                'Exif.Image.Artist': ''}
         img.modify_exif(dict1)
         dict2 = img.read_exif()
         for k, v in dict1.items():
@@ -40,8 +40,8 @@ def test_modify_exif():
 
 def test_modify_iptc():
     with Image(path) as img:
-        dict1 = {"Iptc.Application2.ObjectName": "test-中文-",
-                "Iptc.Application2.Keywords": ''}
+        dict1 = {'Iptc.Application2.ObjectName': 'test-中文-',
+                'Iptc.Application2.Keywords': ''}
         img.modify_iptc(dict1)
         dict2 = img.read_iptc()
         for k, v in dict1.items():
@@ -50,9 +50,9 @@ def test_modify_iptc():
 
 def test_modify_xmp():
     with Image(path) as img:
-        dict1 = {"Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834",
-                "Xmp.xmp.Rating": '',
-                "Xmp.dc.subject": ["flag1-中文-", "flag2-中文-", "flag3-中文-"]}
+        dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',
+                'Xmp.xmp.Rating': '',
+                'Xmp.dc.subject': ['flag1-中文-', 'flag2-中文-', 'flag3-中文-']}
         img.modify_xmp(dict1)
         dict2 = img.read_xmp()
         for k, v in dict1.items():
@@ -80,20 +80,20 @@ def test_clear_xmp():
 @check_md5
 def test_nonexistent_path():
     with pytest.raises(RuntimeError):
-        with Image(os.path.join(current_dir, "nonexistent.jpg")) as img:
+        with Image(os.path.join(current_dir, 'nonexistent.jpg')) as img:
             img.read_exif()
 
 
 @check_md5
 def test_not_image_path():
     with pytest.raises(RuntimeError):
-        with Image(os.path.join(current_dir, "__init__.py")) as img:
+        with Image(os.path.join(current_dir, '__init__.py')) as img:
             img.read_exif()
 
 
 @check_md5
 def test_chinese_path():
-    chinese_path = os.path.join(current_dir, "1 - 副本.jpg")
+    chinese_path = os.path.join(current_dir, '1 - 副本.jpg')
     shutil.copy(path, chinese_path)
 
     from ..lib import sys_name

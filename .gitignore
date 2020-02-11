@@ -132,3 +132,4 @@ __pycache__/
 /pyexiv2/lib/win64/*.exp
 /pyexiv2/lib/win64/*.lib
 /pyexiv2/lib/win64/*.obj
+pyexiv2.egg-info/

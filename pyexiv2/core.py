@@ -23,7 +23,7 @@ class Image:
         self.close()
 
     def close(self):
-        """ Frees the memory for storing image data. """
+        """ Free the memory for storing image data. """
         api.close_image(self.img)
         def closed_warning():
             raise RuntimeError('Do not operate on the closed image.')
@@ -31,19 +31,19 @@ class Image:
             if not attr.startswith('_') and callable(getattr(self, attr)):
                 setattr(self, attr, closed_warning)
 
-    def read_exif(self, encoding='utf-8'):
+    def read_exif(self, encoding='utf-8') -> dict:
         self._exif = api.read_exif(self.img)
         return self._parse(self._exif, encoding)
 
-    def read_iptc(self, encoding='utf-8'):
+    def read_iptc(self, encoding='utf-8') -> dict:
         self._iptc = api.read_iptc(self.img)
         return self._parse(self._iptc, encoding)
 
-    def read_xmp(self, encoding='utf-8'):
+    def read_xmp(self, encoding='utf-8') -> dict:
         self._xmp = api.read_xmp(self.img)
         return self._parse(self._xmp, encoding)
 
-    def read_raw_xmp(self, encoding='utf-8'):
+    def read_raw_xmp(self, encoding='utf-8') -> str:
         self._raw_xmp = api.read_raw_xmp(self.img)
         return self._raw_xmp.decode(encoding)
 
@@ -62,7 +62,7 @@ class Image:
         for line in table:
             decoded_line = [i.decode(encoding) for i in line]
             key, value, typeName = decoded_line
-            if typeName in ["XmpBag", "XmpSeq"]:
+            if typeName in ['XmpBag', 'XmpSeq']:
                 value = value.split(COMMA)
             _dict[key] = value
         return _dict
@@ -80,16 +80,10 @@ class Image:
         return table
 
     def clear_exif(self):
-        """ Delete all EXIF metadata.
-        Once cleared, pyexiv2 may not be able to recover it. """
         api.clear_exif(self.img)
 
     def clear_iptc(self):
-        """ Delete all IPTC metadata.
-        Once cleared, pyexiv2 may not be able to recover it. """
         api.clear_iptc(self.img)
 
     def clear_xmp(self):
-        """ Delete all XMP metadata.
-        Once cleared, pyexiv2 may not be able to recover it. """
         api.clear_xmp(self.img)

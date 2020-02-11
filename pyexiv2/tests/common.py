@@ -9,8 +9,8 @@ import pytest
 from .. import Image
 
 current_dir = os.path.dirname(__file__)
-original_path = os.path.join(current_dir, "1.jpg")
-path = os.path.join(current_dir, "tmp.jpg")
+original_path = os.path.join(current_dir, '1.jpg')
+path = os.path.join(current_dir, 'tmp.jpg')
 
 
 def setup_function():
@@ -34,7 +34,7 @@ def check_md5(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         ret = func(*args, **kwargs)
-        assert _check_md5(path, original_path), "The file has been changed after {}().".format(func.__name__)
+        assert _check_md5(path, original_path), 'The file has been changed after {}().'.format(func.__name__)
         return ret
     return wrapper
 

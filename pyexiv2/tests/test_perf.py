@@ -16,7 +16,7 @@ def test_memory_leak_when_reading():
         test_func.test_read_raw_xmp()
     m1 = p.memory_info().rss
     delta = (m1 - m0) / 1024
-    assert delta < 1024, "Memory grew by {}KB, possibly due to the memory leak.".format(delta)
+    assert delta < 1024, 'Memory grew by {}KB, possibly due to the memory leak.'.format(delta)
     # On my machine, if img.close() hasn't been called, the memory will increase by at least 100M.
 
 
@@ -29,13 +29,13 @@ def test_memory_leak_when_writing():
         test_func.test_modify_xmp()
     m1 = p.memory_info().rss
     delta = (m1 - m0) / 1024
-    assert delta < 1024, "Memory grew by {}KB, possibly due to the memory leak.".format(delta)
+    assert delta < 1024, 'Memory grew by {}KB, possibly due to the memory leak.'.format(delta)
 
 
 def test_stack_overflow():
     with Image(path) as img:
-        dict1 = {"Exif.Image.ImageDescription": "(test_stack_overflow)" * 1000,
-                "Exif.Image.Artist": "0123456789 hello!" * 1000}
+        dict1 = {'Exif.Image.ImageDescription': '(test_stack_overflow)' * 1000,
+                'Exif.Image.Artist': '0123456789 hello!' * 1000}
         for _ in range(10):
             img.modify_exif(dict1)
             dict2 = img.read_exif()
@@ -53,20 +53,20 @@ def test_transmit_various_characters():
                 string.ascii_letters * 5,
                 string.punctuation * 5,
                 string.whitespace * 5,
-                "test-中文-" * 5,
+                'test-中文-' * 5,
                 )
     with Image(path) as img:
         for v in values:
-            img.modify_exif({"Exif.Image.ImageDescription": v})
-            assert img.read_exif().get("Exif.Image.ImageDescription") == v
+            img.modify_exif({'Exif.Image.ImageDescription': v})
+            assert img.read_exif().get('Exif.Image.ImageDescription') == v
 
-            img.modify_iptc({"Iptc.Application2.ObjectName": v})
-            assert img.read_iptc().get("Iptc.Application2.ObjectName") == v
+            img.modify_iptc({'Iptc.Application2.ObjectName': v})
+            assert img.read_iptc().get('Iptc.Application2.ObjectName') == v
 
             # A known problem: XMP text does not support \v \f
             _v = v.replace('\v', ' ').replace('\f', ' ')
-            img.modify_xmp({"Xmp.MicrosoftPhoto.LensModel": _v})
-            assert img.read_xmp().get("Xmp.MicrosoftPhoto.LensModel") == _v
+            img.modify_xmp({'Xmp.MicrosoftPhoto.LensModel': _v})
+            assert img.read_xmp().get('Xmp.MicrosoftPhoto.LensModel') == _v
 
 
 @check_md5
