@@ -1,0 +1,27 @@
+name: Test
+
+on: [push]
+
+jobs:
+  job1:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 4
+      matrix:
+        os: [ubuntu-18.04, windows-2019]
+        python-version: [3.5, 3.6, 3.7, 3.8]
+    steps:
+    - name: git pull
+      uses: actions/checkout@v1
+      with:
+        ref: dev
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python${{ matrix.python-version }} -m pip install pytest psutil
+    - name: Test
+      run: |
+        pytest -v

@@ -13,7 +13,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/LeoHsiao1/pyexiv2',
-    # install_requires=["docutils>=0.3"],
+    # install_requires=["pybind11==2.4.3"],
     packages=setuptools.find_packages(),
     package_data={'': ['*.py', '*.so', '*.dll', '*.pyd']},
     classifiers=[
