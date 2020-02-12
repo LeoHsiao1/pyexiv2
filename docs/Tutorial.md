@@ -1,6 +1,7 @@
-[toc]
+- [Tutorial](https://github.com/LeoHsiao1/pyexiv2/blob/dev/docs/Tutorial.md)
+- [中文教程](https://github.com/LeoHsiao1/pyexiv2/blob/dev/docs/Tutorial-cn.md)
 
-# Tutorials
+# Tutorial
 
 ## API list
 
@@ -11,12 +12,15 @@ class Image(filename, encoding='utf-8')
     def read_iptc(self, encoding='utf-8') -> dict
     def read_xmp(self, encoding='utf-8') -> dict
     def read_raw_xmp(self, encoding='utf-8') -> str
+
     def modify_exif(self, _dict, encoding='utf-8')
     def modify_iptc(self, _dict, encoding='utf-8')
     def modify_xmp(self, _dict, encoding='utf-8')
+
     def clear_exif(self)
     def clear_iptc(self)
     def clear_xmp(self)
+    
     def close(self)
 ```
 
@@ -51,28 +55,28 @@ class Image(filename, encoding='utf-8')
 - Sample:
     ```python
     >>> i = Image(r'.\pyexiv2\tests\1.jpg')
-    >>> # prepare the XMP data you want to modify
-    >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # this will overwrite its original value, or add it if it doesn't exist
-    ...          'Xmp.xmp.Rating': ''}                              # set an empty str explicitly to delete the datum
+    >>> # Prepare the XMP data you want to modify
+    >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # This will overwrite its original value, or add it if it doesn't exist
+    ...          'Xmp.xmp.Rating': ''}                              # Set an empty str explicitly to delete the datum
     >>> img.modify_xmp(dict1)
     >>>
-    >>> dict2 = img.read_xmp()       # check the result
+    >>> dict2 = img.read_xmp()       # Check the result
     >>> dict2['Xmp.xmp.CreateDate']
-    '2019-06-23T19:45:17.834'        # it has been set
+    '2019-06-23T19:45:17.834'        # This tag has been modified
     >>> dict2['Xmp.xmp.Rating']
-    KeyError: 'Xmp.xmp.Rating'       # it has been deleted
+    KeyError: 'Xmp.xmp.Rating'       # This tag has been deleted
     >>> img.close()
     ```
     - Use `img.modify_exif()` and `img.modify_iptc()` in the same way.
-- If you try to modify a non-standard tag, it may be rejected. Such as below:
+- If you try to modify a non-standard tag, you may cause an exception. Such as below:
     ```python
-    >>> img.modify_exif({'Exif.Image.myflag001': 'test'})       # Unallowed
+    >>> img.modify_exif({'Exif.Image.myflag001': 'test'})    # Failed
     RuntimeError: (Caught Exiv2 exception) Invalid tag name or ifdId `myflag001', ifdId 1
-    >>> img.modify_xmp({'Xmp.dc.myflag001': 'test'})            # Allowed
+    >>> img.modify_xmp({'Xmp.dc.myflag001': 'test'})         # Successful
     >>> img.read_xmp()['Xmp.dc.myflag001']
     'test'
     ```
-- Some special tags cannot be modified by pyexiv2. Therefore, you should check if your tag has been successfully modified.
+- Some special tags cannot be modified by pyexiv2.
     ```python
     >>> img.read_xmp()['Xmp.xmpMM.History']
     'type="Seq"'
@@ -84,7 +88,7 @@ class Image(filename, encoding='utf-8')
 
 ### Image.clear_*()
 
-- Calling `img.clear_exif()` will delete all EXIF metadata of the image. Once cleared, pyexiv2 may not be able to recover it.
+- Calling `img.clear_exif()` will delete all EXIF metadata of the image. Once cleared, pyexiv2 may not be able to recover it completely.
   - Use `img.clear_iptc()` and `img.clear_xmp()` in the same way.
 
 ### Image.close()
@@ -98,22 +102,22 @@ class Image(filename, encoding='utf-8')
 
 ## Data types
 
-- The value of the metadata might be of type Short, Long, byte, Ascii, and so on. Most of them will be converted to String type by pyexiv2 when reading.
+- The value of the image metadata might be of type Short, Long, byte, Ascii, and so on. Most of them will be converted to String type by pyexiv2 when reading.
 - Some of the XMP metadata is a list of strings. For example:
     ```python
     >>> img.modify_xmp({'Xmp.dc.subject': ['flag1', 'flag2', 'flag3']})
     >>> img.read_xmp()['Xmp.dc.subject']
     ['flag1', 'flag2', 'flag3']
     ```
-    ```python
-    >>> img.modify_xmp({'Xmp.dc.subject': 'flag1,flag2, 0'})
-    >>> img.read_xmp()['Xmp.dc.subject']
-    ['flag1,flag2', '0']
-    ```
     The principle that pyexiv2 handling this type of value is just like:
     ```python
     buffer = ', '.join(raw_value)
     value = buffer.split(', ')
     ```
-    - Therefore, if the raw value contains `', '` , it will be split.
-    - You can call `img.read_raw_xmp()` to get the raw XMP metadata without splitting.
+    Therefore, if the raw value contains `', '` , it will be split. For example:
+    ```python
+    >>> img.modify_xmp({'Xmp.dc.subject': 'flag1,flag2, 0'})
+    >>> img.read_xmp()['Xmp.dc.subject']
+    ['flag1,flag2', '0']
+    ```
+    You can call `img.read_raw_xmp()` to get the raw XMP metadata without splitting.

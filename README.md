@@ -14,7 +14,8 @@ Read/Write metadata of digital image, including [EXIF](https://en.wikipedia.org/
 
 ## Usage
 
-- [Tutorials](https://github.com/LeoHsiao1/pyexiv2/blob/master/Tutorials.md)
+- [Tutorial](https://github.com/LeoHsiao1/pyexiv2/blob/dev/docs/Tutorial.md)
+- [中文教程](https://github.com/LeoHsiao1/pyexiv2/blob/dev/docs/Tutorial-cn.md)
 
 ## Tests
 
