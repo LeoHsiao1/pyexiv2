@@ -2,7 +2,6 @@
 from .lib import api
 
 
-OK = 'OK'
 COMMA = ', '
 
 

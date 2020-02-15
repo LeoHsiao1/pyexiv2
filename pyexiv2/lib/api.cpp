@@ -3,9 +3,7 @@
 #include <string>
 
 namespace py = pybind11;
-py::object OK = py::str("OK");
 const std::string COMMA = ", ";
-
 
 py::object open_image(const char *filename) 
 {
@@ -17,10 +15,9 @@ py::object open_image(const char *filename)
     return py::cast(img);
 }
 
-py::object close_image(Exiv2::Image::AutoPtr *img)
+void close_image(Exiv2::Image::AutoPtr *img)
 {
     delete img;
-    return OK;
     // Do not operate on the closed image.
 }
 
@@ -72,7 +69,7 @@ py::object read_raw_xmp(Exiv2::Image::AutoPtr *img)
 	return py::bytes((*img)->xmpPacket());
 }
 
-py::object modify_exif(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
+void modify_exif(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
 {
 	Exiv2::ExifData &exifData = (*img)->exifData();
     for (auto _line : table){
@@ -91,10 +88,9 @@ py::object modify_exif(Exiv2::Image::AutoPtr *img, py::list table, py::str encod
 	}
 	(*img)->setExifData(exifData);
 	(*img)->writeMetadata();
-	return OK;
 }
 
-py::object modify_iptc(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
+void modify_iptc(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
 {
 	Exiv2::IptcData &iptcData = (*img)->iptcData();
     for (auto _line : table){
@@ -113,10 +109,9 @@ py::object modify_iptc(Exiv2::Image::AutoPtr *img, py::list table, py::str encod
 	}
 	(*img)->setIptcData(iptcData);
 	(*img)->writeMetadata();
-	return OK;
 }
 
-py::object modify_xmp(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
+void modify_xmp(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
 {
 	Exiv2::XmpData &xmpData = (*img)->xmpData();
     for (auto _line : table){
@@ -150,31 +145,27 @@ py::object modify_xmp(Exiv2::Image::AutoPtr *img, py::list table, py::str encodi
     }
 	(*img)->setXmpData(xmpData);
 	(*img)->writeMetadata();
-	return OK;
 }
 
-py::object clear_exif(Exiv2::Image::AutoPtr *img)
+void clear_exif(Exiv2::Image::AutoPtr *img)
 {
 	Exiv2::ExifData exifData; // an empty container of exif metadata
 	(*img)->setExifData(exifData);
 	(*img)->writeMetadata();
-	return OK;
 }
 
-py::object clear_iptc(Exiv2::Image::AutoPtr *img)
+void clear_iptc(Exiv2::Image::AutoPtr *img)
 {
 	Exiv2::IptcData iptcData;
 	(*img)->setIptcData(iptcData);
 	(*img)->writeMetadata();
-	return OK;
 }
 
-py::object clear_xmp(Exiv2::Image::AutoPtr *img)
+void clear_xmp(Exiv2::Image::AutoPtr *img)
 {
 	Exiv2::XmpData xmpData;
 	(*img)->setXmpData(xmpData);
 	(*img)->writeMetadata();
-	return OK;
 }
 
 PYBIND11_MODULE(api, m)
