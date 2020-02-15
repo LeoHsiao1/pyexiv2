@@ -13,9 +13,9 @@ class Image(filename, encoding='utf-8')
     def read_xmp(self, encoding='utf-8') -> dict
     def read_raw_xmp(self, encoding='utf-8') -> str
 
-    def modify_exif(self, _dict, encoding='utf-8')
-    def modify_iptc(self, _dict, encoding='utf-8')
-    def modify_xmp(self, _dict, encoding='utf-8')
+    def modify_exif(self, dict_, encoding='utf-8')
+    def modify_iptc(self, dict_, encoding='utf-8')
+    def modify_xmp(self, dict_, encoding='utf-8')
 
     def clear_exif(self)
     def clear_iptc(self)
@@ -71,12 +71,17 @@ class Image(filename, encoding='utf-8')
 - If you try to modify a non-standard tag, you may cause an exception. Such as below:
     ```python
     >>> img.modify_exif({'Exif.Image.myflag001': 'test'})    # Failed
-    RuntimeError: (Caught Exiv2 exception) Invalid tag name or ifdId `myflag001', ifdId 1
+    RuntimeError: Invalid tag name or ifdId `myflag001', ifdId 1
     >>> img.modify_xmp({'Xmp.dc.myflag001': 'test'})         # Successful
     >>> img.read_xmp()['Xmp.dc.myflag001']
     'test'
     ```
-- Some special tags cannot be modified by pyexiv2.
+- Some special tags cannot be modified by pyexiv2. For example:
+    ```python
+    >>> img.modify_exif({'Exif.Photo.MakerNote': 'test,,,'})                                                               
+    >>> img.read_exif()['Exif.Photo.MakerNote'] 
+    ''  
+    ```
     ```python
     >>> img.read_xmp()['Xmp.xmpMM.History']
     'type="Seq"'

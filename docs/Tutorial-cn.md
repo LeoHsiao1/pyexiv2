@@ -13,9 +13,9 @@ class Image(filename, encoding='utf-8')
     def read_xmp(self, encoding='utf-8') -> dict
     def read_raw_xmp(self, encoding='utf-8') -> str
 
-    def modify_exif(self, _dict, encoding='utf-8')
-    def modify_iptc(self, _dict, encoding='utf-8')
-    def modify_xmp(self, _dict, encoding='utf-8')
+    def modify_exif(self, dict_, encoding='utf-8')
+    def modify_iptc(self, dict_, encoding='utf-8')
+    def modify_xmp(self, dict_, encoding='utf-8')
 
     def clear_exif(self)
     def clear_iptc(self)
@@ -72,12 +72,17 @@ class Image(filename, encoding='utf-8')
 - 如果你尝试修改一个非标准的标签，则可能引发一个异常。如下：
     ```python
     >>> img.modify_exif({'Exif.Image.myflag001': 'test'})    # 失败
-    RuntimeError: (Caught Exiv2 exception) Invalid tag name or ifdId `myflag001', ifdId 1
+    RuntimeError: Invalid tag name or ifdId `myflag001', ifdId 1
     >>> img.modify_xmp({'Xmp.dc.myflag001': 'test'})         # 成功
     >>> img.read_xmp()['Xmp.dc.myflag001']
     'test'
     ```
-- 某些特殊的标签不能被 pyexiv2 修改。
+- 某些特殊的标签不能被 pyexiv2 修改。例如：
+    ```python
+    >>> img.modify_exif({'Exif.Photo.MakerNote': 'test,,,'})                                                               
+    >>> img.read_exif()['Exif.Photo.MakerNote'] 
+    ''  
+    ```
     ```python
     >>> img.read_xmp()['Xmp.xmpMM.History']
     'type="Seq"'

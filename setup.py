@@ -13,12 +13,17 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/LeoHsiao1/pyexiv2',
-    # install_requires=["pybind11==2.4.3"],
+    install_requires=["pybind11==2.4.3"],
     packages=setuptools.find_packages(),
     package_data={'': ['*.py', '*.so', '*.dll', '*.pyd']},
     classifiers=[
-        'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'Operating System :: POSIX :: Linux',
+        'Operating System :: Microsoft :: Windows',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
 )
 

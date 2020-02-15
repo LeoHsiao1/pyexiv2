@@ -1,9 +1,7 @@
 import platform
 
 # Check the Python interpreter
-if not platform.python_version().startswith('3.'):
-    raise RuntimeError("pyexiv2 can only run by Python3(64bit).")
-if platform.architecture()[0] != '64bit':
+if not platform.python_version().startswith('3.') or platform.architecture()[0] != '64bit':
     raise RuntimeError("pyexiv2 can only run by Python3(64bit).")
 
 # Recognize the system
