@@ -107,3 +107,9 @@ def test_chinese_path():
             compare_dict(testdata.EXIF, img.read_exif())
     finally:
         os.remove(chinese_path)
+
+
+def test_error_log():
+    with pytest.raises(RuntimeError):
+        with Image(path) as img:
+            img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})

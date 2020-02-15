@@ -5,6 +5,9 @@ from .lib import api
 COMMA = ', '
 
 
+api.init()
+
+
 class Image:
     """
     This class is used for reading and writing metadata of digital image.

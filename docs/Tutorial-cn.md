@@ -79,16 +79,16 @@ class Image(filename, encoding='utf-8')
     ```
 - 某些特殊的标签不能被 pyexiv2 修改。例如：
     ```python
-    >>> img.modify_exif({'Exif.Photo.MakerNote': 'test,,,'})                                                               
-    >>> img.read_exif()['Exif.Photo.MakerNote'] 
+    >>> img.modify_exif({'Exif.Photo.MakerNote': 'test,,,'})
+    >>> img.read_exif()['Exif.Photo.MakerNote']
     ''  
     ```
     ```python
     >>> img.read_xmp()['Xmp.xmpMM.History']
     'type="Seq"'
     >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
-    Error: XMP Toolkit error 102: Indexing applied to non-array
-    Error: Failed to encode XMP metadata.
+    RuntimeError: XMP Toolkit error 102: Indexing applied to non-array
+    Failed to encode XMP metadata.
     ```
 - 修改元数据的速度与图片的大小成反比。
 

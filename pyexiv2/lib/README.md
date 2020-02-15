@@ -27,7 +27,7 @@
 
 3. Prepare the environment:
     ```sh
-    cd ./linux64
+    cd pyexiv2/lib/linux64
     EXIV2_DIR=/mnt/c/Users/Leo/Downloads/exiv2-0.27.2-Linux64   # According to your download location
     mv ${EXIV2_DIR}/lib/libexiv2.so.0.27.2 ${EXIV2_DIR}/lib/libexiv2.so     # rename the library file
     cp ${EXIV2_DIR}/lib/libexiv2.so .
@@ -48,7 +48,7 @@
 3. Prepare the environment:
     ```
     "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-    cd .\win64
+    cd pyexiv2\lib\win64
     set EXIV2_DIR=C:\Users\Leo\Downloads\exiv2-0.27.2-2017msvc64
     copy %EXIV2_DIR%\bin\exiv2.dll .
     ```

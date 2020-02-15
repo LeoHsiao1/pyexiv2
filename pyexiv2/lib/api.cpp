@@ -1,44 +1,97 @@
 #include <pybind11/pybind11.h>
 #include <exiv2/exiv2.hpp>
 #include <string>
+#include <sstream>
+#include <iostream>
 
 namespace py = pybind11;
 const std::string COMMA = ", ";
+py::str OK = "OK";
+const char *EXCEPTION_HINT = "Caught Exiv2 exception: ";
+std::stringstream error_log;
 
-py::object open_image(const char *filename) 
+#define catch_block                       \
+    catch (std::exception & e)            \
+    {                                     \
+        std::stringstream ss;             \
+        ss << EXCEPTION_HINT << e.what(); \
+        return py::str(ss.str());         \
+    }
+
+#define read_block                                                     \
+    {                                                                  \
+        py::list table;                                                \
+        for (; i != end; ++i)                                          \
+        {                                                              \
+            py::list line;                                             \
+            line.append(py::bytes(i->key()));                          \
+                                                                       \
+            std::stringstream _value;                                  \
+            _value << i->value();                                      \
+            line.append(py::bytes(_value.str()));                      \
+                                                                       \
+            const char *typeName = i->typeName();                      \
+            line.append(py::bytes((typeName ? typeName : "Unknown"))); \
+            table.append(line);                                        \
+        }                                                              \
+        return table;                                                  \
+    }
+
+void logHandler(int level, const char *msg)
+{
+    switch (level)
+    {
+    case Exiv2::LogMsg::debug:
+    case Exiv2::LogMsg::info:
+    case Exiv2::LogMsg::warn:
+        std::cout << msg << std::endl;
+        break;
+
+    case Exiv2::LogMsg::error:
+        // For unknown reasons, the exception thrown here cannot be caught, so save the log to error_log
+        // std::cout << msg << std::endl;
+        // throw std::exception(msg);
+        error_log << msg;
+        break;
+
+    default:
+        return;
+    }
+}
+
+void init()
+{
+    Exiv2::LogMsg::setHandler(logHandler);
+    Exiv2::LogMsg::setLevel(Exiv2::LogMsg::warn);
+}
+
+void check_error_log()
+{
+    std::string str = error_log.str();
+    if(str != ""){
+        error_log.clear();  // Clear it so it can be used again
+        error_log.str("");
+        throw std::exception(str.c_str());
+    }
+}
+
+py::object open_image(const char *filename)
 {
     Exiv2::Image::AutoPtr *img = new Exiv2::Image::AutoPtr;
     *img = Exiv2::ImageFactory::open(filename);
     if (img->get() == 0)
         throw Exiv2::Error(Exiv2::kerErrorMessage, "Can not open this file.");
     (*img)->readMetadata();
+    check_error_log();
     return py::cast(img);
 }
 
 void close_image(Exiv2::Image::AutoPtr *img)
 {
     delete img;
-    // Do not operate on the closed image.
+    check_error_log();
 }
 
-#define read_block                                                      \
-	{                                                                   \
-        py::list table;                                                 \
-        for (; i != end; ++i)                                           \
-        {                                                               \
-            py::list line;                                              \
-            line.append(py::bytes(i->key()));                           \
-                                                                        \
-            std::stringstream _value;                                   \
-            _value << i->value();                                       \
-            line.append(py::bytes(_value.str()));                       \
-                                                                        \
-            const char *typeName = i->typeName();                       \
-            line.append(py::bytes((typeName ? typeName : "Unknown")));  \
-            table.append(line);                                         \
-        }                                                               \
-        return table;                                                   \
-	}
 
 py::object read_exif(Exiv2::Image::AutoPtr *img)
 {
@@ -46,6 +99,7 @@ py::object read_exif(Exiv2::Image::AutoPtr *img)
     Exiv2::ExifData::iterator i = data.begin();
     Exiv2::ExifData::iterator end = data.end();
     read_block;
+    check_error_log();
 }
 
 py::object read_iptc(Exiv2::Image::AutoPtr *img)
@@ -54,6 +108,7 @@ py::object read_iptc(Exiv2::Image::AutoPtr *img)
 	Exiv2::IptcData::iterator i = data.begin();
 	Exiv2::IptcData::iterator end = data.end();
 	read_block;
+    check_error_log();
 }
 
 py::object read_xmp(Exiv2::Image::AutoPtr *img)
@@ -62,10 +117,12 @@ py::object read_xmp(Exiv2::Image::AutoPtr *img)
 	Exiv2::XmpData::iterator i = data.begin();
 	Exiv2::XmpData::iterator end = data.end();
 	read_block;
+    check_error_log();
 }
 
 py::object read_raw_xmp(Exiv2::Image::AutoPtr *img)
 {
+    check_error_log();
 	return py::bytes((*img)->xmpPacket());
 }
 
@@ -88,6 +145,7 @@ void modify_exif(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
 	}
 	(*img)->setExifData(exifData);
 	(*img)->writeMetadata();
+    check_error_log();
 }
 
 void modify_iptc(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
@@ -109,6 +167,7 @@ void modify_iptc(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
 	}
 	(*img)->setIptcData(iptcData);
 	(*img)->writeMetadata();
+    check_error_log();
 }
 
 void modify_xmp(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
@@ -145,6 +204,7 @@ void modify_xmp(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
     }
 	(*img)->setXmpData(xmpData);
 	(*img)->writeMetadata();
+    check_error_log();
 }
 
 void clear_exif(Exiv2::Image::AutoPtr *img)
@@ -152,6 +212,7 @@ void clear_exif(Exiv2::Image::AutoPtr *img)
 	Exiv2::ExifData exifData; // an empty container of exif metadata
 	(*img)->setExifData(exifData);
 	(*img)->writeMetadata();
+    check_error_log();
 }
 
 void clear_iptc(Exiv2::Image::AutoPtr *img)
@@ -159,6 +220,7 @@ void clear_iptc(Exiv2::Image::AutoPtr *img)
 	Exiv2::IptcData iptcData;
 	(*img)->setIptcData(iptcData);
 	(*img)->writeMetadata();
+    check_error_log();
 }
 
 void clear_xmp(Exiv2::Image::AutoPtr *img)
@@ -166,6 +228,7 @@ void clear_xmp(Exiv2::Image::AutoPtr *img)
 	Exiv2::XmpData xmpData;
 	(*img)->setXmpData(xmpData);
 	(*img)->writeMetadata();
+    check_error_log();
 }
 
 PYBIND11_MODULE(api, m)
@@ -173,6 +236,7 @@ PYBIND11_MODULE(api, m)
     m.doc() = "Expose the API of exiv2 to Python.";
     py::class_<Exiv2::Image::AutoPtr>(m, "Exiv2_Image_AutoPtr")
         .def(py::init<>());
+    m.def("init", &init);
     m.def("open_image", &open_image);
     m.def("close_image", &close_image);
     m.def("read_exif", &read_exif);
