@@ -39,7 +39,7 @@ class Image(filename, encoding='utf-8')
     >>> img.close()
     ```
 - pyexiv2 支持包含 Unicode 字符的图片路径、元数据。默认编码格式为 utf-8 .
-- 出于未知的原因，如果你在Windows上使用 pyexiv2 ，并且图片路径中包含中文，则无法使用 utf-8 进行编码，而只能使用 gbk 进行编码。例如：
+- 如果你不能用`utf-8`编码图片数据或路径中的中文字符，请试试用`gbk`。例如：
     ```python
     >>> img = Image(r'.\pyexiv2\tests\1 - 副本.jpg')
     RuntimeError: d:\1\pyexiv2\pyexiv2\tests\1 - 副本.jpg: Failed to open the data source: No such file or directory (errno = 2)

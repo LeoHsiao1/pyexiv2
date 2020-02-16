@@ -39,7 +39,7 @@ class Image(filename, encoding='utf-8')
     >>> img.close()
     ```
 - pyexiv2 supports Unicode characters that contained in image paths and metadata. The default encoding format is utf-8.
-- For unknown reasons, if you are using pyexiv2 on Windows and the image path contains Chinese, it can't be encoded in utf-8, but in gbk. For example:
+- If you cannot encode Chinese characters in the image data or path in `utf-8`, please try `gbk`. For example:
     ```python
     >>> img = Image(r'.\pyexiv2\tests\1 - 副本.jpg')
     RuntimeError: d:\1\pyexiv2\pyexiv2\tests\1 - 副本.jpg: Failed to open the data source: No such file or directory (errno = 2)

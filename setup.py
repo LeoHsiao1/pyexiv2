@@ -15,7 +15,7 @@ setuptools.setup(
     url='https://github.com/LeoHsiao1/pyexiv2',
     install_requires=["pybind11==2.4.3"],
     packages=setuptools.find_packages(),
-    package_data={'': ['*.py', '*.so', '*.dll', '*.pyd']},
+    package_data={'': ['*.py', '*.md', '*.cpp', '*.so', '*.dll', '*.pyd', '*.jpg']},
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: POSIX :: Linux',
@@ -29,5 +29,7 @@ setuptools.setup(
 
 
 # upload to pypi.org:
+#   python -m pip install setuptools wheel twine
+#   git clean -df
 #   python setup.py sdist bdist_wheel
 #   python -m twine upload dist/*
