@@ -1,209 +1,93 @@
 # -*- coding: utf-8 -*-
-import os
-import sys
-import ctypes
+from .lib import api
 
 
-dll_dir = os.path.join(os.path.dirname(__file__), "lib")
-SEP = "\t"  # separator
-EOL = "\v\f"  # use a weird symbol as EOL
-EOL_replaced = "\v\b"  # If the metadata contains EOL, replace it with this symbol
-COMMA = ", "
-EXCEPTION_HINT = "(Caught Exiv2 exception) "
-OK = "OK"
+COMMA = ', '
 
-# Recognize the system
-if sys.platform.startswith("linux"):
-    ctypes.CDLL(os.path.join(dll_dir, "libexiv2.so"))  # import it at first
-    api = ctypes.CDLL(os.path.join(dll_dir, "api.so"))
-    # Unicode characters need to be handled, because char array can only contain ASCII characters.
-    ENCODING = "utf-8"
-elif sys.platform.startswith("win"):
-    ctypes.CDLL(os.path.join(dll_dir, "exiv2.dll"))
-    api = ctypes.CDLL(os.path.join(dll_dir, "api.dll"))
-    ENCODING = "gbk"
-else:
-    raise RuntimeError("Unknown platform. This module should run on Linux or Windows.")
+
+api.init()
 
 
 class Image:
-    """ 
-    Creating an Image object just means recording the filename, not the actual operation.\n
-    Please call the public methods of class Image.
     """
+    This class is used for reading and writing metadata of digital image.
+    Please call the public methods of this class.
+    """
+    
+    def __init__(self, filename, encoding='utf-8'):
+        """ Open an image and load its metadata. """
+        self.img = api.open_image(filename.encode(encoding))
 
-    def __init__(self, filename:str):
-        self.filename = filename.encode(ENCODING)
+    def __enter__(self):
+        return self
 
-    def read_exif(self) -> dict:
-        self._open_image()
-        return self._read_exif()
+    def __exit__(self, *args):
+        self.close()
 
-    def read_iptc(self) -> dict:
-        self._open_image()
-        return self._read_iptc()
+    def close(self):
+        """ Free the memory for storing image data. """
+        api.close_image(self.img)
+        
+        # Disable all public methods
+        def closed_warning():
+            raise RuntimeError('Do not operate on the closed image.')
+        for attr in dir(self):
+            if not attr.startswith('_') and callable(getattr(self, attr)):
+                setattr(self, attr, closed_warning)
 
-    def read_xmp(self) -> dict:
-        self._open_image()
-        return self._read_xmp()
+    def read_exif(self, encoding='utf-8') -> dict:
+        self._exif = api.read_exif(self.img)
+        return self._parse(self._exif, encoding)
 
-    def read_raw_xmp(self) -> str:
-        """ The raw XMP data is in XML format. """
-        self._open_image()
-        return self._read_raw_xmp()
+    def read_iptc(self, encoding='utf-8') -> dict:
+        self._iptc = api.read_iptc(self.img)
+        return self._parse(self._iptc, encoding)
 
-    def read_all(self) -> dict:
-        """ read all the metadata, return = {"EXIF":{...}, "IPTC":{...}, "XMP":{...}} """
-        self._open_image()
-        _dict = {"EXIF": self._read_exif(),
-                 "IPTC": self._read_iptc(),
-                 "XMP": self._read_xmp()
-                 }
-        return _dict
+    def read_xmp(self, encoding='utf-8') -> dict:
+        self._xmp = api.read_xmp(self.img)
+        return self._parse(self._xmp, encoding)
 
-    def modify_exif(self, exif_dict):
-        self._open_image()
-        self._modify_exif(exif_dict)
+    def read_raw_xmp(self, encoding='utf-8') -> str:
+        self._raw_xmp = api.read_raw_xmp(self.img)
+        return self._raw_xmp.decode(encoding)
 
-    def modify_iptc(self, iptc_dict):
-        self._open_image()
-        self._modify_iptc(iptc_dict)
+    def modify_exif(self, dict_, encoding='utf-8'):
+        api.modify_exif(self.img, self._dumps(dict_), encoding)
 
-    def modify_xmp(self, xmp_dict):
-        self._open_image()
-        self._modify_xmp(xmp_dict)
+    def modify_iptc(self, dict_, encoding='utf-8'):
+        api.modify_iptc(self.img, self._dumps(dict_), encoding)
 
-    def modify_all(self, all_dict):
-        """ all_dict = {"EXIF":{...}, "IPTC":{...}, "XMP":{...}} """
-        self._open_image()
-        self._modify_exif(all_dict["EXIF"])
-        self._modify_iptc(all_dict["IPTC"])
-        self._modify_xmp(all_dict["XMP"])
+    def modify_xmp(self, dict_, encoding='utf-8'):
+        api.modify_xmp(self.img, self._dumps(dict_), encoding)
+    
+    def _parse(self, table: list, encoding='utf-8') -> dict:
+        """ Parse the table returned by C++ API into a dict. """
+        dict_ = {}
+        for line in table:
+            decoded_line = [i.decode(encoding) for i in line]
+            key, value, typeName = decoded_line
+            if typeName in ['XmpBag', 'XmpSeq']:
+                value = value.split(COMMA)
+            dict_[key] = value
+        return dict_
+    
+    def _dumps(self, dict_) -> list:
+        """ Convert the metadata dict into a table that the C++ API can read. """
+        table = []
+        for key, value in dict_.items():
+            typeName = 'str'
+            if isinstance(value, (list, tuple)):
+                typeName = 'array'
+                value = COMMA.join(value)
+            line = [key, value, typeName]
+            table.append(line)
+        return table
 
     def clear_exif(self):
-        """ Delete all EXIF data. Once cleared, pyexiv2 may not be able to recover it. """
-        self._open_image()
-        self._clear_exif()
+        api.clear_exif(self.img)
 
     def clear_iptc(self):
-        """ Delete all IPTC data. Once cleared, pyexiv2 may not be able to recover it. """
-        self._open_image()
-        self._clear_iptc()
+        api.clear_iptc(self.img)
 
     def clear_xmp(self):
-        """ Delete all XMP data. Once cleared, pyexiv2 may not be able to recover it. """
-        self._open_image()
-        self._clear_xmp()
-
-    def clear_all(self):
-        """ Delete all the metadata. Once cleared, pyexiv2 may not be able to recover it. """
-        self._open_image()
-        self._clear_exif()
-        self._clear_iptc()
-        self._clear_xmp()
-
-    def _char_API_void(self, api_name):
-        exec("api.{}.restype = ctypes.c_char_p".format(api_name))
-        exec("ret = api.{}().decode()".format(api_name))
-        exec("if ret != OK: raise RuntimeError(ret)")
-
-    def _open_image(self):
-        """ Let C++ program open an image and read its metadata,
-        save as a global variable in C++ program. """
-        api.open_image.restype = ctypes.c_char_p
-        ret = api.open_image(self.filename).decode()
-        if ret != OK:
-            raise RuntimeError(ret)
-
-    def _read_exif(self):
-        api.read_exif.restype = ctypes.c_char_p
-        text = api.read_exif().decode()
-        return self._loads(text)
-
-    def _read_iptc(self):
-        api.read_iptc.restype = ctypes.c_char_p
-        text = api.read_iptc().decode()
-        return self._loads(text)
-
-    def _read_xmp(self):
-        api.read_xmp.restype = ctypes.c_char_p
-        text = api.read_xmp().decode()
-        return self._loads(text)
-
-    def _read_raw_xmp(self):
-        api.read_raw_xmp.restype = ctypes.c_char_p
-        return api.read_raw_xmp().decode()
-
-    def _modify_exif(self, exif_dict):
-        text = self._dumps(exif_dict)
-        buffer = ctypes.create_string_buffer(text.encode())
-        api.modify_exif.restype = ctypes.c_char_p
-        ret = api.modify_exif(buffer).decode()
-        if ret != OK:
-            raise RuntimeError(ret)
-
-    def _modify_iptc(self, iptc_dict):
-        text = self._dumps(iptc_dict)
-        buffer = ctypes.create_string_buffer(text.encode())
-        api.modify_iptc.restype = ctypes.c_char_p
-        ret = api.modify_iptc(buffer).decode()
-        if ret != OK:
-            raise RuntimeError(ret)
-
-    def _modify_xmp(self, xmp_dict):
-        text = self._dumps(xmp_dict)
-        buffer = ctypes.create_string_buffer(text.encode())
-        api.modify_xmp.restype = ctypes.c_char_p
-        ret = api.modify_xmp(buffer).decode()
-        if ret != OK:
-            raise RuntimeError(ret)
-
-    def _clear_exif(self):
-        api.clear_exif.restype = ctypes.c_char_p
-        ret = api.clear_exif().decode()
-        if ret != OK:
-            raise RuntimeError(ret)
-
-    def _clear_iptc(self):
-        api.clear_iptc.restype = ctypes.c_char_p
-        ret = api.clear_iptc().decode()
-        if ret != OK:
-            raise RuntimeError(ret)
-
-    def _clear_xmp(self):
-        api.clear_xmp.restype = ctypes.c_char_p
-        ret = api.clear_xmp().decode()
-        if ret != OK:
-            raise RuntimeError(ret)
-
-    def _loads(self, text):
-        """ Parses the return text of C++ API. """
-        if text.startswith(EXCEPTION_HINT):
-            raise RuntimeError(text)
-        _dict = {}
-        lines = text.split(EOL)[:-1]  # the last line is empty
-        for line in lines:
-            key, typename, value = line.split(SEP, 2)
-            if typename in ["XmpBag", "XmpSeq"]:
-                value = value.split(COMMA)
-            _dict[key] = value
-        return _dict
-
-    def _dumps(self, _dict):
-        """ Converts the metadata to a text. """
-        text = ""
-        for key, value in _dict.items():
-            typename = "str"
-            if isinstance(value, (list, tuple)):
-                typename = "array"
-                value = COMMA.join(value) # convert list to str
-            value = replace_all(value, EOL, EOL_replaced)
-            text += key + SEP + typename + SEP + value + EOL
-        return text
-
-
-def replace_all(text:str, src: str, dest: str):
-    result = text
-    while src in result:
-        result = result.replace(src, dest)
-    return result
+        api.clear_xmp(self.img)

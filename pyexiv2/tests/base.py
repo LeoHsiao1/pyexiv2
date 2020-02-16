@@ -9,12 +9,12 @@ import pytest
 from .. import Image
 
 current_dir = os.path.dirname(__file__)
-jpg_path = os.path.join(current_dir, "1.jpg")
-path = os.path.join(current_dir, "tmp.jpg")
+original_path = os.path.join(current_dir, '1.jpg')
+path = os.path.join(current_dir, 'tmp.jpg')
 
 
 def setup_function():
-    shutil.copy(jpg_path, path)
+    shutil.copy(original_path, path)
 
 
 def teardown_function():
@@ -23,11 +23,10 @@ def teardown_function():
 
 def _check_md5(file1, file2):
     """ check whether the two files are the same """
-    with open(file1, "rb") as f1:
+    with open(file1, "rb") as f1, open(file2, "rb") as f2:
         h1 = hashlib.md5(f1.read()).digest()
-    with open(file2, "rb") as f2:
         h2 = hashlib.md5(f2.read()).digest()
-    return h1 == h2
+        return h1 == h2
 
 
 def check_md5(func):
@@ -35,6 +34,13 @@ def check_md5(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         ret = func(*args, **kwargs)
-        assert _check_md5(path, jpg_path), "The file has been changed after {}().".format(func.__name__)
+        assert _check_md5(path, original_path), 'The file has been changed after {}().'.format(func.__name__)
         return ret
     return wrapper
+
+
+def compare_dict(d1, d2):
+    """ Compare two dictionaries to see if they are the same. """
+    assert len(d1) == len(d2)
+    for k in d1.keys():
+        assert d1[k] == d2[k], "['{}'] is different.".format(k)
