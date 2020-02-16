@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .common import *
+from .base import *
 from . import testdata
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import psutil
 
-from .common import *
+from .base import *
 from . import test_func
 
 
