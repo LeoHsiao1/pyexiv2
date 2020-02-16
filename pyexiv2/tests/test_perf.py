@@ -15,9 +15,9 @@ def test_memory_leak_when_reading():
         test_func.test_read_xmp()
         test_func.test_read_raw_xmp()
     m1 = p.memory_info().rss
-    delta = (m1 - m0) / 1024
-    assert delta < 1024, 'Memory grew by {}KB, possibly due to the memory leak.'.format(delta)
-    # On my machine, if img.close() hasn't been called, the memory will increase by at least 100M.
+    delta = (m1 - m0) / 1024 / 1024
+    assert delta < 1, 'Memory grew by {}MB, possibly due to the memory leak.'.format(delta)
+    # On my machine, if img.close() hasn't been called, the memory will increase by at least 100MB.
 
 
 def test_memory_leak_when_writing():
@@ -28,8 +28,8 @@ def test_memory_leak_when_writing():
         test_func.test_modify_iptc()
         test_func.test_modify_xmp()
     m1 = p.memory_info().rss
-    delta = (m1 - m0) / 1024
-    assert delta < 1024, 'Memory grew by {}KB, possibly due to the memory leak.'.format(delta)
+    delta = (m1 - m0) / 1024 / 1024
+    assert delta < 1, 'Memory grew by {}MB, possibly due to the memory leak.'.format(delta)
 
 
 def test_stack_overflow():
@@ -69,9 +69,25 @@ def test_transmit_various_characters():
             assert img.read_xmp().get('Xmp.MicrosoftPhoto.LensModel') == _v
 
 
+def _test_thread_safe():
+    """
+    Test whether pyexiv can successfully run multiple threads. 
+    TODO:Could not catch an exception from a child thread.
+    """
+    import multiprocessing
+    pool = multiprocessing.Pool(3)
+    for _ in range(5):
+        pool.apply_async(test_memory_leak_when_reading, ())
+    pool.close()
+    pool.join()
+
+
 @check_md5
 def _test_recovery_exif():
-    """ Test whether pyexiv2 can delete metadata and recover it completely. """
+    """
+    Test whether pyexiv2 can delete metadata and recover it completely.
+    TODO:complete it
+    """
     with Image(path) as img:
         original_dict = img.read_exif()
         img.clear_exif()

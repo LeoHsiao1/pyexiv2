@@ -100,7 +100,7 @@ class Image(filename, encoding='utf-8')
 
 ### Image.close()
 
-- 当你处理完图片之后，请记得调用 `img.close()` ，以释放用于存储图像数据的内存。不调用该方法可能会导致内存溢出，但不会锁定文件描述符。
+- 当你处理完图片之后，请记得调用 `img.close()` ，以释放用于存储图像数据的内存。不调用该方法会导致内存泄漏，但不会锁定文件描述符。
 - 通过 `with` 关键字打开图片时，它会自动关闭图片。例如：
     ```python
     with Image(r'.\pyexiv2\tests\1.jpg') as img:

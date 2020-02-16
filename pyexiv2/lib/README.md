@@ -4,38 +4,42 @@
 
 ```
 .
+├── linux64-py3*    # the build results on Linux(64bit)
+├── win64-py3*      # the build results on Windows(64bit)
 ├── __init__.py
-├── README.md
-├── api.cpp             # Expose the API of exiv2 to Python. It needs to be compiled by pybind11.
-├── linux64
-│   ├── __init__.py
-│   ├── api.so          # The result of compilation on Linux(64bit)
-│   └── libexiv2.so     # Copied from Exiv2 project
-└── win64
-    ├── __init__.py
-    ├── api.pyd         # The result of compilation on Windows(64bit)
-    └── exiv2.dll       # Copied from Exiv2 project
+├── api.cpp         # Expose the API of exiv2 to Python
+├── exiv2.dll       # Copied from the Exiv2 release
+├── libexiv2.so     # Copied from the Exiv2 release
+└── README.md
 ```
-- The current release version of Exiv2 is `0.27.2` .
+- The current release version of Exiv2 is `0.27.2`.
+- You need to install pybind11 to compile api.cpp:`python3 -m pip install pybind11`
+- When using pyexiv2, you must use the same Python interpreter as the compile-time version.
 
 ## Compile steps on Linux
 
 1. Download the release version of Exiv2, unpack it.
     - Linux64 : <https://www.exiv2.org/builds/>
 
-2. install g++ .
-
-3. Prepare the environment:
+2. Download the python interpreter, for example:
     ```sh
-    cd pyexiv2/lib/linux64
+    docker run -d --name python3.5 -v /root/pyexiv2:/root/pyexiv2 python:3.5 tail -f /dev/null
+    docker exec -it python3.5 bash
+    ```
+
+3. install g++ .
+
+4. Prepare the environment:
+    ```sh
+    cd pyexiv2/lib/
     EXIV2_DIR=/mnt/c/Users/Leo/Downloads/exiv2-0.27.2-Linux64   # According to your download location
     mv ${EXIV2_DIR}/lib/libexiv2.so.0.27.2 ${EXIV2_DIR}/lib/libexiv2.so     # rename the library file
     cp ${EXIV2_DIR}/lib/libexiv2.so .
     ```
 
-4. Compile:
+5. Compile:
     ```sh
-    g++ ../api.cpp -o api.so -O3 -Wall -std=c++11 -shared -fPIC `python3 -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2
+    g++ api.cpp -o linux64-py35/api.so -O3 -Wall -std=c++11 -shared -fPIC `python3.5 -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2
     ```
 
 ## Compile steps on Windows
@@ -48,14 +52,15 @@
 3. Prepare the environment:
     ```
     "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-    cd pyexiv2\lib\win64
+    cd pyexiv2\lib
     set EXIV2_DIR=C:\Users\Leo\Downloads\exiv2-0.27.2-2017msvc64
     copy %EXIV2_DIR%\bin\exiv2.dll .
     ```
 
 4. Compile:
     ```
-    cl /MD /LD ..\api.cpp /EHsc -I %EXIV2_DIR%\include -I C:\Users\Leo\AppData\Local\Programs\Python\Python37\include /link %EXIV2_DIR%\lib\exiv2.lib C:\Users\Leo\AppData\Local\Programs\Python\Python37\libs\python37.lib /OUT:api.pyd
+    set py_version=35
+    cl /MD /LD api.cpp /EHsc -I %EXIV2_DIR%\include -I C:\Users\Leo\AppData\Local\Programs\Python\Python%py_version%\include /link %EXIV2_DIR%\lib\exiv2.lib C:\Users\Leo\AppData\Local\Programs\Python\Python%py_version%\libs\python%py_version%.lib /OUT:win64-py%py_version%\api.pyd
     del api.exp api.obj api.lib
     ```
     Modify the path here according to your installation location.

@@ -71,7 +71,7 @@ void check_error_log()
     if(str != ""){
         error_log.clear();  // Clear it so it can be used again
         error_log.str("");
-        throw std::exception(str.c_str());
+        throw std::runtime_error(str);
     }
 }
 

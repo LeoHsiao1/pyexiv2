@@ -27,6 +27,8 @@ class Image:
     def close(self):
         """ Free the memory for storing image data. """
         api.close_image(self.img)
+        
+        # Disable all public methods
         def closed_warning():
             raise RuntimeError('Do not operate on the closed image.')
         for attr in dir(self):

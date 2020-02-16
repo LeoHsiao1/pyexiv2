@@ -98,7 +98,7 @@ class Image(filename, encoding='utf-8')
 
 ### Image.close()
 
-- When you're done with the image, remember to call `img.close()` to free the memory for storing image data. Not calling this method can cause out of memory, but it doesn't lock the file descriptor.
+- When you're done with the image, remember to call `img.close()` to free the memory for storing image data. Not calling this method causes a memory leak, but it doesn't lock the file descriptor.
 - Opening an image by `with` keyword will close the image automatically. For example:
     ```python
     with Image(r'.\pyexiv2\tests\1.jpg') as img:
