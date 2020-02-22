@@ -106,6 +106,8 @@ def test_chinese_path():
 
 
 def test_error_log():
-    with pytest.raises(RuntimeError):
-        with Image(path) as img:
+    with Image(path) as img:
+        with pytest.raises(RuntimeError):
             img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
+        set_log_level(4)
+        img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})

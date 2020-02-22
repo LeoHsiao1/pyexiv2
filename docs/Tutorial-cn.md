@@ -128,3 +128,27 @@ class Image(filename, encoding='utf-8')
     ['flag1,flag2', '0']
     ```
     你可以调用 `img.read_raw_xmp()` ，以获得未分割的 XMP 元数据。
+
+## 日志
+
+- pyexiv2 有 5 种处理日志的级别：
+    - 0 : debug
+    - 1 : info
+    - 2 : warn
+    - 3 : error
+    - 4 : mute
+
+- 默认的日志级别是 `warn` ，因此更低级别的日志不会被处理。
+- `error` 日志会被转换成异常并抛出，其它日志则会被打印到 stdout 。
+- 调用函数 `pyexiv2.set_log_level()` 可以设置处理日志的级别。例如：
+    ```python
+    >>> import pyexiv2
+    >>> img = pyexiv2.Image(r'.\pyexiv2\tests\1.jpg')
+    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
+    RuntimeError: XMP Toolkit error 102: Indexing applied to non-array
+    Failed to encode XMP metadata.
+
+    >>> pyexiv2.set_log_level(4)
+    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
+    >>> img.close()
+    ```

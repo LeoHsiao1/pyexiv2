@@ -60,7 +60,7 @@
 
 4. Compile:
     ```
-    set py_version=35
+    set py_version=38
     cl /MD /LD exiv2api.cpp /EHsc -I %EXIV2_DIR%\include -I C:\Users\Leo\AppData\Local\Programs\Python\Python%py_version%\include /link %EXIV2_DIR%\lib\exiv2.lib C:\Users\Leo\AppData\Local\Programs\Python\Python%py_version%\libs\python%py_version%.lib /OUT:win64-py%py_version%\exiv2api.pyd
     del exiv2api.exp exiv2api.obj exiv2api.lib
     ```

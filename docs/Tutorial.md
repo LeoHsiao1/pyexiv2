@@ -126,3 +126,27 @@ class Image(filename, encoding='utf-8')
     ['flag1,flag2', '0']
     ```
     You can call `img.read_raw_xmp()` to get the raw XMP metadata without splitting.
+
+## logs
+
+- pyexiv2 has five levels of handling logs：
+    - 0 : debug
+    - 1 : info
+    - 2 : warn
+    - 3 : error
+    - 4 : mute
+
+- The default log level is `warn`, so that the lower logs will not be handled.
+- The `error` log will be converted to an exception and thrown. Other logs will be printed to stdout.
+- Call the function `pyexiv2.set_log_level()` to set the level of handling logs. For example:
+    ```python
+    >>> import pyexiv2
+    >>> img = pyexiv2.Image(r'.\pyexiv2\tests\1.jpg')
+    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
+    RuntimeError: XMP Toolkit error 102: Indexing applied to non-array
+    Failed to encode XMP metadata.
+
+    >>> pyexiv2.set_log_level(4)
+    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
+    >>> img.close()
+    ```
