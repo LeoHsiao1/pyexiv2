@@ -1,5 +1,5 @@
-- [Tutorial](https://github.com/LeoHsiao1/pyexiv2/blob/dev/docs/Tutorial.md)
-- [中文教程](https://github.com/LeoHsiao1/pyexiv2/blob/dev/docs/Tutorial-cn.md)
+- [Tutorial](./Tutorial.md)
+- [中文教程](./Tutorial-cn.md)
 
 # 教程
 
