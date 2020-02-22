@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .lib import api
+from .lib import exiv2api as api
 
 
 COMMA = ', '

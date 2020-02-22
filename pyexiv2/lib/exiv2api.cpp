@@ -231,7 +231,7 @@ void clear_xmp(Exiv2::Image::AutoPtr *img)
     check_error_log();
 }
 
-PYBIND11_MODULE(api, m)
+PYBIND11_MODULE(exiv2api, m)
 {
     m.doc() = "Expose the API of exiv2 to Python.";
     py::class_<Exiv2::Image::AutoPtr>(m, "Exiv2_Image_AutoPtr")
