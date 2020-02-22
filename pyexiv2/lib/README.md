@@ -21,26 +21,32 @@
 
 1. Download the release version of Exiv2, unpack it.
     - Linux64 : <https://www.exiv2.org/builds/>
+    - For example:
+        ```sh
+        cd /root/pyexiv2
+        curl -O https://www.exiv2.org/builds/exiv2-0.27.2-Linux64.tar.gz
+        tar -zxvf exiv2-0.27.2-Linux64.tar.gz
+        ```
 
-2. Download the python interpreter, for example:
+2. Set up the python interpreter. For example:
     ```sh
-    docker run -d --name python3.5 -v /root/pyexiv2:/root/pyexiv2 python:3.5 tail -f /dev/null
-    docker exec -it python3.5 bash
+    py_version=8
+    docker run -it --rm --name python3.${py_version} -v /root/pyexiv2:/root/pyexiv2 python:3.${py_version} bash
     ```
 
-3. install g++ .
-
-4. Prepare the environment:
+3. Prepare the environment:
     ```sh
-    cd pyexiv2/lib/
-    EXIV2_DIR=/mnt/c/Users/Leo/Downloads/exiv2-0.27.2-Linux64   # According to your download location
+    py_version=8
+    python3.${py_version} -m pip install pybind11
+    EXIV2_DIR=/root/pyexiv2/exiv2-0.27.2-Linux64   # According to your download location
+    cd /root/pyexiv2/pyexiv2/lib/
     mv ${EXIV2_DIR}/lib/libexiv2.so.0.27.2 ${EXIV2_DIR}/lib/libexiv2.so     # rename the library file
     cp ${EXIV2_DIR}/lib/libexiv2.so .
     ```
 
-5. Compile:
+4. Compile:
     ```sh
-    g++ exiv2api.cpp -o linux64-py35/exiv2api.so -O3 -Wall -std=c++11 -shared -fPIC `python3.5 -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2
+    g++ exiv2api.cpp -o linux64-py3${py_version}/exiv2api.so -O3 -Wall -std=c++11 -shared -fPIC `python3.${py_version} -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2
     ```
 
 ## Compile steps on Windows
@@ -60,8 +66,8 @@
 
 4. Compile:
     ```
-    set py_version=38
-    cl /MD /LD exiv2api.cpp /EHsc -I %EXIV2_DIR%\include -I C:\Users\Leo\AppData\Local\Programs\Python\Python%py_version%\include /link %EXIV2_DIR%\lib\exiv2.lib C:\Users\Leo\AppData\Local\Programs\Python\Python%py_version%\libs\python%py_version%.lib /OUT:win64-py%py_version%\exiv2api.pyd
+    set py_version=8
+    cl /MD /LD exiv2api.cpp /EHsc -I %EXIV2_DIR%\include -I C:\Users\Leo\AppData\Local\Programs\Python\Python3%py_version%\include /link %EXIV2_DIR%\lib\exiv2.lib C:\Users\Leo\AppData\Local\Programs\Python\Python3%py_version%\libs\python3%py_version%.lib /OUT:win64-py3%py_version%\exiv2api.pyd
     del exiv2api.exp exiv2api.obj exiv2api.lib
     ```
     Modify the path here according to your installation location.
