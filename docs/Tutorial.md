@@ -127,9 +127,9 @@ class Image(filename, encoding='utf-8')
     ```
     You can call `img.read_raw_xmp()` to get the raw XMP metadata without splitting.
 
-## logs
+## log
 
-- pyexiv2 has five levels of handling logs：
+- Exiv2 has five levels of handling logs：
     - 0 : debug
     - 1 : info
     - 2 : warn

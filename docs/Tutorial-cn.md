@@ -131,7 +131,7 @@ class Image(filename, encoding='utf-8')
 
 ## 日志
 
-- pyexiv2 有 5 种处理日志的级别：
+- Exiv2 有 5 种处理日志的级别：
     - 0 : debug
     - 1 : info
     - 2 : warn

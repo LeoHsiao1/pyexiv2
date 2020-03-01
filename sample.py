@@ -19,4 +19,3 @@ dict1 = {"Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834",
 img.modify_xmp(dict1)
 
 img.close()
-
