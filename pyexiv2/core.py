@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-from .lib import api
+from .lib import exiv2api as api
 
 
 COMMA = ', '
-
-
-api.init()
 
 
 class Image:
@@ -91,3 +88,22 @@ class Image:
 
     def clear_xmp(self):
         api.clear_xmp(self.img)
+
+
+def set_log_level(level=2):
+    """
+    Set the level of handling logs. There are five levels of handling logs:
+        0 : debug
+        1 : info
+        2 : warn
+        3 : error
+        4 : mute
+    """
+    if level in [0, 1, 2, 3, 4]:
+        api.set_log_level(level)
+    else:
+        raise ValueError('Invalid log level.')
+
+
+api.init()
+set_log_level(2)

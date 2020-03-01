@@ -5,19 +5,19 @@ Read/Write metadata of digital image, including [EXIF](https://en.wikipedia.org/
 - install: `pip install pyexiv2`
 - [source code on github](https://github.com/LeoHsiao1/pyexiv2)
 
-> Version 2.0 is not compatible with previous versions, because the API has changed. See the new [tutorial](https://github.com/LeoHsiao1/pyexiv2/blob/dev/docs/Tutorial.md).
+> Version 2.0 is not compatible with previous versions, because the API has changed. See the [release note](https://github.com/LeoHsiao1/pyexiv2/releases/tag/v2.0.0).
 
 ## Features
 
 - Base on C++ API of [Exiv2](https://www.exiv2.org/index.html) and [pybind11](https://github.com/pybind/pybind11).
-- Supports running on Linux and Windows, with Python3(64bit).
+- Supports running on Linux and Windows, with Python3(64bit, including `3.5` `3.6` `3.7` `3.8`).
 - [Supports various metadata](https://www.exiv2.org/metadata.html)
 - [Supports various image formats](https://dev.exiv2.org/projects/exiv2/wiki/Supported_image_formats)
 
 ## Usage
 
-- [Tutorial](https://github.com/LeoHsiao1/pyexiv2/blob/dev/docs/Tutorial.md)
-- [中文教程](https://github.com/LeoHsiao1/pyexiv2/blob/dev/docs/Tutorial-cn.md)
+- [Tutorial](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial.md)
+- [中文教程](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial-cn.md)
 
 ## Tests
 

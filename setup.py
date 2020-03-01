@@ -6,14 +6,14 @@ with open('README.md', encoding='utf-8') as f:
 
 setuptools.setup(
     name='pyexiv2',
-    version='2.0.0',
+    version='2.1.0',
     author='LeoHsiao',
     author_email='leohsiao@foxmail.com',
     description='Read/Write metadata of digital image, including EXIF, IPTC, XMP.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/LeoHsiao1/pyexiv2',
-    install_requires=["pybind11==2.4.3"],
+    # install_requires=["pybind11==2.4.3"],
     packages=setuptools.find_packages(),
     package_data={'': ['*.py', '*.md', '*.cpp', '*.so', '*.dll', '*.pyd', '*.jpg']},
     classifiers=[
@@ -30,6 +30,6 @@ setuptools.setup(
 
 # upload to pypi.org:
 #   python -m pip install setuptools wheel twine
-#   git clean -df
+#   git clean -d -fx
 #   python setup.py sdist bdist_wheel
 #   python -m twine upload dist/*

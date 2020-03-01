@@ -49,7 +49,6 @@ void logHandler(int level, const char *msg)
 
     case Exiv2::LogMsg::error:
         // For unknown reasons, the exception thrown here cannot be caught, so save the log to error_log
-        // std::cout << msg << std::endl;
         // throw std::exception(msg);
         error_log << msg;
         break;
@@ -57,12 +56,6 @@ void logHandler(int level, const char *msg)
     default:
         return;
     }
-}
-
-void init()
-{
-    Exiv2::LogMsg::setHandler(logHandler);
-    Exiv2::LogMsg::setLevel(Exiv2::LogMsg::warn);
 }
 
 void check_error_log()
@@ -73,6 +66,25 @@ void check_error_log()
         error_log.str("");
         throw std::runtime_error(str);
     }
+}
+
+void set_log_level(int level)
+{
+    if (level == 0)
+        Exiv2::LogMsg::setLevel(Exiv2::LogMsg::debug);
+    if (level == 1)
+        Exiv2::LogMsg::setLevel(Exiv2::LogMsg::info);
+    if (level == 2)
+        Exiv2::LogMsg::setLevel(Exiv2::LogMsg::warn);
+    if (level == 3)
+        Exiv2::LogMsg::setLevel(Exiv2::LogMsg::error);
+    if (level == 4)
+        Exiv2::LogMsg::setLevel(Exiv2::LogMsg::mute);
+}
+
+void init()
+{
+    Exiv2::LogMsg::setHandler(logHandler);
 }
 
 py::object open_image(const char *filename)
@@ -91,7 +103,6 @@ void close_image(Exiv2::Image::AutoPtr *img)
     delete img;
     check_error_log();
 }
-
 
 py::object read_exif(Exiv2::Image::AutoPtr *img)
 {
@@ -231,11 +242,12 @@ void clear_xmp(Exiv2::Image::AutoPtr *img)
     check_error_log();
 }
 
-PYBIND11_MODULE(api, m)
+PYBIND11_MODULE(exiv2api, m)
 {
     m.doc() = "Expose the API of exiv2 to Python.";
     py::class_<Exiv2::Image::AutoPtr>(m, "Exiv2_Image_AutoPtr")
         .def(py::init<>());
+    m.def("set_log_level", &set_log_level);
     m.def("init", &init);
     m.def("open_image", &open_image);
     m.def("close_image", &close_image);
