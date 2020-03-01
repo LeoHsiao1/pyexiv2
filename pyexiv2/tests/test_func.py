@@ -92,7 +92,7 @@ def test_not_image_path():
 
 
 @check_md5
-def test_chinese_path():
+def _test_chinese_path():
     chinese_path = os.path.join(current_dir, '1 - 副本.jpg')
     shutil.copy(path, chinese_path)
     try:
