@@ -111,3 +111,4 @@ def test_error_log():
             img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
         set_log_level(4)
         img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
+        set_log_level(2)    # recover the log level
