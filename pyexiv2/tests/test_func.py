@@ -25,7 +25,7 @@ def test_read_xmp():
 @check_md5
 def test_read_raw_xmp():
     with Image(path) as img:
-        assert len(img.read_raw_xmp()) == 4598
+        assert len(img.read_raw_xmp()) == 4593
 
 
 def test_modify_exif():
@@ -52,7 +52,7 @@ def test_modify_xmp():
     with Image(path) as img:
         dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',
                 'Xmp.xmp.Rating': '',
-                'Xmp.dc.subject': ['flag1-中文-', 'flag2-中文-', 'flag3-中文-']}
+                'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']}
         img.modify_xmp(dict1)
         dict2 = img.read_xmp()
         for k, v in dict1.items():

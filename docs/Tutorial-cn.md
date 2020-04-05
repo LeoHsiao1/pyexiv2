@@ -71,10 +71,10 @@ class Image(filename, encoding='utf-8')
     - 以同样的方式使用 `img.modify_exif()` 和 `img.modify_iptc()`。
 - 如果你尝试修改一个非标准的标签，则可能引发一个异常。如下：
     ```python
-    >>> img.modify_exif({'Exif.Image.myflag001': 'test'})    # 失败
-    RuntimeError: Invalid tag name or ifdId `myflag001', ifdId 1
-    >>> img.modify_xmp({'Xmp.dc.myflag001': 'test'})         # 成功
-    >>> img.read_xmp()['Xmp.dc.myflag001']
+    >>> img.modify_exif({'Exif.Image.mytag001': 'test'})    # 失败
+    RuntimeError: Invalid tag name or ifdId `mytag001', ifdId 1
+    >>> img.modify_xmp({'Xmp.dc.mytag001': 'test'})         # 成功
+    >>> img.read_xmp()['Xmp.dc.mytag001']
     'test'
     ```
 - 某些特殊的标签不能被 pyexiv2 修改。例如：
@@ -112,9 +112,9 @@ class Image(filename, encoding='utf-8')
 - 图片元数据的值可能是 Short、Long、byte、Ascii 等类型。读取时，大多数将被 pyexiv2 转换为 String 类型。
 - 某些 XMP 元数据是字符串列表。例如：
     ```python
-    >>> img.modify_xmp({'Xmp.dc.subject': ['flag1', 'flag2', 'flag3']})
+    >>> img.modify_xmp({'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']})
     >>> img.read_xmp()['Xmp.dc.subject']
-    ['flag1', 'flag2', 'flag3']
+    ['tag1', 'tag2', 'tag3']
     ```
     pyexiv2 处理这种类型的值的原理就像：
     ```python
@@ -123,9 +123,9 @@ class Image(filename, encoding='utf-8')
     ```
     因此，如果原始值中包含  `', '` ，它会被分割。如下：
     ```python
-    >>> img.modify_xmp({'Xmp.dc.subject': 'flag1,flag2, 0'})
+    >>> img.modify_xmp({'Xmp.dc.subject': 'tag1,tag2, tag3'})
     >>> img.read_xmp()['Xmp.dc.subject']
-    ['flag1,flag2', '0']
+    ['tag1,tag2', 'tag3']
     ```
     你可以调用 `img.read_raw_xmp()` ，以获得未分割的 XMP 元数据。
 

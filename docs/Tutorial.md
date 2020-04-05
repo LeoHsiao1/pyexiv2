@@ -70,10 +70,10 @@ class Image(filename, encoding='utf-8')
     - Use `img.modify_exif()` and `img.modify_iptc()` in the same way.
 - If you try to modify a non-standard tag, you may cause an exception. Such as below:
     ```python
-    >>> img.modify_exif({'Exif.Image.myflag001': 'test'})    # Failed
-    RuntimeError: Invalid tag name or ifdId `myflag001', ifdId 1
-    >>> img.modify_xmp({'Xmp.dc.myflag001': 'test'})         # Successful
-    >>> img.read_xmp()['Xmp.dc.myflag001']
+    >>> img.modify_exif({'Exif.Image.mytag001': 'test'})    # Failed
+    RuntimeError: Invalid tag name or ifdId `mytag001', ifdId 1
+    >>> img.modify_xmp({'Xmp.dc.mytag001': 'test'})         # Successful
+    >>> img.read_xmp()['Xmp.dc.mytag001']
     'test'
     ```
 - Some special tags cannot be modified by pyexiv2. For example:
@@ -110,9 +110,9 @@ class Image(filename, encoding='utf-8')
 - The value of the image metadata might be of type Short, Long, byte, Ascii, and so on. Most of them will be converted to String type by pyexiv2 when reading.
 - Some of the XMP metadata is a list of strings. For example:
     ```python
-    >>> img.modify_xmp({'Xmp.dc.subject': ['flag1', 'flag2', 'flag3']})
+    >>> img.modify_xmp({'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']})
     >>> img.read_xmp()['Xmp.dc.subject']
-    ['flag1', 'flag2', 'flag3']
+    ['tag1', 'tag2', 'tag3']
     ```
     The principle that pyexiv2 handling this type of value is just like:
     ```python
@@ -121,9 +121,9 @@ class Image(filename, encoding='utf-8')
     ```
     Therefore, if the raw value contains `', '` , it will be split. For example:
     ```python
-    >>> img.modify_xmp({'Xmp.dc.subject': 'flag1,flag2, 0'})
+    >>> img.modify_xmp({'Xmp.dc.subject': 'tag1,tag2, tag3'})
     >>> img.read_xmp()['Xmp.dc.subject']
-    ['flag1,flag2', '0']
+    ['tag1,tag2', 'tag3']
     ```
     You can call `img.read_raw_xmp()` to get the raw XMP metadata without splitting.
 
