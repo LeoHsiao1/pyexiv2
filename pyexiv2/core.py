@@ -65,7 +65,13 @@ class Image:
             key, value, typeName = decoded_line
             if typeName in ['XmpBag', 'XmpSeq']:
                 value = value.split(COMMA)
-            data[key] = value
+            pre_value = data.get(key)
+            if pre_value == None:
+                data[key] = value
+            elif isinstance(pre_value, str):
+                data[key] = [pre_value, value]
+            elif isinstance(pre_value, list):
+                data[key].append(value)
         return data
     
     def _dumps(self, data: dict) -> list:
