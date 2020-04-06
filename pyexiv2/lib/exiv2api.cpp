@@ -143,16 +143,16 @@ void modify_exif(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
     for (auto _line : table){
         py::list line;
         for (auto item : _line)
-            line.append(item);  // can't use item[0] here, so convert to py::list
+            line.append(item);          // can't use item[0] here, so convert to py::list
         std::string key = py::bytes(line[0].attr("encode")(encoding));
         std::string value = py::bytes(line[1].attr("encode")(encoding));
 
         Exiv2::ExifData::iterator key_pos = exifData.findKey(Exiv2::ExifKey(key));
 		if (key_pos != exifData.end())
-			exifData.erase(key_pos);
+			exifData.erase(key_pos);    // delete the existing tag to write a value
 		if (value == "")
-			continue;   // delete the tag if value == ""
-		exifData[key] = value;
+			continue;                   // skip the tag if value == ""
+		exifData[key] = value;          // write a value to the tag
 	}
 	(*img)->setExifData(exifData);
 	(*img)->writeMetadata();
@@ -170,8 +170,10 @@ void modify_iptc(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
         std::string value = py::bytes(line[1].attr("encode")(encoding));
 
         Exiv2::IptcData::iterator key_pos = iptcData.findKey(Exiv2::IptcKey(key));
-		if (key_pos != iptcData.end())
+		while (key_pos != iptcData.end()){  // use the while loop because the iptc key may repeat
 			iptcData.erase(key_pos);
+            key_pos = iptcData.findKey(Exiv2::IptcKey(key));
+        }
 		if (value == "")
 			continue;
 		iptcData[key] = value;
@@ -200,7 +202,6 @@ void modify_xmp(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
 
         if (typeName == "array")
 		{
-            // Handling the value of array types
             int pos = 0;
 			int COMMA_pos = 0;
 			while (COMMA_pos != std::string::npos)
@@ -220,7 +221,7 @@ void modify_xmp(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
 
 void clear_exif(Exiv2::Image::AutoPtr *img)
 {
-	Exiv2::ExifData exifData; // an empty container of exif metadata
+	Exiv2::ExifData exifData; // create an empty container of exif metadata
 	(*img)->setExifData(exifData);
 	(*img)->writeMetadata();
     check_error_log();
