@@ -114,12 +114,7 @@ class Image(filename, encoding='utf-8')
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1', 'tag2', 'tag3']
     ```
-    The principle that pyexiv2 handling this type of value is just like:
-    ```python
-    buffer = ', '.join(raw_value)
-    value = buffer.split(', ')
-    ```
-    Therefore, if the raw value contains `', '` , it will be split. For example:
+    If the string contains `', '` , it will be split. For example:
     ```python
     >>> img.modify_xmp({'Xmp.dc.subject': 'tag1,tag2, tag3'})
     >>> img.read_xmp()['Xmp.dc.subject']

@@ -116,18 +116,13 @@ class Image(filename, encoding='utf-8')
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1', 'tag2', 'tag3']
     ```
-    pyexiv2 处理这种类型的值的原理就像：
-    ```python
-    buffer = ', '.join(raw_value)
-    value = buffer.split(', ')
-    ```
-    因此，如果原始值中包含  `', '` ，它会被分割。如下：
+    如果字符串中包含  `', '` ，它会被分割。如下：
     ```python
     >>> img.modify_xmp({'Xmp.dc.subject': 'tag1,tag2, tag3'})
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1,tag2', 'tag3']
     ```
-    你可以调用 `img.read_raw_xmp()` ，以获得未分割的 XMP 元数据。
+    你可以调用 `img.read_raw_xmp()` 以获得未分割的 XMP 元数据。
 
 ## 日志
 
