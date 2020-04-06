@@ -41,7 +41,8 @@ def test_modify_exif():
 def test_modify_iptc():
     with Image(path) as img:
         dict1 = {'Iptc.Application2.ObjectName': 'test-中文-',
-                'Iptc.Application2.Keywords': ''}
+                'Iptc.Application2.Copyright': '',
+                'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3']}
         img.modify_iptc(dict1)
         dict2 = img.read_iptc()
         for k, v in dict1.items():

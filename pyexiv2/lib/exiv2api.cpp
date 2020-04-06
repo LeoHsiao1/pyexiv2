@@ -168,6 +168,7 @@ void modify_iptc(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
             line.append(item);
         std::string key = py::bytes(line[0].attr("encode")(encoding));
         std::string value = py::bytes(line[1].attr("encode")(encoding));
+        std::string typeName = py::bytes(line[2].attr("encode")(encoding));
 
         Exiv2::IptcData::iterator key_pos = iptcData.findKey(Exiv2::IptcKey(key));
 		while (key_pos != iptcData.end()){  // use the while loop because the iptc key may repeat
@@ -176,7 +177,22 @@ void modify_iptc(Exiv2::Image::AutoPtr *img, py::list table, py::str encoding)
         }
 		if (value == "")
 			continue;
-		iptcData[key] = value;
+
+        if (typeName == "array")
+		{
+            Exiv2::Value::AutoPtr exiv2_value = Exiv2::Value::create(Exiv2::string);
+            int pos = 0;
+			int COMMA_pos = 0;
+			while (COMMA_pos != std::string::npos)
+			{
+				COMMA_pos = value.find(COMMA, pos);
+                exiv2_value->read(value.substr(pos, COMMA_pos - pos));
+                iptcData.add(Exiv2::IptcKey(key), exiv2_value.get());
+				pos = COMMA_pos + COMMA.length();
+			}
+        }
+        else
+            iptcData[key] = value;
 	}
 	(*img)->setIptcData(iptcData);
 	(*img)->writeMetadata();
