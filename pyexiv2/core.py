@@ -48,30 +48,36 @@ class Image:
         self._raw_xmp = api.read_raw_xmp(self.img)
         return self._raw_xmp.decode(encoding)
 
-    def modify_exif(self, dict_, encoding='utf-8'):
-        api.modify_exif(self.img, self._dumps(dict_), encoding)
+    def modify_exif(self, data: dict, encoding='utf-8'):
+        api.modify_exif(self.img, self._dumps(data), encoding)
 
-    def modify_iptc(self, dict_, encoding='utf-8'):
-        api.modify_iptc(self.img, self._dumps(dict_), encoding)
+    def modify_iptc(self, data: dict, encoding='utf-8'):
+        api.modify_iptc(self.img, self._dumps(data), encoding)
 
-    def modify_xmp(self, dict_, encoding='utf-8'):
-        api.modify_xmp(self.img, self._dumps(dict_), encoding)
+    def modify_xmp(self, data: dict, encoding='utf-8'):
+        api.modify_xmp(self.img, self._dumps(data), encoding)
     
     def _parse(self, table: list, encoding='utf-8') -> dict:
         """ Parse the table returned by C++ API into a dict. """
-        dict_ = {}
+        data = {}
         for line in table:
             decoded_line = [i.decode(encoding) for i in line]
             key, value, typeName = decoded_line
             if typeName in ['XmpBag', 'XmpSeq']:
                 value = value.split(COMMA)
-            dict_[key] = value
-        return dict_
+            pre_value = data.get(key)
+            if pre_value == None:
+                data[key] = value
+            elif isinstance(pre_value, str):
+                data[key] = [pre_value, value]
+            elif isinstance(pre_value, list):
+                data[key].append(value)
+        return data
     
-    def _dumps(self, dict_) -> list:
+    def _dumps(self, data: dict) -> list:
         """ Convert the metadata dict into a table that the C++ API can read. """
         table = []
-        for key, value in dict_.items():
+        for key, value in data.items():
             typeName = 'str'
             if isinstance(value, (list, tuple)):
                 typeName = 'array'

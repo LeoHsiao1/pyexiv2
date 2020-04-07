@@ -15,7 +15,7 @@ img.read_exif()
 
 dict1 = {"Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834",
          "Xmp.xmp.Rating": "",
-         "Xmp.dc.subject": ["flag1中文", "flag2中文", "flag3中文"]}
+         "Xmp.dc.subject": ["tag1", "tag2", "tag3"]}
 img.modify_xmp(dict1)
 
 img.close()
