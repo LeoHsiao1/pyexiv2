@@ -19,15 +19,3 @@ dict1 = {"Xmp.xmp.CreateDate": "2019-06-23T19:45:17.834",
 img.modify_xmp(dict1)
 
 img.close()
-
-
-
-
-from pyexiv2 import Image
-img = Image(r'.\pyexiv2\tests\1.jpg')
-img.read_iptc()
-img.read_iptc()['Iptc.Application2.Keywords']
-img.modify_iptc({'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3']})
-img.modify_iptc({'Iptc.Application2.Keywords': 'tag1, tag2, tag3'})
-img.modify_iptc({'Iptc.Application2.Keywords': ''})
-img.close()
