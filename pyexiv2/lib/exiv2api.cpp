@@ -6,7 +6,6 @@
 
 namespace py = pybind11;
 const std::string COMMA = ", ";
-py::str OK = "OK";
 const char *EXCEPTION_HINT = "Caught Exiv2 exception: ";
 std::stringstream error_log;
 
