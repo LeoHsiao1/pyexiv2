@@ -108,7 +108,7 @@ class Image(filename, encoding='utf-8')
 ## Data types
 
 - The value of the image metadata might be of type Short, Long, byte, Ascii, and so on. Most of them will be converted to String type by pyexiv2 when reading.
-- Some of the XMP metadata is a list of strings. For example:
+- Some metadata is a list of strings. For example:
     ```python
     >>> img.modify_xmp({'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']})
     >>> img.read_xmp()['Xmp.dc.subject']

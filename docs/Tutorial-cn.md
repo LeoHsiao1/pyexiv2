@@ -110,7 +110,7 @@ class Image(filename, encoding='utf-8')
 ## 数据类型
 
 - 图片元数据的值可能是 Short、Long、byte、Ascii 等类型。读取时，大多数将被 pyexiv2 转换为 String 类型。
-- 某些 XMP 元数据是字符串列表。例如：
+- 某些元数据是字符串列表。例如：
     ```python
     >>> img.modify_xmp({'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']})
     >>> img.read_xmp()['Xmp.dc.subject']
