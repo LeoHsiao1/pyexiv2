@@ -11,6 +11,7 @@ Read/Write metadata of digital image, including [EXIF](https://en.wikipedia.org/
 - Supports running on Linux and Windows, with Python3(64bit, including `3.5` `3.6` `3.7` `3.8`).
 - [Supports various metadata](https://www.exiv2.org/metadata.html)
 - [Supports various image formats](https://dev.exiv2.org/projects/exiv2/wiki/Supported_image_formats)
+- Supports Unicode characters that contained in image path or metadata.
 
 ## Usage
 

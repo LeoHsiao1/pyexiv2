@@ -29,7 +29,7 @@ class Image(filename, encoding='utf-8')
 - 示例:
     ```python
     >>> from pyexiv2 import Image
-    >>> i = Image(r'.\pyexiv2\tests\1.jpg')
+    >>> img = Image(r'.\pyexiv2\tests\1.jpg')
     >>> img.read_exif()
     {'Exif.Image.DateTime': '2019:06:23 19:45:17', 'Exif.Image.Artist': 'TEST', 'Exif.Image.Rating': '4', ...}
     >>> img.read_iptc()
@@ -38,14 +38,14 @@ class Image(filename, encoding='utf-8')
     {'Xmp.dc.format': 'image/jpeg', 'Xmp.dc.rights': 'lang="x-default" TEST', 'Xmp.dc.subject': 'TEST', ...}
     >>> img.close()
     ```
-- pyexiv2 支持包含 Unicode 字符的图片路径、元数据。默认编码格式为 utf-8 .
-- 如果你不能用`utf-8`编码图片数据或路径中的中文字符，请试试用`gbk`。例如：
+- pyexiv2 支持包含 Unicode 字符的图片路径、元数据。大部分函数都有一个默认参数：`encoding='utf-8'`。
+  如果你因为图片路径、元数据包含非 ASCII 码字符而遇到错误，请尝试更换编码。例如：
     ```python
-    >>> img = Image(r'.\pyexiv2\tests\1 - 副本.jpg')
-    RuntimeError: d:\1\pyexiv2\pyexiv2\tests\1 - 副本.jpg: Failed to open the data source: No such file or directory (errno = 2)
-    >>> img = Image(r'.\pyexiv2\tests\1 - 副本.jpg', encoding='gbk')
-    >>> img.close()
+    img = Image(path, encoding='utf-8')
+    img = Image(path, encoding='GBK')
+    img = Image(path, encoding='ISO-8859-1')
     ```
+   另一个例子：中国地区的 Windows 电脑通常用 GBK 编码文件路径，因此它们不能被 utf-8 解码。
 - 使用`Image.read_*()`是安全的。这些方法永远不会影响图片文件。（md5不变）
 - 如果 XMP 元数据包含 '\v' 或 '\f'，它将被空格 ' ' 代替。
 - 元数据的读取速度与元数据的数量成反比，不管图像的大小如何。
@@ -55,7 +55,7 @@ class Image(filename, encoding='utf-8')
 
 - 示例:
     ```python
-    >>> i = Image(r'.\pyexiv2\tests\1.jpg')
+    >>> img = Image(r'.\pyexiv2\tests\1.jpg')
     >>> # 准备要修改的XMP数据
     >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # 这将覆盖该标签的原始值，如果不存在该标签则将其添加
     ...          'Xmp.xmp.Rating': ''}                              # 赋值一个空字符串会删除该标签
