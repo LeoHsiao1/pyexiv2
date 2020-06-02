@@ -25,12 +25,15 @@ class Image:
         """ Free the memory for storing image data. """
         api.close_image(self.img)
         
-        # Disable all public methods
+        # Disable all public members
         def closed_warning():
             raise RuntimeError('Do not operate on the closed image.')
         for attr in dir(self):
-            if not attr.startswith('_') and callable(getattr(self, attr)):
-                setattr(self, attr, closed_warning)
+            if not attr.startswith('__'):
+                if callable(getattr(self, attr)):
+                    setattr(self, attr, closed_warning)
+                else:
+                    setattr(self, attr, None)
 
     def read_exif(self, encoding='utf-8') -> dict:
         self._exif = api.read_exif(self.img)
