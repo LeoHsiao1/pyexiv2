@@ -112,7 +112,7 @@ class ImageData(Image):
         self.img = api.open_image_from_bytes(self.buffer)
 
     def get_bytes(self) -> bytes:
-        return self.buffer.dump()
+        return api.get_bytes_of_image(self.img)
 
     def close(self):
         """ Free the memory for storing image data. """

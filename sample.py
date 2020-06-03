@@ -29,7 +29,10 @@ with open(r'.\pyexiv2\tests\1.jpg', 'rb') as f:
     data = f.read()
 
 img = ImageData(data)
-img.get_bytes()
+img.clear_exif()
+img.read_exif()
+len(img.get_bytes())
+img.buffer.size
 
 
 with open(r'.\pyexiv2\tests\1.jpg', 'wb') as f:

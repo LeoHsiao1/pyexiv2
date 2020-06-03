@@ -134,6 +134,11 @@ py::object open_image_from_bytes(Buffer buffer)
     return py::cast(img);
 }
 
+py::bytes get_bytes_of_image(Exiv2::Image::AutoPtr *img)
+{
+    return py::bytes((char *)(*img)->io().mmap(), (*img)->io().size());
+}
+
 void close_image(Exiv2::Image::AutoPtr *img)
 {
     delete img;
@@ -310,6 +315,7 @@ PYBIND11_MODULE(exiv2api, m)
     m.def("init", &init);
     m.def("open_image", &open_image);
     m.def("open_image_from_bytes", &open_image_from_bytes);
+    m.def("get_bytes_of_image", &get_bytes_of_image);
     m.def("close_image", &close_image);
     m.def("read_exif", &read_exif);
     m.def("read_iptc", &read_iptc);
