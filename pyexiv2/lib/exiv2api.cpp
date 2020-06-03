@@ -36,6 +36,32 @@ std::stringstream error_log;
         return table;                                                  \
     }
 
+class Buffer{
+public:
+    char *data;
+    long size;
+
+    Buffer(const char *data_, long size_){
+        size = size_;
+        data = (char *)calloc(size, sizeof(char));
+        if(data == NULL)
+            throw std::runtime_error("Failed to allocate memory.");
+        memcpy(data, data_, size);
+    }
+
+    void destroy(){
+        if(data){
+            // std::cout << "deleting" << data << std::endl;
+            free(data);
+            data = NULL;
+        }
+    }
+
+    py::bytes dump(){
+        return py::bytes((char *)data, size);
+    }
+};
+
 void logHandler(int level, const char *msg)
 {
     switch (level)
@@ -91,7 +117,18 @@ py::object open_image(const char *filename)
     Exiv2::Image::AutoPtr *img = new Exiv2::Image::AutoPtr;
     *img = Exiv2::ImageFactory::open(filename);
     if (img->get() == 0)
-        throw Exiv2::Error(Exiv2::kerErrorMessage, "Can not open this file.");
+        throw Exiv2::Error(Exiv2::kerErrorMessage, "Can not open this image.");
+    (*img)->readMetadata();
+    check_error_log();
+    return py::cast(img);
+}
+
+py::object open_image_from_bytes(Buffer buffer)
+{
+    Exiv2::Image::AutoPtr *img = new Exiv2::Image::AutoPtr;
+    *img = Exiv2::ImageFactory::open((byte *)buffer.data, buffer.size);
+    if (img->get() == 0)
+        throw Exiv2::Error(Exiv2::kerErrorMessage, "Can not open this image.");
     (*img)->readMetadata();
     check_error_log();
     return py::cast(img);
@@ -261,11 +298,18 @@ void clear_xmp(Exiv2::Image::AutoPtr *img)
 PYBIND11_MODULE(exiv2api, m)
 {
     m.doc() = "Expose the API of exiv2 to Python.";
+    py::class_<Buffer>(m, "Buffer")
+        .def(py::init<const char *, long &>())
+        .def_readonly("data", &Buffer::data)
+        .def_readonly("size", &Buffer::size)
+        .def("destroy", &Buffer::destroy)
+        .def("dump", &Buffer::dump);
     py::class_<Exiv2::Image::AutoPtr>(m, "Exiv2_Image_AutoPtr")
         .def(py::init<>());
     m.def("set_log_level", &set_log_level);
     m.def("init", &init);
     m.def("open_image", &open_image);
+    m.def("open_image_from_bytes", &open_image_from_bytes);
     m.def("close_image", &close_image);
     m.def("read_exif", &read_exif);
     m.def("read_iptc", &read_iptc);

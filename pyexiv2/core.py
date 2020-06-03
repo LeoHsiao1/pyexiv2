@@ -25,7 +25,7 @@ class Image:
         """ Free the memory for storing image data. """
         api.close_image(self.img)
         
-        # Disable all public members
+        # Disable all members
         def closed_warning():
             raise RuntimeError('Do not operate on the closed image.')
         for attr in dir(self):
@@ -97,6 +97,27 @@ class Image:
 
     def clear_xmp(self):
         api.clear_xmp(self.img)
+
+
+class ImageData(Image):
+    """
+    Similar to class `Image`, but opens the image from bytes.
+    """
+    def __init__(self, data: bytes):
+        """ Open an image and load its metadata. """
+        length = len(data)
+        if length >= 2**31:
+            raise ValueError('Could only open images that are less than 2GB in size. The size of your image is {} bytes.'.format(length))
+        self.buffer = api.Buffer(data, length)
+        self.img = api.open_image_from_bytes(self.buffer)
+
+    def get_bytes(self) -> bytes:
+        return self.buffer.dump()
+
+    def close(self):
+        """ Free the memory for storing image data. """
+        self.buffer.destroy()
+        super().close()
 
 
 def set_log_level(level=2):
