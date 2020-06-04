@@ -13,7 +13,7 @@ class Image:
     
     def __init__(self, filename, encoding='utf-8'):
         """ Open an image and load its metadata. """
-        self.img = api.open_image(filename.encode(encoding))
+        self.img = api.Image(filename.encode(encoding))
 
     def __enter__(self):
         return self
@@ -23,7 +23,7 @@ class Image:
 
     def close(self):
         """ Free the memory for storing image data. """
-        api.close_image(self.img)
+        self.img.close_image()
         
         # Disable all members
         def closed_warning():
@@ -34,31 +34,31 @@ class Image:
                     setattr(self, attr, closed_warning)
                 else:
                     setattr(self, attr, None)
-
+    
     def read_exif(self, encoding='utf-8') -> dict:
-        self._exif = api.read_exif(self.img)
+        self._exif = self.img.read_exif()
         return self._parse(self._exif, encoding)
 
     def read_iptc(self, encoding='utf-8') -> dict:
-        self._iptc = api.read_iptc(self.img)
+        self._iptc = self.img.read_iptc()
         return self._parse(self._iptc, encoding)
 
     def read_xmp(self, encoding='utf-8') -> dict:
-        self._xmp = api.read_xmp(self.img)
+        self._xmp = self.img.read_xmp()
         return self._parse(self._xmp, encoding)
 
     def read_raw_xmp(self, encoding='utf-8') -> str:
-        self._raw_xmp = api.read_raw_xmp(self.img)
+        self._raw_xmp = self.img.read_raw_xmp()
         return self._raw_xmp.decode(encoding)
 
     def modify_exif(self, data: dict, encoding='utf-8'):
-        api.modify_exif(self.img, self._dumps(data), encoding)
+        self.img.modify_exif(self._dumps(data), encoding)
 
     def modify_iptc(self, data: dict, encoding='utf-8'):
-        api.modify_iptc(self.img, self._dumps(data), encoding)
+        self.img.modify_iptc(self._dumps(data), encoding)
 
     def modify_xmp(self, data: dict, encoding='utf-8'):
-        api.modify_xmp(self.img, self._dumps(data), encoding)
+        self.img.modify_xmp(self._dumps(data), encoding)
     
     def _parse(self, table: list, encoding='utf-8') -> dict:
         """ Parse the table returned by C++ API into a dict. """
@@ -90,13 +90,13 @@ class Image:
         return table
 
     def clear_exif(self):
-        api.clear_exif(self.img)
+        self.img.clear_exif()
 
     def clear_iptc(self):
-        api.clear_iptc(self.img)
+        self.img.clear_iptc()
 
     def clear_xmp(self):
-        api.clear_xmp(self.img)
+        self.img.clear_xmp()
 
 
 class ImageData(Image):
@@ -109,11 +109,11 @@ class ImageData(Image):
         if length >= 2**31:
             raise ValueError('Could only open images that are less than 2GB in size. The size of your image is {} bytes.'.format(length))
         self.buffer = api.Buffer(data, length)
-        self.img = api.open_image_from_bytes(self.buffer)
+        self.img = api.Image(self.buffer)
 
     def get_bytes(self) -> bytes:
-        return api.get_bytes_of_image(self.img)
-
+        return self.img.get_bytes_of_image()
+    
     def close(self):
         """ Free the memory for storing image data. """
         self.buffer.destroy()
