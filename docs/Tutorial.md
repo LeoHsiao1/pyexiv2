@@ -5,9 +5,9 @@
 
 ## API list
 
-Please call the public methods of class `pyexiv2.Image`:
-```python
-class Image(filename, encoding='utf-8')
+```py
+class Image:
+    def __init__(self, filename, encoding='utf-8')
     def read_exif(self, encoding='utf-8') -> dict
     def read_iptc(self, encoding='utf-8') -> dict
     def read_xmp(self, encoding='utf-8') -> dict
@@ -22,14 +22,35 @@ class Image(filename, encoding='utf-8')
     def clear_xmp(self)
     
     def close(self)
+
+class ImageData(Image):
+    def __init__(self, data: bytes)
+    def get_bytes(self) -> bytes
+
+set_log_level()
 ```
+
+## class Image
+
+- Class `Image` is used to open an image based on the file path. For example:
+    ```py
+    >>> from pyexiv2 import Image
+    >>> img = Image(r'.\pyexiv2\tests\1.jpg')
+    >>> data = img.read_exif()
+    >>> img.close()
+    ```
+- When you're done with the image, remember to call `img.close()` to free the memory for storing image data. Not calling this method causes a memory leak, but it doesn't lock the file descriptor.
+- Opening an image by keyword `with` will close the image automatically. For example:
+    ```py
+    with Image(r'.\pyexiv2\tests\1.jpg') as img:
+        data = ims.read_exif()
+    ```
 
 ### Image.read_*()
 
 - Sample:
-    ```python
-    >>> from pyexiv2 import Image
-    >>> i = Image(r'.\pyexiv2\tests\1.jpg')
+    ```py
+    >>> img = Image(r'.\pyexiv2\tests\1.jpg')
     >>> img.read_exif()
     {'Exif.Image.DateTime': '2019:06:23 19:45:17', 'Exif.Image.Artist': 'TEST', 'Exif.Image.Rating': '4', ...}
     >>> img.read_iptc()
@@ -40,7 +61,7 @@ class Image(filename, encoding='utf-8')
     ```
 - pyexiv2 supports Unicode characters that contained in image paths and metadata. The default encoding format is utf-8.
 - If you cannot encode Chinese characters in the image data or path in `utf-8`, please try `gbk`. For example:
-    ```python
+    ```py
     >>> img = Image(r'.\pyexiv2\tests\1 - 副本.jpg')
     RuntimeError: d:\1\pyexiv2\pyexiv2\tests\1 - 副本.jpg: Failed to open the data source: No such file or directory (errno = 2)
     >>> img = Image(r'.\pyexiv2\tests\1 - 副本.jpg', encoding='gbk')
@@ -53,8 +74,8 @@ class Image(filename, encoding='utf-8')
 ### Image.modify_*()
 
 - Sample:
-    ```python
-    >>> i = Image(r'.\pyexiv2\tests\1.jpg')
+    ```py
+    >>> img = Image(r'.\pyexiv2\tests\1.jpg')
     >>> # Prepare the XMP data you want to modify
     >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # This will overwrite its original value, or add it if it doesn't exist
     ...          'Xmp.xmp.Rating': ''}                              # Set an empty str explicitly to delete the datum
@@ -69,7 +90,7 @@ class Image(filename, encoding='utf-8')
     ```
     - Use `img.modify_exif()` and `img.modify_iptc()` in the same way.
 - If you try to modify a non-standard tag, you may cause an exception. Such as below:
-    ```python
+    ```py
     >>> img.modify_exif({'Exif.Image.mytag001': 'test'})    # Failed
     RuntimeError: Invalid tag name or ifdId `mytag001', ifdId 1
     >>> img.modify_xmp({'Xmp.dc.mytag001': 'test'})         # Successful
@@ -77,12 +98,12 @@ class Image(filename, encoding='utf-8')
     'test'
     ```
 - Some special tags cannot be modified by pyexiv2. For example:
-    ```python
+    ```py
     >>> img.modify_exif({'Exif.Photo.MakerNote': 'test,,,'})
     >>> img.read_exif()['Exif.Photo.MakerNote']
-    ''  
+    ''
     ```
-    ```python
+    ```py
     >>> img.read_xmp()['Xmp.xmpMM.History']
     'type="Seq"'
     >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
@@ -94,28 +115,42 @@ class Image(filename, encoding='utf-8')
 ### Image.clear_*()
 
 - Calling `img.clear_exif()` will delete all EXIF metadata of the image. Once cleared, pyexiv2 may not be able to recover it completely.
-  - Use `img.clear_iptc()` and `img.clear_xmp()` in the same way.
+- Use `img.clear_iptc()` and `img.clear_xmp()` in the similar way.
 
-### Image.close()
+## class ImageData
 
-- When you're done with the image, remember to call `img.close()` to free the memory for storing image data. Not calling this method causes a memory leak, but it doesn't lock the file descriptor.
-- Opening an image by `with` keyword will close the image automatically. For example:
-    ```python
-    with Image(r'.\pyexiv2\tests\1.jpg') as img:
-        ims.read_exif()
+- Class `ImageData`, inherited from class `Image`, is used to open an image from bytes data. 
+- Example of reading:
+    ```py
+    with open(r'.\pyexiv2\tests\1.jpg', 'rb') as f:
+        with ImageData(f.read()) as img:
+            data = img.read_exif()
+    ```
+- Example of modifing:
+    ```py
+    with open(r'.\pyexiv2\tests\1.jpg', 'rb+') as f:
+        with ImageData(f.read()) as img:
+            changes = {'Iptc.Application2.ObjectName': 'test'}
+            img.modify_iptc(changes)
+            f.seek(0)
+            # Get the bytes data of the image and save it to the file
+            f.write(img.get_bytes())
+        f.seek(0)
+        with ImageData(f.read()) as img:
+            result = img.read_iptc()
     ```
 
 ## Data types
 
 - The value of the image metadata might be of type Short, Long, byte, Ascii, and so on. Most of them will be converted to String type by pyexiv2 when reading.
 - Some metadata is a list of strings. For example:
-    ```python
+    ```py
     >>> img.modify_xmp({'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']})
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1', 'tag2', 'tag3']
     ```
     If the string contains `', '` , it will be split. For example:
-    ```python
+    ```py
     >>> img.modify_xmp({'Xmp.dc.subject': 'tag1,tag2, tag3'})
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1,tag2', 'tag3']
@@ -134,7 +169,7 @@ class Image(filename, encoding='utf-8')
 - The default log level is `warn`, so that the lower logs will not be handled.
 - The `error` log will be converted to an exception and thrown. Other logs will be printed to stdout.
 - Call the function `pyexiv2.set_log_level()` to set the level of handling logs. For example:
-    ```python
+    ```py
     >>> import pyexiv2
     >>> img = pyexiv2.Image(r'.\pyexiv2\tests\1.jpg')
     >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})

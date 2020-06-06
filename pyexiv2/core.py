@@ -101,7 +101,7 @@ class Image:
 
 class ImageData(Image):
     """
-    Similar to class `Image`, but opens the image from bytes.
+    Similar to class `Image`, but opens the image from bytes data.
     """
     def __init__(self, data: bytes):
         """ Open an image and load its metadata. """
