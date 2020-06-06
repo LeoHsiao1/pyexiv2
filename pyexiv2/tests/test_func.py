@@ -34,7 +34,12 @@ def test_modify_exif():
                    'Exif.Image.Artist': ''}
         img.modify_exif(changes)
         correct_result = generate_the_correct_result(testdata.EXIF, changes)
-        compare_dict(correct_result, img.read_exif())
+        result = img.read_exif()
+        ignored_keys = ['Exif.Image.ExifTag']
+        for key in ignored_keys:
+            correct_result.pop(key)
+            result.pop(key)
+        compare_dict(correct_result, result)
 
 
 def test_modify_iptc():

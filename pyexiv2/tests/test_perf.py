@@ -34,13 +34,13 @@ def test_memory_leak_when_writing():
 
 def test_stack_overflow():
     with Image(path) as img:
-        dict1 = {'Exif.Image.ImageDescription': '(test_stack_overflow)' * 1000,
-                 'Exif.Image.Artist': '0123456789 hello!' * 1000}
+        changes = {'Iptc.Application2.ObjectName': 'test-中文-' * 1000,
+                   'Iptc.Application2.Copyright': '0123456789 hello!' * 1000,
+                   'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3'] * 1000}
         for _ in range(10):
-            img.modify_exif(dict1)
-            dict2 = img.read_exif()
-            for k, v in dict1.items():
-                assert dict2.get(k, '') == v
+            img.modify_iptc(changes)
+            correct_result = generate_the_correct_result(testdata.IPTC, changes)
+            compare_dict(correct_result, img.read_iptc())
 
 
 def test_transmit_various_characters():

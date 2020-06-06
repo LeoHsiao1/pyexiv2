@@ -7,6 +7,7 @@ from functools import wraps
 import pytest
 
 from .. import Image, ImageData, set_log_level
+from . import testdata
 
 current_dir = os.path.dirname(__file__)
 original_path = os.path.join(current_dir, '1.jpg')
