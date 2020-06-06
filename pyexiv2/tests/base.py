@@ -6,7 +6,7 @@ from functools import wraps
 
 import pytest
 
-from .. import Image, set_log_level
+from .. import Image, ImageData, set_log_level
 
 current_dir = os.path.dirname(__file__)
 original_path = os.path.join(current_dir, '1.jpg')
@@ -44,3 +44,13 @@ def compare_dict(d1, d2):
     assert len(d1) == len(d2)
     for k in d1.keys():
         assert d1[k] == d2[k], "['{}'] is different.".format(k)
+
+
+def generate_the_correct_result(raw_dict: dict, changes: dict) -> dict:
+    ''' Generate the result that supposed to be after modification by pyexiv2.  '''
+    correct_result = raw_dict.copy()
+    correct_result.update(changes)
+    for k, v in list(correct_result.items()):
+        if v == '':
+            correct_result.pop(k)
+    return correct_result

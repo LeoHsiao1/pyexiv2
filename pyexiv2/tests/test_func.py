@@ -30,34 +30,31 @@ def test_read_raw_xmp():
 
 def test_modify_exif():
     with Image(path) as img:
-        dict1 = {'Exif.Image.ImageDescription': 'test-中文-',
-                'Exif.Image.Artist': ''}
-        img.modify_exif(dict1)
-        dict2 = img.read_exif()
-        for k, v in dict1.items():
-            assert dict2.get(k, '') == v
+        changes = {'Exif.Image.ImageDescription': 'test-中文-',
+                   'Exif.Image.Artist': ''}
+        img.modify_exif(changes)
+        correct_result = generate_the_correct_result(testdata.EXIF, changes)
+        compare_dict(correct_result, img.read_exif())
 
 
 def test_modify_iptc():
     with Image(path) as img:
-        dict1 = {'Iptc.Application2.ObjectName': 'test-中文-',
-                'Iptc.Application2.Copyright': '',
-                'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3']}
-        img.modify_iptc(dict1)
-        dict2 = img.read_iptc()
-        for k, v in dict1.items():
-            assert dict2.get(k, '') == v
+        changes = {'Iptc.Application2.ObjectName': 'test-中文-',
+                   'Iptc.Application2.Copyright': '',
+                   'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3']}
+        img.modify_iptc(changes)
+        correct_result = generate_the_correct_result(testdata.IPTC, changes)
+        compare_dict(correct_result, img.read_iptc())
 
 
 def test_modify_xmp():
     with Image(path) as img:
-        dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',
-                'Xmp.xmp.Rating': '',
-                'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']}
-        img.modify_xmp(dict1)
-        dict2 = img.read_xmp()
-        for k, v in dict1.items():
-            assert dict2.get(k, '') == v
+        changes = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',
+                   'Xmp.xmp.Rating': '',
+                   'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']}
+        img.modify_xmp(changes)
+        correct_result = generate_the_correct_result(testdata.XMP, changes)
+        compare_dict(correct_result, img.read_xmp())
 
 
 def test_clear_exif():
