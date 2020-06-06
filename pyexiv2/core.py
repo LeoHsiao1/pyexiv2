@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .lib import exiv2api as api
+from .lib import exiv2api
 
 
 COMMA = ', '
@@ -13,7 +13,7 @@ class Image:
     
     def __init__(self, filename, encoding='utf-8'):
         """ Open an image and load its metadata. """
-        self.img = api.Image(filename.encode(encoding))
+        self.img = exiv2api.Image(filename.encode(encoding))
 
     def __enter__(self):
         return self
@@ -108,10 +108,11 @@ class ImageData(Image):
         length = len(data)
         if length >= 2**31:
             raise ValueError('Could only open images that are less than 2GB in size. The size of your image is {} bytes.'.format(length))
-        self.buffer = api.Buffer(data, length)
-        self.img = api.Image(self.buffer)
+        self.buffer = exiv2api.Buffer(data, length)
+        self.img = exiv2api.Image(self.buffer)
 
     def get_bytes(self) -> bytes:
+        """ Get the bytes data of the image. """
         return self.img.get_bytes_of_image()
     
     def close(self):
@@ -130,10 +131,10 @@ def set_log_level(level=2):
         4 : mute
     """
     if level in [0, 1, 2, 3, 4]:
-        api.set_log_level(level)
+        exiv2api.set_log_level(level)
     else:
         raise ValueError('Invalid log level.')
 
 
-api.init()
+exiv2api.init()
 set_log_level(2)
