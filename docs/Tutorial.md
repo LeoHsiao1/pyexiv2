@@ -59,16 +59,16 @@ set_log_level()
     {'Xmp.dc.format': 'image/jpeg', 'Xmp.dc.rights': 'lang="x-default" TEST', 'Xmp.dc.subject': 'TEST', ...}
     >>> img.close()
     ```
-- pyexiv2 supports Unicode characters that contained in image paths and metadata. The default encoding format is utf-8.
-- If you cannot encode Chinese characters in the image data or path in `utf-8`, please try `gbk`. For example:
-    ```py
-    >>> img = Image(r'.\pyexiv2\tests\1 - 副本.jpg')
-    RuntimeError: d:\1\pyexiv2\pyexiv2\tests\1 - 副本.jpg: Failed to open the data source: No such file or directory (errno = 2)
-    >>> img = Image(r'.\pyexiv2\tests\1 - 副本.jpg', encoding='gbk')
-    >>> img.close()
+- pyexiv2 supports Unicode characters that contained in image path or metadata. Most functions have a default parameter: `encoding='utf-8'`.
+  If you encounter an error because the image path or metadata contains non-ASCII characters, try changing the encoding. For example:
+    ```python
+    img = Image(path, encoding='utf-8')
+    img = Image(path, encoding='gbk')
+    img = Image(path, encoding='ISO-8859-1')
     ```
+  Another example: Windows computers in China usually encoded file paths by GBK, so they cannot be decoded by utf-8.
 - It is safe to use `Image.read_*()`. These methods never affect image files. (md5 unchanged)
-- If the XMP metadata contains '\v' or '\f', it will be replaced with space ' '.
+- If the XMP metadata contains `\v` or `\f`, it will be replaced with space ` `.
 - The speed of reading metadata is inversely proportional to the amount of metadata, regardless of the size of the image.
 
 ### Image.modify_*()

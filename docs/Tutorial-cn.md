@@ -39,7 +39,7 @@ set_log_level()
     >>> data = img.read_exif()
     >>> img.close()
     ```
-- 当你处理完图片之后，请记得调用 `img.close()` ，以释放用于存储图像数据的内存。不调用该方法会导致内存泄漏，但不会锁定文件描述符。
+- 当你处理完图片之后，请记得调用 `img.close()` ，以释放用于存储图片数据的内存。不调用该方法会导致内存泄漏，但不会锁定文件描述符。
 - 通过 `with` 关键字打开图片时，它会自动关闭图片。例如：
     ```py
     with Image(r'.\pyexiv2\tests\1.jpg') as img:
@@ -60,17 +60,17 @@ set_log_level()
     {'Xmp.dc.format': 'image/jpeg', 'Xmp.dc.rights': 'lang="x-default" TEST', 'Xmp.dc.subject': 'TEST', ...}
     >>> img.close()
     ```
-- pyexiv2 支持包含 Unicode 字符的图片路径、元数据。默认编码格式为 utf-8 .
-- 如果你不能用`utf-8`编码图片数据或路径中的中文字符，请试试用`gbk`。例如：
-    ```py
-    >>> img = Image(r'.\pyexiv2\tests\1 - 副本.jpg')
-    RuntimeError: d:\1\pyexiv2\pyexiv2\tests\1 - 副本.jpg: Failed to open the data source: No such file or directory (errno = 2)
-    >>> img = Image(r'.\pyexiv2\tests\1 - 副本.jpg', encoding='gbk')
-    >>> img.close()
+- pyexiv2 支持包含 Unicode 字符的图片路径、元数据。大部分函数都有一个默认参数：`encoding='utf-8'`。
+  如果你因为图片路径、元数据包含非 ASCII 码字符而遇到错误，请尝试更换编码。例如：
+    ```python
+    img = Image(path, encoding='utf-8')
+    img = Image(path, encoding='GBK')
+    img = Image(path, encoding='ISO-8859-1')
     ```
+   另一个例子：中国地区的 Windows 电脑通常用 GBK 编码文件路径，因此它们不能被 utf-8 解码。
 - 使用`Image.read_*()`是安全的。这些方法永远不会影响图片文件。（md5不变）
-- 如果 XMP 元数据包含 '\v' 或 '\f'，它将被空格 ' ' 代替。
-- 元数据的读取速度与元数据的数量成反比，不管图像的大小如何。
+- 如果 XMP 元数据包含 `\v` 或 `\f`，它将被空格 ` ` 代替。
+- 元数据的读取速度与元数据的数量成反比，不管图片的大小如何。
 
 ### Image.modify_*()
 
