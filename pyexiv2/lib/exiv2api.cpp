@@ -118,7 +118,7 @@ public:
     }
 
     Image(Buffer buffer){
-        *img = Exiv2::ImageFactory::open((byte *)buffer.data, buffer.size);
+        *img = Exiv2::ImageFactory::open((Exiv2::byte *)buffer.data, buffer.size);
         if (img->get() == 0)
             throw Exiv2::Error(Exiv2::kerErrorMessage, "Can not open this image.");
         (*img)->readMetadata();
