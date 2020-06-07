@@ -107,7 +107,7 @@ class ImageData(Image):
         """ Open an image and load its metadata. """
         length = len(data)
         if length >= 2**31:
-            raise ValueError('Could only open images that are less than 2GB in size. The size of your image is {} bytes.'.format(length))
+            raise ValueError('Only images smaller than 2GB can be opened. The size of your image is {} bytes.'.format(length))
         self.buffer = exiv2api.Buffer(data, length)
         self.img = exiv2api.Image(self.buffer)
 
