@@ -32,8 +32,7 @@
     ```sh
     EXIV2_DIR=/root/pyexiv2/exiv2-0.27.2-Linux64   # According to your download location
     LIB_DIR=/root/pyexiv2/pyexiv2/lib/
-    mv ${EXIV2_DIR}/lib/libexiv2.so.0.27.2 ${EXIV2_DIR}/lib/libexiv2.so     # rename the library file
-    cp ${EXIV2_DIR}/lib/libexiv2.so $LIB_DIR
+    cp ${EXIV2_DIR}/lib/libexiv2.so.0.27.2 $LIB_DIR/libexiv2.so
     ```
 
 3. Set up the python interpreter. For example:
@@ -47,6 +46,36 @@
     ```sh
     cd $LIB_DIR
     g++ exiv2api.cpp -o linux64-py3${py_version}/exiv2api.so -O3 -Wall -std=c++11 -shared -fPIC `python3.$py_version -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2
+    ```
+
+## Compile steps on Darwin
+
+1. Download the release version of Exiv2, unpack it.
+    - Darwin : <https://www.exiv2.org/builds/>
+    - For example:
+        ```sh
+        cd /Users/leo/Documents/
+        curl -O https://www.exiv2.org/builds/exiv2-0.27.2-Darwin.tar.gz
+        tar -zxvf exiv2-0.27.2-Darwin.tar.gz
+        ```
+
+2. Prepare the environment:
+    ```sh
+    EXIV2_DIR=/Users/leo/Documents/exiv2-0.27.2-Darwin
+    LIB_DIR=/Users/leo/Documents/pyexiv2/pyexiv2/lib/
+    cp ${EXIV2_DIR}/lib/libexiv2.0.27.2.dylib ${LIB_DIR}/libexiv2.dylib
+    ```
+
+3. Set up the python interpreter. For example:
+    ```sh
+    py_version=8
+    python3.$py_version -m pip install pybind11
+    ```
+
+4. Compile:
+    ```sh
+    cd $LIB_DIR
+    g++ exiv2api.cpp -o darwin64-py3${py_version}/exiv2api.so -O3 -Wall -std=c++11 -shared -fPIC `python3.$py_version -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2 -undefined dynamic_lookup
     ```
 
 ## Compile steps on Windows
