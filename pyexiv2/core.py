@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .lib import exiv2api as api
+from .lib import exiv2api
 
 
 COMMA = ', '
@@ -13,7 +13,7 @@ class Image:
     
     def __init__(self, filename, encoding='utf-8'):
         """ Open an image and load its metadata. """
-        self.img = api.open_image(filename.encode(encoding))
+        self.img = exiv2api.Image(filename.encode(encoding))
 
     def __enter__(self):
         return self
@@ -23,39 +23,42 @@ class Image:
 
     def close(self):
         """ Free the memory for storing image data. """
-        api.close_image(self.img)
+        self.img.close_image()
         
-        # Disable all public methods
+        # Disable all members
         def closed_warning():
             raise RuntimeError('Do not operate on the closed image.')
         for attr in dir(self):
-            if not attr.startswith('_') and callable(getattr(self, attr)):
-                setattr(self, attr, closed_warning)
-
+            if not attr.startswith('__'):
+                if callable(getattr(self, attr)):
+                    setattr(self, attr, closed_warning)
+                else:
+                    setattr(self, attr, None)
+    
     def read_exif(self, encoding='utf-8') -> dict:
-        self._exif = api.read_exif(self.img)
+        self._exif = self.img.read_exif()
         return self._parse(self._exif, encoding)
 
     def read_iptc(self, encoding='utf-8') -> dict:
-        self._iptc = api.read_iptc(self.img)
+        self._iptc = self.img.read_iptc()
         return self._parse(self._iptc, encoding)
 
     def read_xmp(self, encoding='utf-8') -> dict:
-        self._xmp = api.read_xmp(self.img)
+        self._xmp = self.img.read_xmp()
         return self._parse(self._xmp, encoding)
 
     def read_raw_xmp(self, encoding='utf-8') -> str:
-        self._raw_xmp = api.read_raw_xmp(self.img)
+        self._raw_xmp = self.img.read_raw_xmp()
         return self._raw_xmp.decode(encoding)
 
     def modify_exif(self, data: dict, encoding='utf-8'):
-        api.modify_exif(self.img, self._dumps(data), encoding)
+        self.img.modify_exif(self._dumps(data), encoding)
 
     def modify_iptc(self, data: dict, encoding='utf-8'):
-        api.modify_iptc(self.img, self._dumps(data), encoding)
+        self.img.modify_iptc(self._dumps(data), encoding)
 
     def modify_xmp(self, data: dict, encoding='utf-8'):
-        api.modify_xmp(self.img, self._dumps(data), encoding)
+        self.img.modify_xmp(self._dumps(data), encoding)
     
     def _parse(self, table: list, encoding='utf-8') -> dict:
         """ Parse the table returned by C++ API into a dict. """
@@ -87,13 +90,35 @@ class Image:
         return table
 
     def clear_exif(self):
-        api.clear_exif(self.img)
+        self.img.clear_exif()
 
     def clear_iptc(self):
-        api.clear_iptc(self.img)
+        self.img.clear_iptc()
 
     def clear_xmp(self):
-        api.clear_xmp(self.img)
+        self.img.clear_xmp()
+
+
+class ImageData(Image):
+    """
+    Similar to class `Image`, but opens the image from bytes data.
+    """
+    def __init__(self, data: bytes):
+        """ Open an image and load its metadata. """
+        length = len(data)
+        if length >= 2**31:
+            raise ValueError('Only images smaller than 2GB can be opened. The size of your image is {} bytes.'.format(length))
+        self.buffer = exiv2api.Buffer(data, length)
+        self.img = exiv2api.Image(self.buffer)
+
+    def get_bytes(self) -> bytes:
+        """ Get the bytes data of the image. """
+        return self.img.get_bytes_of_image()
+    
+    def close(self):
+        """ Free the memory for storing image data. """
+        self.buffer.destroy()
+        super().close()
 
 
 def set_log_level(level=2):
@@ -106,10 +131,10 @@ def set_log_level(level=2):
         4 : mute
     """
     if level in [0, 1, 2, 3, 4]:
-        api.set_log_level(level)
+        exiv2api.set_log_level(level)
     else:
         raise ValueError('Invalid log level.')
 
 
-api.init()
+exiv2api.init()
 set_log_level(2)

@@ -34,13 +34,13 @@ def test_memory_leak_when_writing():
 
 def test_stack_overflow():
     with Image(path) as img:
-        dict1 = {'Exif.Image.ImageDescription': '(test_stack_overflow)' * 1000,
-                'Exif.Image.Artist': '0123456789 hello!' * 1000}
+        changes = {'Iptc.Application2.ObjectName': 'test-中文-' * 1000,
+                   'Iptc.Application2.Copyright': '0123456789 hello!' * 1000,
+                   'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3'] * 1000}
         for _ in range(10):
-            img.modify_exif(dict1)
-            dict2 = img.read_exif()
-            for k, v in dict1.items():
-                assert dict2.get(k, '') == v
+            img.modify_iptc(changes)
+            correct_result = generate_the_correct_result(testdata.IPTC, changes)
+            compare_dict(correct_result, img.read_iptc())
 
 
 def test_transmit_various_characters():
@@ -50,11 +50,11 @@ def test_transmit_various_characters():
     """
     import string
     values = (string.digits * 5,
-                string.ascii_letters * 5,
-                string.punctuation * 5,
-                string.whitespace * 5,
-                'test-中文-' * 5,
-                )
+              string.ascii_letters * 5,
+              string.punctuation * 5,
+              string.whitespace * 5,
+              'test-中文-' * 5,
+              )
     with Image(path) as img:
         for v in values:
             img.modify_exif({'Exif.Image.ImageDescription': v})
@@ -72,7 +72,7 @@ def test_transmit_various_characters():
 def _test_thread_safe():
     """
     Test whether pyexiv can successfully run multiple threads. 
-    TODO:Could not catch an exception from a child thread.
+    TODO: Could not catch the exception from the child thread.
     """
     import multiprocessing
     pool = multiprocessing.Pool(3)
@@ -86,7 +86,7 @@ def _test_thread_safe():
 def _test_recovery_exif():
     """
     Test whether pyexiv2 can delete metadata and recover it completely.
-    TODO:complete it
+    TODO: complete it
     """
     with Image(path) as img:
         original_dict = img.read_exif()
