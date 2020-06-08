@@ -95,17 +95,16 @@ def test_not_image_path():
 
 
 @check_md5
-def test_chinese_path():
-    from ..lib import sys_name
+def _test_chinese_path():
     chinese_path = os.path.join(current_dir, '1 - 副本.jpg')
     shutil.copy(path, chinese_path)
     try:
-        if sys_name == 'Linux':
-            with Image(chinese_path, encoding='utf-8') as img:
-                compare_dict(testdata.EXIF, img.read_exif())
-        elif sys_name == 'Windows':
-            with Image(chinese_path, encoding='gbk') as img:
-                compare_dict(testdata.EXIF, img.read_exif())
+        with Image(chinese_path, encoding='utf-8') as img:
+            exif = img.read_exif()
+    except:
+        with Image(chinese_path, encoding='gbk') as img:
+            exif = img.read_exif()
+        compare_dict(testdata.EXIF, exif)
     finally:
         os.remove(chinese_path)
 
