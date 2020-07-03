@@ -2,14 +2,16 @@
 
 ## File lists
 
-```
+```sh
 .
-├── linux64-py3*    # the build results on Linux(64bit)
-├── win64-py3*      # the build results on Windows(64bit)
+├── darwin64-py3*   # the build results of exiv2api.cpp on Darwin
+├── linux64-py3*    # the build results of exiv2api.cpp on Linux
+├── win64-py3*      # the build results of exiv2api.cpp on Windows
 ├── __init__.py
 ├── exiv2api.cpp    # Expose the API of exiv2 to Python
-├── exiv2.dll       # Copied from the Exiv2 release
-├── libexiv2.so     # Copied from the Exiv2 release
+├── exiv2.dll       # Copied from Windows libraries of Exiv2
+├── libexiv2.dylib  # Copied from Darwin libraries of Exiv2
+├── libexiv2.so     # Copied from Linux libraries of Exiv2
 └── README.md
 ```
 - The current release version of Exiv2 is `0.27.2`.
