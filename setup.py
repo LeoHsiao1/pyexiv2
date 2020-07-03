@@ -6,7 +6,7 @@ with open('README.md', encoding='utf-8') as f:
 
 setuptools.setup(
     name='pyexiv2',
-    version='2.3.0',
+    version='2.3.1',
     author='LeoHsiao',
     author_email='leohsiao@foxmail.com',
     description='Read/Write metadata of digital image, including EXIF, IPTC, XMP.',
@@ -15,7 +15,7 @@ setuptools.setup(
     url='https://github.com/LeoHsiao1/pyexiv2',
     # install_requires=["pybind11==2.4.3"],
     packages=setuptools.find_packages(),
-    package_data={'': ['*.py', '*.md', '*.cpp', '*.so', '*.dll', '*.pyd', '*.jpg']},
+    package_data={'': ['*.py', '*.md', '*.cpp', '*.so', '*.dylib', '*.dll', '*.pyd', '*.jpg']},
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: POSIX :: Linux',
