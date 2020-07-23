@@ -22,7 +22,7 @@
 ## Compile steps on Linux
 
 1. Download the release version of Exiv2, unpack it.
-    - Linux64 : <https://www.exiv2.org/builds/>
+    - Linux64 : <https://www.exiv2.org/archive.html>
     - For example:
         ```sh
         cd /root/pyexiv2/
@@ -53,7 +53,7 @@
 ## Compile steps on Darwin
 
 1. Download the release version of Exiv2, unpack it.
-    - Darwin : <https://www.exiv2.org/builds/>
+    - Darwin : <https://www.exiv2.org/archive.html>
     - For example:
         ```sh
         cd /Users/leo/Documents/
@@ -83,7 +83,7 @@
 ## Compile steps on Windows
 
 1. Download the release version of Exiv2 project.
-    - msvc64 : <https://www.exiv2.org/builds/>
+    - msvc64 : <https://www.exiv2.org/archive.html>
 
 2. Install `Visual Studio 2017` (must use the same version of Visual Studio as the Exiv2 build) , and set the environment variables it needs.
 
