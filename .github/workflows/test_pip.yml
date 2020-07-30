@@ -1,9 +1,8 @@
 name: Test pip
 
-on: [push]
-# on:
-#   release:
-#     types: [published]
+on:
+  release:
+    types: [published]
 
 jobs:
   Test_run:

@@ -1,6 +1,6 @@
 name: Test run
 
-# on: [push]
+on: [push]
 
 jobs:
   Test_run:
