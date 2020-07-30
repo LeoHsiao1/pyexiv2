@@ -33,4 +33,4 @@ setuptools.setup(
 #   python -m pip install setuptools wheel twine
 #   git clean -d -fx
 #   python setup.py sdist bdist_wheel
-#   python -m twine upload dist/*
+#   twine upload dist/*
