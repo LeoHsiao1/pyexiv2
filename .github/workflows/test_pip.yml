@@ -1,6 +1,8 @@
-name: Test run
+name: Test pip
 
-on: [push]
+on:
+  release:
+    types: [published]
 
 jobs:
   Test_run:
@@ -20,7 +22,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        python -m pip install pyexiv2
         python -m pip install pytest psutil
     - name: Test
       run: |
-        pytest -v
+        cd .github
+        cd workflows
+        python test_pip.py
