@@ -23,4 +23,4 @@ jobs:
         python -m pip install pytest psutil
     - name: Test
       run: |
-        pytest -v pyexiv2/tests
+        pytest -v
