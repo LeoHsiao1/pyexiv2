@@ -15,7 +15,7 @@ jobs:
     - name: git pull
       uses: actions/checkout@v1
       with:
-        ref: dev
+        ref: master
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
@@ -26,6 +26,4 @@ jobs:
         python -m pip install pytest psutil
     - name: Test
       run: |
-        cd .github
-        cd workflows
-        python test_pip.py
+        pytest -v pyexiv2/tests
