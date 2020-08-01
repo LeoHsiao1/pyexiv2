@@ -9,15 +9,19 @@
 ├── win64-py3*      # the build results of exiv2api.cpp on Windows
 ├── __init__.py
 ├── exiv2api.cpp    # Expose the API of exiv2 to Python
-├── exiv2.dll       # Copied from Windows libraries of Exiv2
-├── libexiv2.dylib  # Copied from Darwin libraries of Exiv2
-├── libexiv2.so     # Copied from Linux libraries of Exiv2
+├── exiv2.dll       # Copied from the Exiv2 library for Windows
+├── libexiv2.dylib  # Copied from the Exiv2 library for Darwin
+├── libexiv2.so     # Copied from the Exiv2 library for Linux
 └── README.md
 ```
+- The principle of the pyexiv2 library:
+  1. Write exiv2api.cpp to call the C++ API of the exiv2 library.
+  2. Use Pybind11 to compile exiv2api.cpp into a Python module.
+  3. Import the exiv2api module in the Python interpreter and call its API.
+- The build results of exiv2api.cpp is not compatible with different platforms, or even with different minor versions of the Python interpreter.
+- If the build results provided here do not apply to your platform, please compile it yourself. Then modify the code in `./__init__.py` so that it can successfully execute `import exiv2api`.
 - The current release version of Exiv2 is `0.27.2`.
-- You need to install pybind11 to compile exiv2api.cpp : `python3 -m pip install pybind11`
-- When using pyexiv2, you must use the same Python interpreter as the compile-time version.
-- On the development branch, it is not necessary to compile all versions of exiv2api.cpp and save them to the git repository.
+- It is not necessary to compile all versions of exiv2api.cpp and save them to the git repository, except when release a new version.
 
 ## Compile steps on Linux
 
