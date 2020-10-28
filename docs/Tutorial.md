@@ -13,9 +13,9 @@ class Image:
     def read_xmp(self, encoding='utf-8') -> dict
     def read_raw_xmp(self, encoding='utf-8') -> str
 
-    def modify_exif(self, dict_, encoding='utf-8')
-    def modify_iptc(self, dict_, encoding='utf-8')
-    def modify_xmp(self, dict_, encoding='utf-8')
+    def modify_exif(self, data: dict, encoding='utf-8')
+    def modify_iptc(self, data: dict, encoding='utf-8')
+    def modify_xmp(self, data: dict, encoding='utf-8')
 
     def clear_exif(self)
     def clear_iptc(self)
@@ -27,22 +27,22 @@ class ImageData(Image):
     def __init__(self, data: bytes)
     def get_bytes(self) -> bytes
 
-set_log_level()
+set_log_level(level=2)
 ```
 
 ## class Image
 
 - Class `Image` is used to open an image based on the file path. For example:
     ```py
-    >>> from pyexiv2 import Image
-    >>> img = Image(r'.\pyexiv2\tests\1.jpg')
+    >>> import pyexiv2
+    >>> img = pyexiv2.Image(r'.\pyexiv2\tests\1.jpg')
     >>> data = img.read_exif()
     >>> img.close()
     ```
 - When you're done with the image, remember to call `img.close()` to free the memory for storing image data. Not calling this method causes a memory leak, but it doesn't lock the file descriptor.
 - Opening an image by keyword `with` will close the image automatically. For example:
     ```py
-    with Image(r'.\pyexiv2\tests\1.jpg') as img:
+    with pyexiv2.Image(r'.\pyexiv2\tests\1.jpg') as img:
         data = ims.read_exif()
     ```
 
@@ -50,7 +50,6 @@ set_log_level()
 
 - Sample:
     ```py
-    >>> img = Image(r'.\pyexiv2\tests\1.jpg')
     >>> img.read_exif()
     {'Exif.Image.DateTime': '2019:06:23 19:45:17', 'Exif.Image.Artist': 'TEST', 'Exif.Image.Rating': '4', ...}
     >>> img.read_iptc()
@@ -67,7 +66,7 @@ set_log_level()
     img = Image(path, encoding='ISO-8859-1')
     ```
   Another example: Windows computers in China usually encoded file paths by GBK, so they cannot be decoded by utf-8.
-- It is safe to use `Image.read_*()`. These methods never affect image files. (md5 unchanged)
+- It is safe to use `Image.read_*()`. These methods never affect image files (md5 unchanged).
 - If the XMP metadata contains `\v` or `\f`, it will be replaced with space ` `.
 - The speed of reading metadata is inversely proportional to the amount of metadata, regardless of the size of the image.
 
@@ -75,7 +74,6 @@ set_log_level()
 
 - Sample:
     ```py
-    >>> img = Image(r'.\pyexiv2\tests\1.jpg')
     >>> # Prepare the XMP data you want to modify
     >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # This will overwrite its original value, or add it if it doesn't exist
     ...          'Xmp.xmp.Rating': ''}                              # Set an empty str explicitly to delete the datum
@@ -123,20 +121,20 @@ set_log_level()
 - Example of reading:
     ```py
     with open(r'.\pyexiv2\tests\1.jpg', 'rb') as f:
-        with ImageData(f.read()) as img:
+        with pyexiv2.ImageData(f.read()) as img:
             data = img.read_exif()
     ```
 - Example of modifing:
     ```py
     with open(r'.\pyexiv2\tests\1.jpg', 'rb+') as f:
-        with ImageData(f.read()) as img:
+        with pyexiv2.ImageData(f.read()) as img:
             changes = {'Iptc.Application2.ObjectName': 'test'}
             img.modify_iptc(changes)
             f.seek(0)
             # Get the bytes data of the image and save it to the file
             f.write(img.get_bytes())
         f.seek(0)
-        with ImageData(f.read()) as img:
+        with pyexiv2.ImageData(f.read()) as img:
             result = img.read_iptc()
     ```
 
@@ -170,13 +168,10 @@ set_log_level()
 - The `error` log will be converted to an exception and thrown. Other logs will be printed to stdout.
 - Call the function `pyexiv2.set_log_level()` to set the level of handling logs. For example:
     ```py
-    >>> import pyexiv2
-    >>> img = pyexiv2.Image(r'.\pyexiv2\tests\1.jpg')
-    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
+    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'}) # An error that was not caught is displayed
     RuntimeError: XMP Toolkit error 102: Indexing applied to non-array
     Failed to encode XMP metadata.
 
     >>> pyexiv2.set_log_level(4)
-    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
-    >>> img.close()
+    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'}) # No error displayed
     ```
