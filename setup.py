@@ -6,7 +6,7 @@ with open('README.md', encoding='utf-8') as f:
 
 setuptools.setup(
     name='pyexiv2',
-    version='2.3.1',
+    version='2.3.2',
     author='LeoHsiao',
     author_email='leohsiao@foxmail.com',
     description='Read/Write metadata of digital image, including EXIF, IPTC, XMP.',
@@ -29,6 +29,7 @@ setuptools.setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
 )
 

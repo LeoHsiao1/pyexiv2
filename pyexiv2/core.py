@@ -25,9 +25,9 @@ class Image:
         """ Free the memory for storing image data. """
         self.img.close_image()
         
-        # Disable all members
+        # Disable all methods and properties
         def closed_warning():
-            raise RuntimeError('Do not operate on the closed image.')
+            raise RuntimeError('The image has been closed, so it is not allowed to operate.')
         for attr in dir(self):
             if not attr.startswith('__'):
                 if callable(getattr(self, attr)):

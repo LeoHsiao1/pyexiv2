@@ -13,9 +13,9 @@ class Image:
     def read_xmp(self, encoding='utf-8') -> dict
     def read_raw_xmp(self, encoding='utf-8') -> str
 
-    def modify_exif(self, dict_, encoding='utf-8')
-    def modify_iptc(self, dict_, encoding='utf-8')
-    def modify_xmp(self, dict_, encoding='utf-8')
+    def modify_exif(self, data: dict, encoding='utf-8')
+    def modify_iptc(self, data: dict, encoding='utf-8')
+    def modify_xmp(self, data: dict, encoding='utf-8')
 
     def clear_exif(self)
     def clear_iptc(self)
@@ -27,22 +27,22 @@ class ImageData(Image):
     def __init__(self, data: bytes)
     def get_bytes(self) -> bytes
 
-set_log_level()
+set_log_level(level=2)
 ```
 
 ## 类 Image
 
 - 类 `Image` 用于根据文件路径打开图片。例如：
     ```py
-    >>> from pyexiv2 import Image
-    >>> img = Image(r'.\pyexiv2\tests\1.jpg')
+    >>> import pyexiv2
+    >>> img = pyexiv2.Image(r'.\pyexiv2\tests\1.jpg')
     >>> data = img.read_exif()
     >>> img.close()
     ```
 - 当你处理完图片之后，请记得调用 `img.close()` ，以释放用于存储图片数据的内存。不调用该方法会导致内存泄漏，但不会锁定文件描述符。
 - 通过 `with` 关键字打开图片时，它会自动关闭图片。例如：
     ```py
-    with Image(r'.\pyexiv2\tests\1.jpg') as img:
+    with pyexiv2.Image(r'.\pyexiv2\tests\1.jpg') as img:
         ims.read_exif()
     ```
 
@@ -50,8 +50,6 @@ set_log_level()
 
 - 示例:
     ```py
-    >>> from pyexiv2 import Image
-    >>> img = Image(r'.\pyexiv2\tests\1.jpg')
     >>> img.read_exif()
     {'Exif.Image.DateTime': '2019:06:23 19:45:17', 'Exif.Image.Artist': 'TEST', 'Exif.Image.Rating': '4', ...}
     >>> img.read_iptc()
@@ -63,12 +61,12 @@ set_log_level()
 - pyexiv2 支持包含 Unicode 字符的图片路径、元数据。大部分函数都有一个默认参数：`encoding='utf-8'`。
   如果你因为图片路径、元数据包含非 ASCII 码字符而遇到错误，请尝试更换编码。例如：
     ```python
-    img = Image(path, encoding='utf-8')
-    img = Image(path, encoding='GBK')
-    img = Image(path, encoding='ISO-8859-1')
+    img = pyexiv2.Image(path, encoding='utf-8')
+    img = pyexiv2.Image(path, encoding='GBK')
+    img = pyexiv2.Image(path, encoding='ISO-8859-1')
     ```
    另一个例子：中国地区的 Windows 电脑通常用 GBK 编码文件路径，因此它们不能被 utf-8 解码。
-- 使用`Image.read_*()`是安全的。这些方法永远不会影响图片文件。（md5不变）
+- 使用 `Image.read_*()` 是安全的。这些方法永远不会影响图片文件（md5不变）。
 - 如果 XMP 元数据包含 `\v` 或 `\f`，它将被空格 ` ` 代替。
 - 元数据的读取速度与元数据的数量成反比，不管图片的大小如何。
 
@@ -76,7 +74,6 @@ set_log_level()
 
 - 示例:
     ```py
-    >>> img = Image(r'.\pyexiv2\tests\1.jpg')
     >>> # 准备要修改的XMP数据
     >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # 这将覆盖该标签的原始值，如果不存在该标签则将其添加
     ...          'Xmp.xmp.Rating': ''}                              # 赋值一个空字符串会删除该标签
@@ -124,20 +121,20 @@ set_log_level()
 - 读取的示例：
     ```py
     with open(r'.\pyexiv2\tests\1.jpg', 'rb') as f:
-        with ImageData(f.read()) as img:
+        with pyexiv2.ImageData(f.read()) as img:
             data = img.read_exif()
     ```
 - 修改的示例：
     ```py
     with open(r'.\pyexiv2\tests\1.jpg', 'rb+') as f:
-        with ImageData(f.read()) as img:
+        with pyexiv2.ImageData(f.read()) as img:
             changes = {'Iptc.Application2.ObjectName': 'test'}
             img.modify_iptc(changes)
             f.seek(0)
             # 获取图片的字节数据并保存到文件中
             f.write(img.get_bytes())
         f.seek(0)
-        with ImageData(f.read()) as img:
+        with pyexiv2.ImageData(f.read()) as img:
             result = img.read_iptc()
     ```
 
@@ -171,8 +168,6 @@ set_log_level()
 - `error` 日志会被转换成异常并抛出，其它日志则会被打印到 stdout 。
 - 调用函数 `pyexiv2.set_log_level()` 可以设置处理日志的级别。例如：
     ```py
-    >>> import pyexiv2
-    >>> img = pyexiv2.Image(r'.\pyexiv2\tests\1.jpg')
     >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
     RuntimeError: XMP Toolkit error 102: Indexing applied to non-array
     Failed to encode XMP metadata.
