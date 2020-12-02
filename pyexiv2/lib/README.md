@@ -23,6 +23,37 @@
 - The current release version of Exiv2 is `0.27.2`.
 - It is not necessary to compile all versions of exiv2api.cpp and save them to the git repository, except when release a new version.
 
+## Compile steps on Linux
+
+1. Download the release version of Exiv2, unpack it.
+    - Linux64 : <https://www.exiv2.org/archive.html>
+    - For example:
+        ```sh
+        cd /root/
+        curl -O https://www.exiv2.org/builds/exiv2-0.27.2-Linux64.tar.gz
+        tar -zxvf exiv2-0.27.2-Linux64.tar.gz
+        ```
+
+2. Prepare the environment:
+    ```sh
+    EXIV2_DIR=/root/exiv2-0.27.2-Linux64   # According to your download location
+    LIB_DIR=/root/pyexiv2/pyexiv2/lib/
+    cp ${EXIV2_DIR}/lib/libexiv2.so.0.27.2 $LIB_DIR/libexiv2.so
+    ```
+
+3. Set up the python interpreter. For example:
+    ```sh
+    py_version=8
+    # docker run -it --rm --name python3.$py_version -e "py_version=$py_version" -e "EXIV2_DIR=$EXIV2_DIR" -e "LIB_DIR=$LIB_DIR" -v /root:/root python:3.$py_version-buster sh
+    python3.$py_version -m pip install pybind11
+    ```
+
+4. Compile:
+    ```sh
+    cd $LIB_DIR
+    g++ exiv2api.cpp -o py3${py_version}-linux/exiv2api.so -O3 -Wall -std=c++11 -shared -fPIC `python3.$py_version -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2
+    ```
+
 ## Compile steps on Darwin
 
 1. Download the release version of Exiv2, unpack it.
@@ -38,6 +69,7 @@
     ```sh
     EXIV2_DIR=/Users/leo/Documents/exiv2-0.27.2-Darwin
     LIB_DIR=/Users/leo/Documents/pyexiv2/pyexiv2/lib/
+    cp ${EXIV2_DIR}/lib/libexiv2.0.27.2.dylib ${EXIV2_DIR}/lib/libexiv2.dylib
     cp ${EXIV2_DIR}/lib/libexiv2.0.27.2.dylib ${LIB_DIR}/libexiv2.dylib
     ```
 
@@ -51,37 +83,6 @@
     ```sh
     cd $LIB_DIR
     g++ exiv2api.cpp -o py3${py_version}-darwin/exiv2api.so -O3 -Wall -std=c++11 -shared -fPIC `python3.$py_version -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2 -undefined dynamic_lookup
-    ```
-
-## Compile steps on Linux
-
-1. Download the release version of Exiv2, unpack it.
-    - Linux64 : <https://www.exiv2.org/archive.html>
-    - For example:
-        ```sh
-        cd /root/pyexiv2/
-        curl -O https://www.exiv2.org/builds/exiv2-0.27.2-Linux64.tar.gz
-        tar -zxvf exiv2-0.27.2-Linux64.tar.gz
-        ```
-
-2. Prepare the environment:
-    ```sh
-    EXIV2_DIR=/root/pyexiv2/exiv2-0.27.2-Linux64   # According to your download location
-    LIB_DIR=/root/pyexiv2/pyexiv2/lib/
-    cp ${EXIV2_DIR}/lib/libexiv2.so.0.27.2 $LIB_DIR/libexiv2.so
-    ```
-
-3. Set up the python interpreter. For example:
-    ```sh
-    py_version=8
-    docker run -it --rm --name python3.$py_version -e "py_version=$py_version" -e "EXIV2_DIR=$EXIV2_DIR" -e "LIB_DIR=$LIB_DIR" -v /root/pyexiv2:/root/pyexiv2 python:3.$py_version bash
-    python3.$py_version -m pip install pybind11
-    ```
-
-4. Compile:
-    ```sh
-    cd $LIB_DIR
-    g++ exiv2api.cpp -o py3${py_version}-linux/exiv2api.so -O3 -Wall -std=c++11 -shared -fPIC `python3.$py_version -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2
     ```
 
 ## Compile steps on Windows
@@ -102,7 +103,8 @@
 4. Compile:
     ```batch
     set py_version=8
-    cl /MD /LD exiv2api.cpp /EHsc -I %EXIV2_DIR%\include -I C:\Users\Leo\AppData\Local\Programs\Python\Python3%py_version%\include /link %EXIV2_DIR%\lib\exiv2.lib C:\Users\Leo\AppData\Local\Programs\Python\Python3%py_version%\libs\python3%py_version%.lib /OUT:py3%py_version%-win\exiv2api.pyd
+    set py_home=C:\Users\Leo\AppData\Local\Programs\Python\Python3%py_version%
+    cl /MD /LD exiv2api.cpp /EHsc -I %EXIV2_DIR%\include -I %py_home%\include -I %py_home%\Lib\site-packages\pybind11\include /link %EXIV2_DIR%\lib\exiv2.lib %py_home%\libs\python3%py_version%.lib /OUT:py3%py_version%-win\exiv2api.pyd
     del exiv2api.exp exiv2api.obj exiv2api.lib
     ```
-    Modify the path here according to your installation location.
+    - Modify the path here according to your installation location.

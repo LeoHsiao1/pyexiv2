@@ -4,12 +4,14 @@ import ctypes
 import platform
 
 
-# Check the Python interpreter
 if platform.architecture()[0] != '64bit':
     raise RuntimeError('pyexiv2 can only run on 64-bit python3 interpreter.')
+
+# Check the Python interpreter
 py_version = platform.python_version()[:3]
-if py_version not in ['3.5', '3.6', '3.7', '3.8']:
-    raise RuntimeError('pyexiv2 only supports these Python versions: 3.5, 3.6, 3.7, 3.8 , but your version is {} .'.format(py_version))
+expected_py_version = ['3.5', '3.6', '3.7', '3.8', '3.9']
+if py_version not in expected_py_version:
+    raise RuntimeError('pyexiv2 only supports these Python versions: {} . But your version is {} .'.format(expected_py_version, py_version))
 
 lib_dir = os.path.dirname(__file__)
 

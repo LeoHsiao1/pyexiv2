@@ -6,9 +6,10 @@ jobs:
   Test_run:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-18.04, macOS-latest, windows-2019]
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
     steps:
     - name: git pull
       uses: actions/checkout@v1
