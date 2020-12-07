@@ -43,7 +43,7 @@ set_log_level(level=2)
 - 通过 `with` 关键字打开图片时，它会自动关闭图片。例如：
     ```py
     with pyexiv2.Image(r'.\pyexiv2\tests\1.jpg') as img:
-        ims.read_exif()
+        data = img.read_exif()
     ```
 
 ### Image.read_*()

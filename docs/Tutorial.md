@@ -43,7 +43,7 @@ set_log_level(level=2)
 - Opening an image by keyword `with` will close the image automatically. For example:
     ```py
     with pyexiv2.Image(r'.\pyexiv2\tests\1.jpg') as img:
-        data = ims.read_exif()
+        data = img.read_exif()
     ```
 
 ### Image.read_*()
