@@ -14,6 +14,7 @@ Read/Write metadata of digital image, including [EXIF](https://en.wikipedia.org/
 - [Supports various image formats](https://dev.exiv2.org/projects/exiv2/wiki/Supported_image_formats)
 - Supports opening images based on the file path or from bytes data.
 - Supports Unicode characters that contained in image path or metadata.
+- Supports modifying the JPEG Header Comment
 
 ## Defects
 
@@ -29,6 +30,3 @@ Read/Write metadata of digital image, including [EXIF](https://en.wikipedia.org/
 
 There are some test cases in folder [pyexiv2/tests](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/tests/).
 
-## Other notes
-
-- Does not read/write the "JPEG COM" structure for JPEG Header comments (See https://stackoverflow.com/questions/17447201/how-do-text-comments-in-jpg-files-work )

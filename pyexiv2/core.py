@@ -99,6 +99,15 @@ class Image:
         self.img.clear_xmp()
 
 
+    def clear_comment(self):
+        self.img.clear_comment()
+
+    def get_comment(self):
+        return self.img.get_comment()
+
+    def set_comment(self, comment_str):
+        self.img.set_comment(comment_str)
+
 class ImageData(Image):
     """
     Similar to class `Image`, but opens the image from bytes data.

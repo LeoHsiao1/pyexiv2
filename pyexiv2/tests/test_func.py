@@ -41,6 +41,24 @@ def test_modify_exif():
             result.pop(key)
         compare_dict(correct_result, result)
 
+def test_modify_jpeg_header_comments():
+    
+    with Image(path) as img:
+        comment = "nice raw image comment"
+        img.set_comment(comment)
+
+        comment_retrieved = img.get_comment()
+
+        assert comment == comment_retrieved
+
+        img.clear_comment()
+        comment_retrieved = img.get_comment()
+        assert comment_retrieved == ""
+
+        # Try again after we ran clear_comment() just to be sure
+        img.set_comment(comment)
+        comment_retrieved = img.get_comment()
+        assert comment == comment_retrieved
 
 def test_modify_iptc():
     with Image(path) as img:

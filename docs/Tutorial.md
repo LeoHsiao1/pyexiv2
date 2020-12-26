@@ -115,6 +115,17 @@ set_log_level(level=2)
 - Calling `img.clear_exif()` will delete all EXIF metadata of the image. Once cleared, pyexiv2 may not be able to recover it completely.
 - Use `img.clear_iptc()` and `img.clear_xmp()` in the similar way.
 
+### image.*_comment()
+
+This is for handling the JPEG `COM` field which contains a comment related to the image outside of the EXIF/IPTC data (part of the JPEG header)
+
+_NOTE:_ This is SEPARATE from any EXIF/IPTC data! But it is well supported by the exiv2 library.
+
+- `img.clear_comment()`
+- `img.set_comment("foo bar")`
+- `comment = img.get_comment()` Returns an empty string if none set/empty.
+
+
 ## class ImageData
 
 - Class `ImageData`, inherited from class `Image`, is used to open an image from bytes data. 
