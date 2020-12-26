@@ -19,6 +19,7 @@ Read/Write metadata of digital image, including [EXIF](https://en.wikipedia.org/
 
 - Can only read the image less than 2G and modify the image less than 1G.
 - Not thread safe.
+- Cann't read/write image structure. Such as JPEG COM , DQT.
 
 ## Usage
 
@@ -29,6 +30,3 @@ Read/Write metadata of digital image, including [EXIF](https://en.wikipedia.org/
 
 There are some test cases in folder [pyexiv2/tests](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/tests/).
 
-## Other notes
-
-- Does not read/write the "JPEG COM" structure for JPEG Header comments (See https://stackoverflow.com/questions/17447201/how-do-text-comments-in-jpg-files-work )
