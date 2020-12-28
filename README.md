@@ -17,7 +17,7 @@ Read/Write metadata of digital image, including [EXIF](https://en.wikipedia.org/
 
 ## Defects
 
-- Can only read the image less than 2G and modify the image less than 1G.
+- Can only read the images less than 2G, and modify images less than 1G. (See https://github.com/Exiv2/exiv2/issues/1248)
 - Not thread safe.
 - Cann't read/write image structure. Such as JPEG COM , DQT.
 
