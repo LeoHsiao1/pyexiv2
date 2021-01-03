@@ -4,7 +4,7 @@ from .base import *
 
 @check_md5
 def test_read_all():
-    with open(path, 'rb') as f:
+    with open(test_img, 'rb') as f:
         with ImageData(f.read()) as img:
             diff_dict(testdata.EXIF, img.read_exif())
             diff_dict(testdata.IPTC, img.read_iptc())
@@ -13,7 +13,7 @@ def test_read_all():
 
 
 def test_modify_exif():
-    with open(path, 'rb+') as f:
+    with open(test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             changes = {'Exif.Image.ImageDescription': 'test-中文-',
                        'Exif.Image.Artist': ''}
@@ -32,7 +32,7 @@ def test_modify_exif():
 
 
 def test_modify_iptc():
-    with open(path, 'rb+') as f:
+    with open(test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             changes = {'Iptc.Application2.ObjectName': 'test-中文-',
                        'Iptc.Application2.Copyright': '',
@@ -47,7 +47,7 @@ def test_modify_iptc():
 
 
 def test_modify_xmp():
-    with open(path, 'rb+') as f:
+    with open(test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             changes = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',
                        'Xmp.xmp.Rating': '',
@@ -62,7 +62,7 @@ def test_modify_xmp():
 
 
 def test_clear_all():
-    with open(path, 'rb+') as f:
+    with open(test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             img.clear_exif()
             img.clear_iptc()
@@ -77,7 +77,7 @@ def test_clear_all():
 
 
 def test_error_log():
-    with open(path, 'rb') as f:
+    with open(test_img, 'rb') as f:
         with ImageData(f.read()) as img:
             with pytest.raises(RuntimeError):
                 img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})

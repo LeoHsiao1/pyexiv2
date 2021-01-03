@@ -33,7 +33,7 @@ def test_memory_leak_when_writing():
 
 
 def test_stack_overflow():
-    with Image(path) as img:
+    with Image(test_img) as img:
         changes = {'Iptc.Application2.ObjectName': 'test-中文-' * 1000,
                    'Iptc.Application2.Copyright': '0123456789 hello!' * 1000,
                    'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3'] * 1000}
@@ -55,7 +55,7 @@ def test_transmit_various_characters():
               string.whitespace * 5,
               'test-中文-' * 5,
               )
-    with Image(path) as img:
+    with Image(test_img) as img:
         for v in values:
             img.modify_exif({'Exif.Image.ImageDescription': v})
             assert img.read_exif().get('Exif.Image.ImageDescription') == v
@@ -88,7 +88,7 @@ def _test_recovery_exif():
     Test whether pyexiv2 can delete metadata and recover it completely.
     TODO: complete it
     """
-    with Image(path) as img:
+    with Image(test_img) as img:
         original_dict = img.read_exif()
         img.clear_exif()
         img.modify_exif(original_dict)

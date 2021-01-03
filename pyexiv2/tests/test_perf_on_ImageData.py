@@ -31,7 +31,7 @@ def test_memory_leak_when_writing():
 
 def test_stack_overflow():
     for _ in range(10):
-        with open(path, 'rb+') as f:
+        with open(test_img, 'rb+') as f:
             with ImageData(f.read()) as img:
                 changes = {'Iptc.Application2.ObjectName': 'test-中文-' * 1000,
                            'Iptc.Application2.Copyright': '0123456789 hello!' * 1000,

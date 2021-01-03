@@ -9,17 +9,18 @@ import pytest
 from .. import Image, ImageData, set_log_level
 from . import testdata
 
-current_dir = os.path.dirname(__file__)
-original_path = os.path.join(current_dir, '1.jpg')
-path = os.path.join(current_dir, 'tmp.jpg')
+
+TEST_DIR      = os.path.dirname(__file__)
+original_img  = os.path.join(TEST_DIR, '1.jpg')
+test_img      = os.path.join(TEST_DIR, 'test.jpg')
 
 
 def setup_function():
-    shutil.copy(original_path, path)
+    shutil.copy(original_img, test_img) # Before each test, make a temporary copy of the image
 
 
 def teardown_function():
-    os.remove(path)
+    os.remove(test_img)
 
 
 def diff_file_by_md5(file1, file2):
@@ -34,7 +35,7 @@ def check_md5(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         ret = func(*args, **kwargs)
-        diff_file_by_md5(original_path, path)
+        diff_file_by_md5(original_img, test_img)
         return ret
     return wrapper
 
