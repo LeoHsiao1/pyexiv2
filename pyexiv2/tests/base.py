@@ -22,20 +22,19 @@ def teardown_function():
     os.remove(path)
 
 
-def _check_md5(file1, file2):
-    """ check whether the two files are the same """
+def diff_file_by_md5(file1, file2):
     with open(file1, "rb") as f1, open(file2, "rb") as f2:
-        h1 = hashlib.md5(f1.read()).digest()
-        h2 = hashlib.md5(f2.read()).digest()
-        return h1 == h2
+        v1 = hashlib.md5(f1.read()).digest()
+        v2 = hashlib.md5(f2.read()).digest()
+        assert v1 == v2, 'The MD5 value of the file has changed.'
 
 
 def check_md5(func):
-    """ A decorator that checks if a file has been changed. """
+    """ A decorator to check if the file has been changed. """
     @wraps(func)
     def wrapper(*args, **kwargs):
         ret = func(*args, **kwargs)
-        assert _check_md5(path, original_path), 'The file has been changed after {}().'.format(func.__name__)
+        diff_file_by_md5(original_path, path)
         return ret
     return wrapper
 
