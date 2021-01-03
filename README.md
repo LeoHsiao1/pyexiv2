@@ -14,6 +14,7 @@ Read/Write metadata of digital image, including [EXIF](https://en.wikipedia.org/
 - [Supports various image formats](https://dev.exiv2.org/projects/exiv2/wiki/Supported_image_formats)
 - Supports opening images based on the file path or from bytes data.
 - Supports Unicode characters that contained in image path or metadata.
+- Supports modifying the JPEG Header Comment
 
 ## Defects
 

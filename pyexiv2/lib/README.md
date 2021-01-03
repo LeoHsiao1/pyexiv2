@@ -83,8 +83,9 @@
     ```sh
     cd $LIB_DIR
     g++ exiv2api.cpp -o py3${py_version}-darwin/exiv2api.so -O3 -Wall -std=c++11 -shared -fPIC `python3.$py_version -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2 -undefined dynamic_lookup
-    ```
-
+   ```
+   
+    
 ## Compile steps on Windows
 
 1. Download the release version of Exiv2 project.

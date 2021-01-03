@@ -166,6 +166,12 @@ public:
         return py::bytes((*img)->xmpPacket());
     }
 
+    std::string get_comment()
+    {
+        std::string s = (*img)->comment();
+        return s;
+    }
+
     void modify_exif(py::list table, py::str encoding)
     {
         Exiv2::ExifData &exifData = (*img)->exifData();
@@ -264,6 +270,18 @@ public:
         check_error_log();
     }
 
+    void clear_comment()
+    {
+        (*img)->clearComment();
+        check_error_log();
+    }
+
+    void set_comment(const std::string &s){
+        // exiv2 -c "Hello comment world" ./1.jpg
+        (*img)->setComment(s);
+        check_error_log();
+    }
+
     void clear_exif()
     {
         Exiv2::ExifData exifData;   // create an empty container of exif metadata
@@ -314,5 +332,8 @@ PYBIND11_MODULE(exiv2api, m)
         .def("modify_xmp", &Image::modify_xmp)
         .def("clear_exif", &Image::clear_exif)
         .def("clear_iptc", &Image::clear_iptc)
-        .def("clear_xmp", &Image::clear_xmp);
+        .def("clear_xmp", &Image::clear_xmp)
+        .def("clear_comment", &Image::clear_comment)
+        .def("set_comment", &Image::set_comment)
+        .def("get_comment", &Image::get_comment);
 }
