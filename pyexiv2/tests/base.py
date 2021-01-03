@@ -40,18 +40,17 @@ def check_md5(func):
     return wrapper
 
 
-def compare_dict(d1, d2):
-    """ Compare two dictionaries to see if they are the same. """
-    assert len(d1) == len(d2)
-    for k in d1.keys():
-        assert d1[k] == d2[k], "['{}'] is different.".format(k)
+def diff_dict(dict1, dict2):
+    assert len(dict1) == len(dict2)
+    for k in dict1.keys():
+        assert dict1[k] == dict2[k], "['{}'] is different.".format(k)
 
 
-def generate_the_correct_result(raw_dict: dict, changes: dict) -> dict:
-    ''' Generate the result that supposed to be after modification by pyexiv2.  '''
-    correct_result = raw_dict.copy()
-    correct_result.update(changes)
-    for k, v in list(correct_result.items()):
+def simulate_updating_metadata(raw_dict: dict, changes: dict) -> dict:
+    ''' Simulate the process of updating the metadata dict by pyexiv2.  '''
+    result = raw_dict.copy()
+    result.update(changes)
+    for k, v in list(result.items()):
         if v == '':
-            correct_result.pop(k)
-    return correct_result
+            result.pop(k)
+    return result

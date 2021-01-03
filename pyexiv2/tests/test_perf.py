@@ -39,8 +39,8 @@ def test_stack_overflow():
                    'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3'] * 1000}
         for _ in range(10):
             img.modify_iptc(changes)
-            correct_result = generate_the_correct_result(testdata.IPTC, changes)
-            compare_dict(correct_result, img.read_iptc())
+            expected_result = simulate_updating_metadata(testdata.IPTC, changes)
+            diff_dict(expected_result, img.read_iptc())
 
 
 def test_transmit_various_characters():

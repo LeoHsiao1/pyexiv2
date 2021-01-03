@@ -6,9 +6,9 @@ from .base import *
 def test_read_all():
     with open(path, 'rb') as f:
         with ImageData(f.read()) as img:
-            compare_dict(testdata.EXIF, img.read_exif())
-            compare_dict(testdata.IPTC, img.read_iptc())
-            compare_dict(testdata.XMP, img.read_xmp())
+            diff_dict(testdata.EXIF, img.read_exif())
+            diff_dict(testdata.IPTC, img.read_iptc())
+            diff_dict(testdata.XMP, img.read_xmp())
             assert len(img.read_raw_xmp()) == 4593
 
 
@@ -22,13 +22,13 @@ def test_modify_exif():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            correct_result = generate_the_correct_result(testdata.EXIF, changes)
+            expected_result = simulate_updating_metadata(testdata.EXIF, changes)
             result = img.read_exif()
             ignored_keys = ['Exif.Image.ExifTag']
             for key in ignored_keys:
-                correct_result.pop(key)
+                expected_result.pop(key)
                 result.pop(key)
-            compare_dict(correct_result, result)
+            diff_dict(expected_result, result)
 
 
 def test_modify_iptc():
@@ -42,8 +42,8 @@ def test_modify_iptc():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            correct_result = generate_the_correct_result(testdata.IPTC, changes)
-            compare_dict(correct_result, img.read_iptc())
+            expected_result = simulate_updating_metadata(testdata.IPTC, changes)
+            diff_dict(expected_result, img.read_iptc())
 
 
 def test_modify_xmp():
@@ -57,8 +57,8 @@ def test_modify_xmp():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            correct_result = generate_the_correct_result(testdata.XMP, changes)
-            compare_dict(correct_result, img.read_xmp())
+            expected_result = simulate_updating_metadata(testdata.XMP, changes)
+            diff_dict(expected_result, img.read_xmp())
 
 
 def test_clear_all():
