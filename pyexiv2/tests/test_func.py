@@ -1,31 +1,31 @@
 # -*- coding: utf-8 -*-
 from .base import *
-from . import testdata
+from . import reference_data
 
 
 @check_md5
 def test_read_exif():
     img = Image(test_img)
-    diff_dict(testdata.EXIF, img.read_exif())
+    diff_dict(reference_data.EXIF, img.read_exif())
     img.close()
 
 
 @check_md5
 def test_read_iptc():
     with Image(test_img) as img:
-        diff_dict(testdata.IPTC, img.read_iptc())
+        diff_dict(reference_data.IPTC, img.read_iptc())
 
 
 @check_md5
 def test_read_xmp():
     with Image(test_img) as img:
-        diff_dict(testdata.XMP, img.read_xmp())
+        diff_dict(reference_data.XMP, img.read_xmp())
 
 
 @check_md5
 def test_read_raw_xmp():
     with Image(test_img) as img:
-        assert len(img.read_raw_xmp()) == 4593
+        diff_text(reference_data.RAW_XMP, img.read_raw_xmp())
 
 
 def test_modify_exif():
@@ -33,7 +33,7 @@ def test_modify_exif():
         changes = {'Exif.Image.ImageDescription': 'test-中文-',
                    'Exif.Image.Artist': ''}
         img.modify_exif(changes)
-        expected_result = simulate_updating_metadata(testdata.EXIF, changes)
+        expected_result = simulate_updating_metadata(reference_data.EXIF, changes)
         result = img.read_exif()
         ignored_keys = ['Exif.Image.ExifTag']
         for key in ignored_keys:
@@ -48,7 +48,7 @@ def test_modify_iptc():
                    'Iptc.Application2.Copyright': '',
                    'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3']}
         img.modify_iptc(changes)
-        expected_result = simulate_updating_metadata(testdata.IPTC, changes)
+        expected_result = simulate_updating_metadata(reference_data.IPTC, changes)
         diff_dict(expected_result, img.read_iptc())
 
 
@@ -58,7 +58,7 @@ def test_modify_xmp():
                    'Xmp.xmp.Rating': '',
                    'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']}
         img.modify_xmp(changes)
-        expected_result = simulate_updating_metadata(testdata.XMP, changes)
+        expected_result = simulate_updating_metadata(reference_data.XMP, changes)
         diff_dict(expected_result, img.read_xmp())
 
 
@@ -104,7 +104,7 @@ def _test_chinese_path():
     except:
         with Image(chinese_path, encoding='gbk') as img:
             exif = img.read_exif()
-        diff_dict(testdata.EXIF, exif)
+        diff_dict(reference_data.EXIF, exif)
     finally:
         os.remove(chinese_path)
 

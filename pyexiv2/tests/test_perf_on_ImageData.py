@@ -41,5 +41,5 @@ def test_stack_overflow():
                 f.write(img.get_bytes())
             f.seek(0)
             with ImageData(f.read()) as img:
-                expected_result = simulate_updating_metadata(testdata.IPTC, changes)
+                expected_result = simulate_updating_metadata(reference_data.IPTC, changes)
                 diff_dict(expected_result, img.read_iptc())

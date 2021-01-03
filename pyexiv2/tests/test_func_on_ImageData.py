@@ -6,10 +6,10 @@ from .base import *
 def test_read_all():
     with open(test_img, 'rb') as f:
         with ImageData(f.read()) as img:
-            diff_dict(testdata.EXIF, img.read_exif())
-            diff_dict(testdata.IPTC, img.read_iptc())
-            diff_dict(testdata.XMP, img.read_xmp())
-            assert len(img.read_raw_xmp()) == 4593
+            diff_dict(reference_data.EXIF, img.read_exif())
+            diff_dict(reference_data.IPTC, img.read_iptc())
+            diff_dict(reference_data.XMP, img.read_xmp())
+            diff_text(reference_data.RAW_XMP, img.read_raw_xmp())
 
 
 def test_modify_exif():
@@ -22,7 +22,7 @@ def test_modify_exif():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            expected_result = simulate_updating_metadata(testdata.EXIF, changes)
+            expected_result = simulate_updating_metadata(reference_data.EXIF, changes)
             result = img.read_exif()
             ignored_keys = ['Exif.Image.ExifTag']
             for key in ignored_keys:
@@ -42,7 +42,7 @@ def test_modify_iptc():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            expected_result = simulate_updating_metadata(testdata.IPTC, changes)
+            expected_result = simulate_updating_metadata(reference_data.IPTC, changes)
             diff_dict(expected_result, img.read_iptc())
 
 
@@ -57,7 +57,7 @@ def test_modify_xmp():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            expected_result = simulate_updating_metadata(testdata.XMP, changes)
+            expected_result = simulate_updating_metadata(reference_data.XMP, changes)
             diff_dict(expected_result, img.read_xmp())
 
 
