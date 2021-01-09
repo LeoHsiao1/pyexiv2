@@ -295,24 +295,21 @@ public:
 
     void clear_exif()
     {
-        Exiv2::ExifData exifData;   // create an empty container of exif metadata
-        (*img)->setExifData(exifData);
+        (*img)->clearExifData();
         (*img)->writeMetadata();
         check_error_log();
     }
 
     void clear_iptc()
     {
-        Exiv2::IptcData iptcData;
-        (*img)->setIptcData(iptcData);
+        (*img)->clearIptcData();
         (*img)->writeMetadata();
         check_error_log();
     }
 
     void clear_xmp()
     {
-        Exiv2::XmpData xmpData;
-        (*img)->setXmpData(xmpData);
+        (*img)->clearXmpData();
         (*img)->writeMetadata();
         check_error_log();
     }
