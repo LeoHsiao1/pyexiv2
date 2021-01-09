@@ -329,14 +329,13 @@ PYBIND11_MODULE(exiv2api, m)
         .def("read_iptc"         , &Image::read_iptc)
         .def("read_xmp"          , &Image::read_xmp)
         .def("read_raw_xmp"      , &Image::read_raw_xmp)
+        .def("read_comment"      , &Image::read_comment)
         .def("modify_exif"       , &Image::modify_exif)
         .def("modify_iptc"       , &Image::modify_iptc)
         .def("modify_xmp"        , &Image::modify_xmp)
+        .def("modify_comment"    , &Image::modify_comment)
         .def("clear_exif"        , &Image::clear_exif)
         .def("clear_iptc"        , &Image::clear_iptc)
         .def("clear_xmp"         , &Image::clear_xmp)
-
-        .def("read_comment"      , &Image::read_comment)
-        .def("modify_comment"    , &Image::modify_comment)
         .def("clear_comment"     , &Image::clear_comment);
 }
