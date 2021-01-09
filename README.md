@@ -1,6 +1,6 @@
 # pyexiv2
 
-Read/Write metadata(including [EXIF](https://en.wikipedia.org/wiki/Exif), [IPTC](https://en.wikipedia.org/wiki/International_Press_Telecommunications_Council), [XMP](https://en.wikipedia.org/wiki/Extensible_Metadata_Platform)), comment embedded within digital images.
+Read/Write metadata(including [EXIF](https://en.wikipedia.org/wiki/Exif), [IPTC](https://en.wikipedia.org/wiki/International_Press_Telecommunications_Council), [XMP](https://en.wikipedia.org/wiki/Extensible_Metadata_Platform)), [comment](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial.md#image_comment) and [ICC Profile](https://en.wikipedia.org/wiki/ICC_profile) embedded in digital images.
 - Install: `pip install pyexiv2`
 - [Source code on GitHub](https://github.com/LeoHsiao1/pyexiv2)
 
@@ -16,7 +16,6 @@ Read/Write metadata(including [EXIF](https://en.wikipedia.org/wiki/Exif), [IPTC]
 
 ## Defects
 
-- Can't read/write image structure which is not metadata, such as DQT(Define Quantization Table).
 - Can't read the image larger than 2G, and modify the image larger than 1G. [related issue](https://github.com/Exiv2/exiv2/issues/1248)
 - Not thread safe, because it uses some global variables.
 
