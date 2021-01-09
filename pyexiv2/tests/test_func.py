@@ -32,6 +32,12 @@ def test_read_comment():
         diff_text(reference.COMMENT, img.read_comment())
 
 
+@check_md5
+def test_read_icc():
+    with Image(test_img) as img:
+        diff_text(reference.RGB_ICC, img.read_icc())
+
+
 def test_modify_exif():
     with Image(test_img) as img:
         changes = {'Exif.Image.ImageDescription': 'test-中文-',
@@ -73,6 +79,11 @@ def test_modify_comment():
         diff_text(comment, img.read_comment())
 
 
+def test_modify_icc():
+    with Image(test_img) as img:
+        img.modify_icc(reference.GRAY_ICC)
+        diff_text(reference.GRAY_ICC, img.read_icc())
+
 
 def test_clear_exif():
     with Image(test_img) as img:
@@ -97,6 +108,11 @@ def test_clear_comment():
         img.clear_comment()
         assert img.read_comment() == ''
 
+
+def test_clear_icc():
+    with Image(test_img) as img:
+        img.clear_icc()
+        assert img.read_icc() == b''
 
 
 @check_md5

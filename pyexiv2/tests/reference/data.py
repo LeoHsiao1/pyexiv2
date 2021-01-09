@@ -86,3 +86,10 @@ RAW_XMP = """
 """.strip('\n')
 
 COMMENT = 'Hello World!  \n你好！\n'
+
+with open(os.path.join(os.path.dirname(__file__), 'gray.icc'), 'rb') as f:
+    GRAY_ICC = f.read()
+
+with open(os.path.join(os.path.dirname(__file__), 'rgb.icc'), 'rb') as f:
+    RGB_ICC = f.read()
+
