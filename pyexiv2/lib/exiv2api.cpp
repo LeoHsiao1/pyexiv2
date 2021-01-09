@@ -54,7 +54,7 @@ void logHandler(int level, const char *msg)
     case Exiv2::LogMsg::warn:
         std::cout << msg << std::endl;
         break;
-    
+
     case Exiv2::LogMsg::error:
         // For unknown reasons, the exception thrown here cannot be caught, so save the log to error_log
         // throw std::exception(msg);
@@ -166,6 +166,11 @@ public:
         return py::bytes((*img)->xmpPacket());
     }
 
+    py::object read_comment()
+    {
+        return py::bytes((*img)->comment());
+    }
+
     void modify_exif(py::list table, py::str encoding)
     {
         Exiv2::ExifData &exifData = (*img)->exifData();
@@ -238,7 +243,7 @@ public:
             std::string key = py::bytes(line[0].attr("encode")(encoding));
             std::string value = py::bytes(line[1].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
-            
+
             Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
             if (key_pos != xmpData.end())
                 xmpData.erase(key_pos);
@@ -260,6 +265,14 @@ public:
                 xmpData[key] = value;
         }
         (*img)->setXmpData(xmpData);
+        (*img)->writeMetadata();
+        check_error_log();
+    }
+
+    void modify_comment(py::str data, py::str encoding)
+    {
+        std::string comment = py::bytes(data.attr("encode")(encoding));
+        (*img)->setComment(comment);
         (*img)->writeMetadata();
         check_error_log();
     }
@@ -287,32 +300,42 @@ public:
         (*img)->writeMetadata();
         check_error_log();
     }
+
+    void clear_comment()
+    {
+        (*img)->clearComment();
+        (*img)->writeMetadata();
+        check_error_log();
+    }
 };
 
 PYBIND11_MODULE(exiv2api, m)
 {
     m.doc() = "Expose the API of exiv2 to Python.";
+    m.def("set_log_level", &set_log_level);
+    m.def("init"         , &init);
     py::class_<Buffer>(m, "Buffer")
         .def(py::init<const char *, long>())
-        .def_readonly("data", &Buffer::data)
-        .def_readonly("size", &Buffer::size)
-        .def("destroy", &Buffer::destroy)
-        .def("dump", &Buffer::dump);
-    m.def("set_log_level", &set_log_level);
-    m.def("init", &init);
+        .def_readonly("data"      , &Buffer::data)
+        .def_readonly("size"      , &Buffer::size)
+        .def("destroy"            , &Buffer::destroy)
+        .def("dump"               , &Buffer::dump);
     py::class_<Image>(m, "Image")
         .def(py::init<const char *>())
         .def(py::init<Buffer &>())
-        .def("close_image", &Image::close_image)
+        .def("close_image"       , &Image::close_image)
         .def("get_bytes_of_image", &Image::get_bytes_of_image)
-        .def("read_exif", &Image::read_exif)
-        .def("read_iptc", &Image::read_iptc)
-        .def("read_xmp", &Image::read_xmp)
-        .def("read_raw_xmp", &Image::read_raw_xmp)
-        .def("modify_exif", &Image::modify_exif)
-        .def("modify_iptc", &Image::modify_iptc)
-        .def("modify_xmp", &Image::modify_xmp)
-        .def("clear_exif", &Image::clear_exif)
-        .def("clear_iptc", &Image::clear_iptc)
-        .def("clear_xmp", &Image::clear_xmp);
+        .def("read_exif"         , &Image::read_exif)
+        .def("read_iptc"         , &Image::read_iptc)
+        .def("read_xmp"          , &Image::read_xmp)
+        .def("read_raw_xmp"      , &Image::read_raw_xmp)
+        .def("read_comment"      , &Image::read_comment)
+        .def("modify_exif"       , &Image::modify_exif)
+        .def("modify_iptc"       , &Image::modify_iptc)
+        .def("modify_xmp"        , &Image::modify_xmp)
+        .def("modify_comment"    , &Image::modify_comment)
+        .def("clear_exif"        , &Image::clear_exif)
+        .def("clear_iptc"        , &Image::clear_iptc)
+        .def("clear_xmp"         , &Image::clear_xmp)
+        .def("clear_comment"     , &Image::clear_comment);
 }
