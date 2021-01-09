@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from .lib import exiv2api
 
 
@@ -54,6 +53,9 @@ class Image:
     def read_comment(self, encoding='utf-8') -> str:
         return self.img.read_comment().decode(encoding)
 
+    def read_icc(self) -> bytes:
+        return self.img.read_icc()
+
     def modify_exif(self, data: dict, encoding='utf-8'):
         self.img.modify_exif(self._dumps(data), encoding)
 
@@ -65,6 +67,11 @@ class Image:
 
     def modify_comment(self, data: str, encoding='utf-8'):
         self.img.modify_comment(data, encoding)
+
+    def modify_icc(self, data: bytes):
+        if not isinstance(data, bytes):
+            raise TypeError('The data should be of bytes type.')
+        return self.img.modify_icc(data, len(data))
 
     def _parse(self, table: list, encoding='utf-8') -> dict:
         """ Parse the table returned by C++ API into a dict. """
@@ -106,6 +113,9 @@ class Image:
 
     def clear_comment(self):
         self.img.clear_comment()
+
+    def clear_icc(self):
+        self.img.clear_icc()
 
 
 class ImageData(Image):

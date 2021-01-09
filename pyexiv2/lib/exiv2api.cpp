@@ -113,7 +113,7 @@ public:
         *img = Exiv2::ImageFactory::open(filename);
         if (img->get() == 0)
             throw Exiv2::Error(Exiv2::kerErrorMessage, "Can not open this image.");
-        (*img)->readMetadata();
+        (*img)->readMetadata();     // Calling readMetadata() reads all types of metadata supported by the image
         check_error_log();
     }
 
@@ -163,12 +163,20 @@ public:
 
     py::object read_raw_xmp()
     {
+        /*  When readMetadata() is called, Exiv2 reads the raw XMP text,
+            stores it in a string called XmpPacket, then parses it into an XmpData instance.
+        */
         return py::bytes((*img)->xmpPacket());
     }
 
     py::object read_comment()
     {
         return py::bytes((*img)->comment());
+    }
+
+    py::object read_icc()
+    {
+        return py::bytes((const char*)(*img)->iccProfile()->pData_, (*img)->iccProfile()->size_);
     }
 
     void modify_exif(py::list table, py::str encoding)
@@ -183,13 +191,13 @@ public:
 
             Exiv2::ExifData::iterator key_pos = exifData.findKey(Exiv2::ExifKey(key));
             if (key_pos != exifData.end())
-                exifData.erase(key_pos);    // delete the existing tag to write a value
+                exifData.erase(key_pos);    // delete the existing tag to set a new value, otherwise the old value may be retained
             if (value == "")
                 continue;                   // skip the tag if value == ""
-            exifData[key] = value;          // write a value to the tag
+            exifData[key] = value;          // set a value to the tag
         }
         (*img)->setExifData(exifData);
-        (*img)->writeMetadata();
+        (*img)->writeMetadata();            // write the cached metadata to the image
         check_error_log();
     }
 
@@ -271,8 +279,16 @@ public:
 
     void modify_comment(py::str data, py::str encoding)
     {
-        std::string comment = py::bytes(data.attr("encode")(encoding));
-        (*img)->setComment(comment);
+        std::string data_str = py::bytes(data.attr("encode")(encoding));
+        (*img)->setComment(data_str);
+        (*img)->writeMetadata();
+        check_error_log();
+    }
+
+    void modify_icc(const char *data, long size)
+    {
+        Exiv2::DataBuf data_buf((const byte*) data, size);
+        (*img)->setIccProfile(data_buf);
         (*img)->writeMetadata();
         check_error_log();
     }
@@ -307,6 +323,13 @@ public:
         (*img)->writeMetadata();
         check_error_log();
     }
+
+    void clear_icc()
+    {
+        (*img)->clearIccProfile();
+        (*img)->writeMetadata();
+        check_error_log();
+    }
 };
 
 PYBIND11_MODULE(exiv2api, m)
@@ -330,12 +353,15 @@ PYBIND11_MODULE(exiv2api, m)
         .def("read_xmp"          , &Image::read_xmp)
         .def("read_raw_xmp"      , &Image::read_raw_xmp)
         .def("read_comment"      , &Image::read_comment)
+        .def("read_icc"          , &Image::read_icc)
         .def("modify_exif"       , &Image::modify_exif)
         .def("modify_iptc"       , &Image::modify_iptc)
         .def("modify_xmp"        , &Image::modify_xmp)
         .def("modify_comment"    , &Image::modify_comment)
+        .def("modify_icc"        , &Image::modify_icc)
         .def("clear_exif"        , &Image::clear_exif)
         .def("clear_iptc"        , &Image::clear_iptc)
         .def("clear_xmp"         , &Image::clear_xmp)
-        .def("clear_comment"     , &Image::clear_comment);
+        .def("clear_comment"     , &Image::clear_comment)
+        .def("clear_icc"         , &Image::clear_icc);
 }
