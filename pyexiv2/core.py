@@ -10,7 +10,7 @@ class Image:
     This class is used for reading and writing metadata of digital image.
     Please call the public methods of this class.
     """
-    
+
     def __init__(self, filename, encoding='utf-8'):
         """ Open an image and load its metadata. """
         self.img = exiv2api.Image(filename.encode(encoding))
@@ -24,9 +24,9 @@ class Image:
     def close(self):
         """ Free the memory for storing image data. """
         self.img.close_image()
-        
+
         # Disable all methods and properties
-        def closed_warning():
+        def closed_warning(*args, **kwargs):
             raise RuntimeError('The image has been closed, so it is not allowed to operate.')
         for attr in dir(self):
             if not attr.startswith('__'):
@@ -34,7 +34,7 @@ class Image:
                     setattr(self, attr, closed_warning)
                 else:
                     setattr(self, attr, None)
-    
+
     def read_exif(self, encoding='utf-8') -> dict:
         self._exif = self.img.read_exif()
         return self._parse(self._exif, encoding)
@@ -51,6 +51,9 @@ class Image:
         self._raw_xmp = self.img.read_raw_xmp()
         return self._raw_xmp.decode(encoding)
 
+    def read_comment(self, encoding='utf-8') -> str:
+        return self.img.read_comment().decode(encoding)
+
     def modify_exif(self, data: dict, encoding='utf-8'):
         self.img.modify_exif(self._dumps(data), encoding)
 
@@ -59,7 +62,10 @@ class Image:
 
     def modify_xmp(self, data: dict, encoding='utf-8'):
         self.img.modify_xmp(self._dumps(data), encoding)
-    
+
+    def modify_comment(self, data: str, encoding='utf-8'):
+        self.img.modify_comment(data, encoding)
+
     def _parse(self, table: list, encoding='utf-8') -> dict:
         """ Parse the table returned by C++ API into a dict. """
         data = {}
@@ -76,7 +82,7 @@ class Image:
             elif isinstance(pre_value, list):
                 data[key].append(value)
         return data
-    
+
     def _dumps(self, data: dict) -> list:
         """ Convert the metadata dict into a table that the C++ API can read. """
         table = []
@@ -98,15 +104,9 @@ class Image:
     def clear_xmp(self):
         self.img.clear_xmp()
 
-
     def clear_comment(self):
         self.img.clear_comment()
 
-    def get_comment(self):
-        return self.img.get_comment()
-
-    def set_comment(self, comment_str):
-        self.img.set_comment(comment_str)
 
 class ImageData(Image):
     """
@@ -123,7 +123,7 @@ class ImageData(Image):
     def get_bytes(self) -> bytes:
         """ Get the bytes data of the image. """
         return self.img.get_bytes_of_image()
-    
+
     def close(self):
         """ Free the memory for storing image data. """
         self.buffer.destroy()
