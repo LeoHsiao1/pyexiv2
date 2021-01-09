@@ -28,6 +28,12 @@ def test_read_raw_xmp():
         diff_text(reference_data.RAW_XMP, img.read_raw_xmp())
 
 
+@check_md5
+def test_read_comment():
+    with Image(test_img) as img:
+        diff_text(reference_data.COMMENT, img.read_comment())
+
+
 def test_modify_exif():
     with Image(test_img) as img:
         changes = {'Exif.Image.ImageDescription': 'test-中文-',
@@ -41,24 +47,6 @@ def test_modify_exif():
             result.pop(key)
         diff_dict(expected_result, result)
 
-def test_modify_jpeg_header_comments():
-    
-    with Image(path) as img:
-        comment = "nice raw image comment"
-        img.set_comment(comment)
-
-        comment_retrieved = img.get_comment()
-
-        assert comment == comment_retrieved
-
-        img.clear_comment()
-        comment_retrieved = img.get_comment()
-        assert comment_retrieved == ""
-
-        # Try again after we ran clear_comment() just to be sure
-        img.set_comment(comment)
-        comment_retrieved = img.get_comment()
-        assert comment == comment_retrieved
 
 def test_modify_iptc():
     with Image(test_img) as img:
@@ -80,6 +68,13 @@ def test_modify_xmp():
         diff_dict(expected_result, img.read_xmp())
 
 
+def test_modify_comment():
+    with Image(test_img) as img:
+        comment = 'Hello!  \n你好！\n' * 1000
+        img.modify_comment(comment)
+        diff_text(comment, img.read_comment())
+
+
 def test_clear_exif():
     with Image(test_img) as img:
         img.clear_exif()
@@ -96,6 +91,12 @@ def test_clear_xmp():
     with Image(test_img) as img:
         img.clear_xmp()
         assert img.read_xmp() == {}
+
+
+def test_clear_comment():
+    with Image(test_img) as img:
+        img.clear_comment()
+        assert img.read_comment() == ''
 
 
 @check_md5

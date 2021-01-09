@@ -53,7 +53,7 @@ def diff_dict(dict1, dict2):
 
 
 def simulate_updating_metadata(raw_dict: dict, changes: dict) -> dict:
-    ''' Simulate the process of updating the metadata dict by pyexiv2. '''
+    """ Simulate the process of updating the metadata dict by pyexiv2. """
     result = raw_dict.copy()
     result.update(changes)
     for k, v in list(result.items()):
