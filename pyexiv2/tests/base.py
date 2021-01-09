@@ -1,13 +1,17 @@
-# -*- coding: utf-8 -*-
+"""
+This script provides the test environment for test cases.
+"""
 import hashlib
 import os
 import shutil
 from functools import wraps
 
+import psutil
 import pytest
 
 from .. import Image, ImageData, set_log_level
-from . import reference_data
+from . import reference
+from .utils import *
 
 
 TEST_DIR      = os.path.dirname(__file__)
@@ -38,18 +42,6 @@ def check_md5(func):
         diff_file_by_md5(original_img, test_img)
         return ret
     return wrapper
-
-
-def diff_text(text1: (str, bytes), text2: (str, bytes)):
-    max_len = max(len(text1), len(text2))
-    for i in range(max_len):
-        assert text1[i:i+1] == text2[i:i+1], "The two text is different at index {} :\n< {}\n> {}".format(i, text1[i:i+10], text2[i:i+10])
-
-
-def diff_dict(dict1, dict2):
-    assert len(dict1) == len(dict2)
-    for k in dict1.keys():
-        assert dict1[k] == dict2[k], "['{}'] is different.".format(k)
 
 
 def simulate_updating_metadata(raw_dict: dict, changes: dict) -> dict:

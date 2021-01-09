@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-import psutil
-
 from .base import *
 from . import test_func_on_ImageData
 
@@ -41,5 +38,5 @@ def test_stack_overflow():
                 f.write(img.get_bytes())
             f.seek(0)
             with ImageData(f.read()) as img:
-                expected_result = simulate_updating_metadata(reference_data.IPTC, changes)
+                expected_result = simulate_updating_metadata(reference.IPTC, changes)
                 diff_dict(expected_result, img.read_iptc())

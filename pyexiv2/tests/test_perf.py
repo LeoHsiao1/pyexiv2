@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-import psutil
-
 from .base import *
 from . import test_func
 
@@ -39,7 +36,7 @@ def test_stack_overflow():
                    'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3'] * 1000}
         for _ in range(10):
             img.modify_iptc(changes)
-            expected_result = simulate_updating_metadata(reference_data.IPTC, changes)
+            expected_result = simulate_updating_metadata(reference.IPTC, changes)
             diff_dict(expected_result, img.read_iptc())
 
 
