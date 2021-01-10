@@ -176,7 +176,7 @@ public:
 
     py::object read_icc()
     {
-        return py::bytes((const char*)(*img)->iccProfile()->pData_, (*img)->iccProfile()->size_);
+        return py::bytes((char*)(*img)->iccProfile()->pData_, (*img)->iccProfile()->size_);
     }
 
     void modify_exif(py::list table, py::str encoding)
@@ -287,7 +287,7 @@ public:
 
     void modify_icc(const char *data, long size)
     {
-        Exiv2::DataBuf data_buf((const byte*) data, size);
+        Exiv2::DataBuf data_buf((Exiv2::byte *) data, size);
         (*img)->setIccProfile(data_buf);
         (*img)->writeMetadata();
         check_error_log();
