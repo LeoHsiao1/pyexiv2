@@ -1,18 +1,38 @@
-from .base import *
+"""
+This script inherits test_func.py, but overloads and adds some test functions.
+"""
+from .test_func import *
 
 
-@check_md5
-def test_read_all():
-    with open(test_img, 'rb') as f:
-        with ImageData(f.read()) as img:
-            diff_dict(reference.EXIF, img.read_exif())
-            diff_dict(reference.IPTC, img.read_iptc())
-            diff_dict(reference.XMP, img.read_xmp())
-            diff_text(reference.RAW_XMP, img.read_raw_xmp())
+def setup_function():
+    if ENV.skip_test:
+        pytest.skip()
+    shutil.copy(ENV.original_img, ENV.test_img)  # Before each test, make a temporary copy of the image
+    with open(ENV.test_img, 'rb') as f:
+        ENV.img = ImageData(f.read())
 
 
 def test_modify_exif():
-    with open(test_img, 'rb+') as f:
+    with open(ENV.test_img, 'rb+') as f:
+        with ImageData(f.read()) as img:
+            changes = {'Exif.Image.ImageDescription': 'test-中文-',
+                       'Exif.Image.Artist': ''}
+            img.modify_exif(changes)
+            f.seek(0)
+            f.write(img.get_bytes())
+        f.seek(0)
+        with ImageData(f.read()) as img:
+            expected_result = simulate_updating_metadata(reference.EXIF, changes)
+            result = img.read_exif()
+            ignored_keys = ['Exif.Image.ExifTag']
+            for key in ignored_keys:
+                expected_result.pop(key)
+                result.pop(key)
+            diff_dict(expected_result, result)
+
+
+def test_modify_exif():
+    with open(ENV.test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             changes = {'Exif.Image.ImageDescription': 'test-中文-',
                        'Exif.Image.Artist': ''}
@@ -31,7 +51,7 @@ def test_modify_exif():
 
 
 def test_modify_iptc():
-    with open(test_img, 'rb+') as f:
+    with open(ENV.test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             changes = {'Iptc.Application2.ObjectName': 'test-中文-',
                        'Iptc.Application2.Copyright': '',
@@ -46,7 +66,7 @@ def test_modify_iptc():
 
 
 def test_modify_xmp():
-    with open(test_img, 'rb+') as f:
+    with open(ENV.test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             changes = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',
                        'Xmp.xmp.Rating': '',
@@ -61,7 +81,7 @@ def test_modify_xmp():
 
 
 def test_clear_all():
-    with open(test_img, 'rb+') as f:
+    with open(ENV.test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             img.clear_exif()
             img.clear_iptc()
