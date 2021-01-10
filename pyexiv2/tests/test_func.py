@@ -1,6 +1,44 @@
 from .base import *
 
 
+def test_open_img_by_path():
+    try:
+        img = Image(ENV.test_img)
+        img.read_exif()
+        img.close()
+        check_img_md5()
+
+        with Image(ENV.test_img) as img:
+            img.read_exif()
+            check_img_md5()
+    except:
+        ENV.skip_test = True
+        raise
+
+
+def test_nonexistent_path():
+    with pytest.raises(RuntimeError):
+        with Image(os.path.join(ENV.test_dir, 'nonexistent.jpg')) as img:
+            img.read_exif()
+
+
+def test_not_image_path():
+    with pytest.raises(RuntimeError):
+        with Image(os.path.join(ENV.test_dir, '__init__.py')) as img:
+            img.read_exif()
+
+
+def _test_chinese_path():
+    chinese_path = os.path.join(ENV.test_dir, '1 - 副本.jpg')
+    shutil.copy(ENV.test_img, chinese_path)
+    try:
+        with Image(chinese_path, encoding='gbk') as img:
+            exif = img.read_exif()
+        diff_dict(reference.EXIF, exif)
+    finally:
+        os.remove(chinese_path)
+
+
 def test_read_exif():
     diff_dict(reference.EXIF, ENV.img.read_exif())
     check_img_md5()
@@ -35,6 +73,8 @@ def test_modify_exif():
     changes = {'Exif.Image.ImageDescription': 'test-中文-',
                'Exif.Image.Artist': ''}
     ENV.img.modify_exif(changes)
+
+    # Check the modified data
     expected_result = simulate_updating_metadata(reference.EXIF, changes)
     result = ENV.img.read_exif()
     ignored_keys = ['Exif.Image.ExifTag']
@@ -42,6 +82,17 @@ def test_modify_exif():
         expected_result.pop(key)
         result.pop(key)
     diff_dict(expected_result, result)
+
+    # Copy the image and check again, in case the modified data is not saved to disk
+    try:
+        shutil.copy(ENV.test_img, ENV.test_img_copy)
+        with Image(ENV.test_img_copy) as img_copy:
+            result = img_copy.read_exif()
+            for key in ignored_keys:
+                result.pop(key)
+            diff_dict(expected_result, result)
+    finally:
+        os.remove(ENV.test_img_copy)
 
 
 def test_modify_iptc():
@@ -51,6 +102,7 @@ def test_modify_iptc():
     ENV.img.modify_iptc(changes)
     expected_result = simulate_updating_metadata(reference.IPTC, changes)
     diff_dict(expected_result, ENV.img.read_iptc())
+    check_the_copy_of_img(diff_dict, expected_result, 'read_iptc')
 
 
 def test_modify_xmp():
@@ -60,42 +112,50 @@ def test_modify_xmp():
     ENV.img.modify_xmp(changes)
     expected_result = simulate_updating_metadata(reference.XMP, changes)
     diff_dict(expected_result, ENV.img.read_xmp())
+    check_the_copy_of_img(diff_dict, expected_result, 'read_xmp')
 
 
 def test_modify_comment():
     comment = 'Hello!  \n你好！\n' * 1000
     ENV.img.modify_comment(comment)
     diff_text(comment, ENV.img.read_comment())
+    check_the_copy_of_img(diff_text, comment, 'read_comment')
 
 
 def test_modify_icc():
     ENV.img.modify_icc(reference.GRAY_ICC)
     diff_text(reference.GRAY_ICC, ENV.img.read_icc())
+    check_the_copy_of_img(diff_text, reference.GRAY_ICC, 'read_icc')
 
 
 def test_clear_exif():
     ENV.img.clear_exif()
-    assert ENV.img.read_exif() == {}
+    diff_dict({}, ENV.img.read_exif())
+    check_the_copy_of_img(diff_dict, {}, 'read_exif')
 
 
 def test_clear_iptc():
     ENV.img.clear_iptc()
-    assert ENV.img.read_iptc() == {}
+    diff_dict({}, ENV.img.read_iptc())
+    check_the_copy_of_img(diff_dict, {}, 'read_iptc')
 
 
 def test_clear_xmp():
     ENV.img.clear_xmp()
-    assert ENV.img.read_xmp() == {}
+    diff_dict({}, ENV.img.read_xmp())
+    check_the_copy_of_img(diff_dict, {}, 'read_xmp')
 
 
 def test_clear_comment():
     ENV.img.clear_comment()
-    assert ENV.img.read_comment() == ''
+    diff_text('', ENV.img.read_comment())
+    check_the_copy_of_img(diff_text, '', 'read_comment')
 
 
 def test_clear_icc():
     ENV.img.clear_icc()
-    assert ENV.img.read_icc() == b''
+    diff_text(b'', ENV.img.read_icc())
+    check_the_copy_of_img(diff_text, b'', 'read_icc')
 
 
 def test_error_log():

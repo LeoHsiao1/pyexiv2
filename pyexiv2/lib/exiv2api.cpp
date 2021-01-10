@@ -197,7 +197,7 @@ public:
             exifData[key] = value;          // set a value to the tag
         }
         (*img)->setExifData(exifData);
-        (*img)->writeMetadata();            // write the cached metadata to the image
+        (*img)->writeMetadata();            // Save the cached metadata to disk
         check_error_log();
     }
 

@@ -17,6 +17,7 @@ class ENV:
     test_dir      = os.path.dirname(__file__)
     original_img  = os.path.join(test_dir, '1.jpg')
     test_img      = os.path.join(test_dir, 'test.jpg')
+    test_img_copy = os.path.join(test_dir, 'test-copy.jpg')
     skip_test     = False
 
 
@@ -32,23 +33,6 @@ def teardown_function():
     os.remove(ENV.test_img)
 
 
-def simulate_updating_metadata(raw_dict: dict, changes: dict) -> dict:
-    """ Simulate the process of updating the metadata dict by pyexiv2. """
-    result = raw_dict.copy()
-    result.update(changes)
-    for k, v in list(result.items()):
-        if v == '':
-            result.pop(k)
-    return result
-
-
-def check_img_md5():
-    with open(ENV.original_img, "rb") as f1, open(ENV.test_img, "rb") as f2:
-        v1 = hashlib.md5(f1.read()).digest()
-        v2 = hashlib.md5(f2.read()).digest()
-        assert v1 == v2, 'The MD5 value of the image has changed.'
-
-
 def diff_text(text1: (str, bytes), text2: (str, bytes)):
     max_len = max(len(text1), len(text2))
     for i in range(max_len):
@@ -59,4 +43,31 @@ def diff_dict(dict1, dict2):
     assert len(dict1) == len(dict2), "The two dict are of different length: {}, {}".format(len(dict1), len(dict2))
     for k in dict1.keys():
         assert dict1[k] == dict2[k], "['{}'] is different.".format(k)
+
+
+def check_img_md5():
+    with open(ENV.original_img, "rb") as f1, open(ENV.test_img, "rb") as f2:
+        v1 = hashlib.md5(f1.read()).digest()
+        v2 = hashlib.md5(f2.read()).digest()
+        assert v1 == v2, 'The MD5 value of the image has changed.'
+
+
+def simulate_updating_metadata(raw_dict: dict, changes: dict) -> dict:
+    """ Simulate the process of updating the metadata dict by pyexiv2. """
+    result = raw_dict.copy()
+    result.update(changes)
+    for k, v in list(result.items()):
+        if v == '':
+            result.pop(k)
+    return result
+
+
+def check_the_copy_of_img(diff, reference, method_name):
+    """ Copy the image and check it, in case the modified data is not saved to disk. """
+    try:
+        shutil.copy(ENV.test_img, ENV.test_img_copy)
+        with Image(ENV.test_img_copy) as img:
+            diff(reference, getattr(img, method_name)())
+    finally:
+        os.remove(ENV.test_img_copy)
 
