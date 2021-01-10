@@ -76,7 +76,7 @@
 3. Set up the python interpreter. For example:
     ```sh
     py_version=8
-    python3.$py_version -m pip install pybind11
+    python3.$py_version -m pip install pybind11     # -i https://pypi.tuna.tsinghua.edu.cn/simple
     ```
 
 4. Compile:

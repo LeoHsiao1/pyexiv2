@@ -6,7 +6,7 @@ COMMA = ', '
 
 class Image:
     """
-    This class is used for reading and writing metadata of digital image.
+    Open an image based on the file path. Read and write the metadata of the image.
     Please call the public methods of this class.
     """
 
