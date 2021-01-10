@@ -74,12 +74,3 @@ def test_clear_all():
             assert img.read_iptc() == {}
             assert img.read_xmp() == {}
 
-
-def test_error_log():
-    with open(test_img, 'rb') as f:
-        with ImageData(f.read()) as img:
-            with pytest.raises(RuntimeError):
-                img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
-            set_log_level(4)
-            img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
-            set_log_level(2)    # recover the log level
