@@ -19,7 +19,7 @@ Read/Write metadata(including [EXIF](https://en.wikipedia.org/wiki/Exif), [IPTC]
 - Can't read the image larger than 2G, and modify the image larger than 1G. [related issue](https://github.com/Exiv2/exiv2/issues/1248)
 - Not thread safe, because it uses some global variables.
 
-## Usage
+## Docs
 
 - [Tutorial](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial.md)
 - [中文教程](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial-cn.md)
