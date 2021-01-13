@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import setuptools
 
+
 with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
+
 setuptools.setup(
     name='pyexiv2',
-    version='2.3.2',
+    version='2.4.0',
     author='LeoHsiao',
     author_email='leohsiao@foxmail.com',
     description='Read/Write metadata of digital image, including EXIF, IPTC, XMP.',
@@ -16,8 +18,7 @@ setuptools.setup(
     url='https://github.com/LeoHsiao1/pyexiv2',
     packages=setuptools.find_packages(),
     # packages=['pyexiv2', 'docs'],
-    package_data={'': ['*.py', '*.md', '*.cpp',
-                       '*.so', '*.dylib', '*.dll', '*.pyd', '*.jpg']},
+    package_data={'': ['*']},
     python_requires='>=3.5',
     # install_requires=["pybind11"],
     classifiers=[
@@ -32,10 +33,3 @@ setuptools.setup(
         'Programming Language :: Python :: 3.9',
     ],
 )
-
-
-# upload to pypi.org:
-#   python -m pip install setuptools wheel twine
-#   git clean -d -fx
-#   python setup.py sdist bdist_wheel   # then rename pyexiv2-x.x.x-py3-none-any.whl to pyexiv2-x.x.x.whl
-#   twine upload dist/*
