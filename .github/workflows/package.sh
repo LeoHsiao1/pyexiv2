@@ -1,12 +1,16 @@
 #!/bin/bash
 
 ######
-# It is recommended that this script be executed using bash instead of sh .
+# Execute this script with `bash .github/workflows/package.sh`.
 # If you execute this script in WSL, you need to grant "Full control" to "Authenticated Users" in the Windows File settings for the folder.
 ######
 
+set -e
+echo WORK_DIR: `pwd`
+
 WORK_DIR=`pwd`
-echo WORK_DIR: $WORK_DIR
+LIB_DIR=`pwd`/pyexiv2/lib
+TEST_DIR=`pwd`/pyexiv2/tests
 
 if [ ! -f setup.py ]
 then
@@ -28,27 +32,47 @@ rm -rf dist/*
 
 # Make a source package
 reset_workdir
-rm -rf pyexiv2/lib/py3*     # Delete all compiled files
+rm -rf $LIB_DIR/py3*     # Delete all compiled files
 python3 setup.py sdist
 
-# Make a wheel package
-reset_workdir
-rm -rf pyexiv2/tests/       # Delete tests directory
-python3 setup.py bdist_wheel --python-tag cp3
-cd dist
-whl_name=`ls *cp3-none-any.whl`
-mv $whl_name ${whl_name/-none-any/}
-
-
-# Make a wheel package that contains only compiled files for a single platform
+# Make a wheel package that contains all compiled files
 # reset_workdir
-# cd pyexiv2/lib/
-# rm -rf  *.dylib  *.dll  py*-darwin  py*-win
-# ls py* | grep -v 'py35-linux'
-# find . -maxdepth 1 -type d -name 'py*' | grep -v py35-linux | xargs rm -rf
-# cd $WORK_DIR
-# python3 setup.py bdist_wheel --python-tag cp35  --plat-name linux_x86_64
+# rm -rf $TEST_DIR
+# python3 setup.py bdist_wheel --python-tag cp3
+# cd dist
+# whl_name=`ls *cp3-none-any.whl`
+# mv $whl_name ${whl_name/-none-any/}
 
+make_wheels(){
+    for version in {5..9}
+    do
+        reset_workdir
+        rm -rf $TEST_DIR
+        cd $LIB_DIR
+        rm -rf $rm_files
+        find . -maxdepth 1 -type d -name 'py3*' | grep -v py3${version}-${plat_tag} | xargs rm -rf
+        cd $WORK_DIR
+        python3 setup.py bdist_wheel --python-tag cp3${version}  --plat-name ${plat_name}
+    done
+}
+
+# Make wheel packages for Linux platform
+plat_tag=linux
+plat_name=linux_x86_64
+rm_files='libexiv2.dylib  exiv2.dll'
+make_wheels
+
+# Make wheel packages for MacOS platform
+plat_tag=darwin
+plat_name=macosx_x86_64
+rm_files='libexiv2.so  exiv2.dll'
+make_wheels
+
+# Make wheel packages for Windows platform
+plat_tag=win
+plat_name=win_amd64
+rm_files='libexiv2.so  libexiv2.dylib'
+make_wheels
 
 
 reset_workdir
