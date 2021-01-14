@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ######
-# Execute this script with `bash .github/workflows/package.sh`.
+# Execute this script with `bash .github/workflows/make_package.sh`.
 # If you execute this script in WSL, you need to grant "Full control" to "Authenticated Users" in the Windows File settings for the folder.
 ######
 

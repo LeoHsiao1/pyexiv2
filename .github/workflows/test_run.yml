@@ -1,3 +1,5 @@
+# Each time you commit, run the test cases.
+
 name: Test run
 
 on: [push]

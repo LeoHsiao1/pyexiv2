@@ -1,4 +1,6 @@
-name: Test pip
+# Test whether the packages uploaded to pypi.org is working properly
+
+name: Test package
 
 on:
   release:
