@@ -30,9 +30,11 @@ reset_workdir(){
 # Clear dist directory
 rm -rf dist/*
 
-# Make a source package
+# Make a source package without 
 reset_workdir
-rm -rf $LIB_DIR/py3*     # Delete all compiled files
+cd $LIB_DIR
+rm -f libexiv2.so  libexiv2.dylib  exiv2.dll  py3*  # remove all compiled files
+cd $WORK_DIR
 python3 setup.py sdist
 
 # Make a wheel package that contains all compiled files
