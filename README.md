@@ -6,11 +6,11 @@ Read/Write metadata(including [EXIF](https://en.wikipedia.org/wiki/Exif), [IPTC]
 
 ## Features
 
+- Base on C++ API of [Exiv2](https://www.exiv2.org/index.html) and invoke it through [pybind11](https://github.com/pybind/pybind11).
+- Supports running on Linux, MacOS and Windows, with CPython interpreter(64bit, including `3.5` `3.6` `3.7` `3.8` `3.9`).\
+  If you want to run pyexiv2 on another platform, you can compile it yourself. See [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md)
 - [Supported image metadata](https://www.exiv2.org/metadata.html)
 - [Supported image formats](https://dev.exiv2.org/projects/exiv2/wiki/Supported_image_formats)
-- Base on C++ API of [Exiv2](https://www.exiv2.org/index.html) and invoke it through [pybind11](https://github.com/pybind/pybind11).
-- Supports running on Linux, MacOS and Windows, with Python3(64bit, including `3.5` `3.6` `3.7` `3.8` `3.9`).
-  If you want to run pyexiv2 on another platform, you can compile it yourself. See [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md)
 - Supports opening images based on the file path or from bytes data.
 - Supports Unicode characters that contained in image path or metadata.
 
