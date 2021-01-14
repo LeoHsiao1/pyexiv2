@@ -9,16 +9,22 @@ from functools import wraps
 import psutil
 import pytest
 
-from .. import Image, ImageData, set_log_level
 from . import reference
 
 
 class ENV:
+    name_for_import_pyexiv2  = os.environ.get('NAME_FOR_IMPORT_PYEXIV2') or '..'
     test_dir      = os.path.dirname(__file__)
     original_img  = os.path.join(test_dir, '1.jpg')
     test_img      = os.path.join(test_dir, 'test.jpg')
     test_img_copy = os.path.join(test_dir, 'test-copy.jpg')
     skip_test     = False
+
+
+if ENV.name_for_import_pyexiv2 == '..':
+    from ..         import Image, ImageData, set_log_level
+elif ENV.name_for_import_pyexiv2 == 'pyexiv2':
+    from pyexiv2    import Image, ImageData, set_log_level
 
 
 def setup_function():
