@@ -1,4 +1,4 @@
-# Test whether the packages uploaded to pypi.org is working properly
+# Test the pyexiv2 packages uploaded to pypi.org , by executing the test cases in master branch.
 
 name: Test package
 
@@ -18,7 +18,7 @@ jobs:
     - name: git pull
       uses: actions/checkout@v1
       with:
-        ref: dev
+        ref: master
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1

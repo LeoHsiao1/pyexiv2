@@ -1,6 +1,6 @@
-# Each time you commit, run the test cases.
+# Each time you push, run the test cases in current commit.
 
-name: Test run
+name: Test push
 
 on: [push]
 
@@ -15,8 +15,6 @@ jobs:
     steps:
     - name: git pull
       uses: actions/checkout@v1
-      with:
-        ref: dev
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
