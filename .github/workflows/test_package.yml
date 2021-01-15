@@ -31,14 +31,10 @@ jobs:
         python -m pip install pyexiv2
         python -m pip install pytest psutil
 
-    - name: Remove lib        # To use only the installed pyexiv2
-      uses: JesseTG/rm@v1.0.2
-      with:
-        path: pyexiv2/lib
-
     - name: Test
       run: |
-        python -c "import os; print(os.environ.get('NAME_FOR_IMPORT_PYEXIV2'))"
+        python -c "import os; os.remove('pyexiv2/__init__.py')"    # Disable pyexiv2 in the repository, to use only the installed pyexiv2
+        python -c "from pyexiv2 import Image; print(Image.__doc__)"
         pytest -v
       env:
         NAME_FOR_IMPORT_PYEXIV2: pyexiv2
