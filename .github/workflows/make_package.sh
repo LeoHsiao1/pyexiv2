@@ -33,7 +33,7 @@ rm -rf dist/*
 # Make a source package without 
 reset_workdir
 cd $LIB_DIR
-rm -f libexiv2.so  libexiv2.dylib  exiv2.dll  py3*  # remove all compiled files
+rm -rf libexiv2.so  libexiv2.dylib  exiv2.dll  py3*  # remove all compiled files
 cd $WORK_DIR
 python3 setup.py sdist
 
@@ -60,13 +60,13 @@ make_wheels(){
 
 # Make wheel packages for Linux platform
 plat_tag=linux
-plat_name=linux_x86_64
+plat_name=manylinux2014_x86_64
 rm_files='libexiv2.dylib  exiv2.dll'
 make_wheels
 
 # Make wheel packages for MacOS platform
 plat_tag=darwin
-plat_name=macosx_x86_64
+plat_name=macosx_10_14_x86_64
 rm_files='libexiv2.so  exiv2.dll'
 make_wheels
 
