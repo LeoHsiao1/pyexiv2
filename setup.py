@@ -8,10 +8,10 @@ with open('README.md', encoding='utf-8') as f:
 
 setuptools.setup(
     name='pyexiv2',
-    version='2.4.0',
+    version='2.4.1',
     author='LeoHsiao',
     author_email='leohsiao@foxmail.com',
-    description='Read/Write metadata of digital image, including EXIF, IPTC, XMP.',
+    description='Read/Write metadata(including EXIF, IPTC, XMP), comment and ICC Profile embedded in digital images.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     license='GPLv3',
