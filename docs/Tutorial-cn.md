@@ -1,31 +1,55 @@
-- [Tutorial](./Tutorial.md)
-- [中文教程](./Tutorial-cn.md)
-
 # 教程
+
+语言: [English](./Tutorial.md) | [中文](./Tutorial-cn.md)
+
+目录:
+<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [API列表](#api列表)
+- [类 Image](#类-image)
+  - [Image.read_*()](#imageread_)
+  - [Image.modify_*()](#imagemodify_)
+  - [Image.clear_*()](#imageclear_)
+  - [Image.*_comment()](#image_comment)
+- [类 ImageData](#类-imagedata)
+- [数据类型](#数据类型)
+- [日志](#日志)
+
+<!-- /code_chunk_output -->
 
 ## API列表
 
 ```py
 class Image:
     def __init__(self, filename, encoding='utf-8')
+    def close(self)
+
     def read_exif(self, encoding='utf-8') -> dict
     def read_iptc(self, encoding='utf-8') -> dict
     def read_xmp(self, encoding='utf-8') -> dict
     def read_raw_xmp(self, encoding='utf-8') -> str
+    def read_comment(self, encoding='utf-8') -> str
+    def read_icc(self, encoding='utf-8') -> bytes
 
     def modify_exif(self, data: dict, encoding='utf-8')
     def modify_iptc(self, data: dict, encoding='utf-8')
     def modify_xmp(self, data: dict, encoding='utf-8')
+    def modify_comment(self, data: str, encoding='utf-8')
+    def modify_icc(self, data: bytes)
 
     def clear_exif(self)
     def clear_iptc(self)
     def clear_xmp(self)
-    
-    def close(self)
+    def clear_comment(self)
+    def clear_icc(self)
+
 
 class ImageData(Image):
     def __init__(self, data: bytes)
     def get_bytes(self) -> bytes
+
 
 set_log_level(level=2)
 ```
@@ -114,6 +138,32 @@ set_log_level(level=2)
 
 - 调用 `img.clear_exif()` 将删除图片的所有 EXIF 元数据。一旦清除元数据，pyexiv2 可能无法完全恢复它。
 - 按类似的方式使用 `img.clear_iptc()` 和 `img.clear_xmp()` .
+
+### Image.*_comment()
+
+- 它主要用于读、写 JPEG COM (COMMENT) 段，不属于 EXIF、IPTC、XMP 元数据。
+  - [相关讨论](https://github.com/Exiv2/exiv2/issues/1445#issuecomment-753951580)
+- 示例:
+    ```py
+    >>> img.modify_comment('Hello World!   \n你好！\n')
+    >>> img.read_comment()
+    'Hello World!   \n你好！\n'
+    >>> img.clear_comment()
+    >>> img.read_comment()
+    ''
+    ```
+- 它也能用于处理非 JPEG 格式的图片，但可能没有效果或产生异常：
+    ```py
+    >>> img = pyexiv2.Image('2.gif')
+    >>> img.read_comment()
+    ''
+    >>> img.modify_comment('Hello World!')
+    RuntimeError: Setting Image comment in GIF images is not supported
+    >>> img.clear_comment()
+    >>> img.read_comment()
+    ''
+    >>> img.close()
+    ```
 
 ## 类 ImageData
 

@@ -1,57 +1,79 @@
-# -*- coding: utf-8 -*-
+"""
+This script provides the test environment for test cases.
+"""
 import hashlib
 import os
 import shutil
 from functools import wraps
 
+import psutil
 import pytest
 
-from .. import Image, ImageData, set_log_level
-from . import testdata
+from . import reference
 
-current_dir = os.path.dirname(__file__)
-original_path = os.path.join(current_dir, '1.jpg')
-path = os.path.join(current_dir, 'tmp.jpg')
+
+class ENV:
+    name_for_import_pyexiv2  = os.environ.get('NAME_FOR_IMPORT_PYEXIV2') or '..'
+    test_dir      = os.path.dirname(__file__)
+    original_img  = os.path.join(test_dir, '1.jpg')
+    test_img      = os.path.join(test_dir, 'test.jpg')
+    test_img_copy = os.path.join(test_dir, 'test-copy.jpg')
+    skip_test     = False
+
+
+if ENV.name_for_import_pyexiv2 == '..':
+    from ..         import Image, ImageData, set_log_level
+elif ENV.name_for_import_pyexiv2 == 'pyexiv2':
+    from pyexiv2    import Image, ImageData, set_log_level
 
 
 def setup_function():
-    shutil.copy(original_path, path)
+    if ENV.skip_test:
+        pytest.skip()
+    shutil.copy(ENV.original_img, ENV.test_img)  # Before each test, make a temporary copy of the image
+    ENV.img = Image(ENV.test_img)
 
 
 def teardown_function():
-    os.remove(path)
+    ENV.img.close()
+    os.remove(ENV.test_img)
 
 
-def _check_md5(file1, file2):
-    """ check whether the two files are the same """
-    with open(file1, "rb") as f1, open(file2, "rb") as f2:
-        h1 = hashlib.md5(f1.read()).digest()
-        h2 = hashlib.md5(f2.read()).digest()
-        return h1 == h2
+def diff_text(text1: (str, bytes), text2: (str, bytes)):
+    max_len = max(len(text1), len(text2))
+    for i in range(max_len):
+        assert text1[i:i+1] == text2[i:i+1], "The two text is different at index {} :\n{}\n{}".format(i, text1[i:i+10], text2[i:i+10])
 
 
-def check_md5(func):
-    """ A decorator that checks if a file has been changed. """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        ret = func(*args, **kwargs)
-        assert _check_md5(path, original_path), 'The file has been changed after {}().'.format(func.__name__)
-        return ret
-    return wrapper
+def diff_dict(dict1, dict2):
+    assert len(dict1) == len(dict2), "The two dict are of different length: {}, {}".format(len(dict1), len(dict2))
+    for k in dict1.keys():
+        assert dict1[k] == dict2[k], "['{}'] is different.".format(k)
 
 
-def compare_dict(d1, d2):
-    """ Compare two dictionaries to see if they are the same. """
-    assert len(d1) == len(d2)
-    for k in d1.keys():
-        assert d1[k] == d2[k], "['{}'] is different.".format(k)
+def check_img_md5():
+    with open(ENV.original_img, "rb") as f1, open(ENV.test_img, "rb") as f2:
+        v1 = hashlib.md5(f1.read()).digest()
+        v2 = hashlib.md5(f2.read()).digest()
+        assert v1 == v2, 'The MD5 value of the image has changed.'
 
 
-def generate_the_correct_result(raw_dict: dict, changes: dict) -> dict:
-    ''' Generate the result that supposed to be after modification by pyexiv2.  '''
-    correct_result = raw_dict.copy()
-    correct_result.update(changes)
-    for k, v in list(correct_result.items()):
+def simulate_updating_metadata(raw_dict: dict, changes: dict) -> dict:
+    """ Simulate the process of updating the metadata dict by pyexiv2. """
+    result = raw_dict.copy()
+    result.update(changes)
+    for k, v in list(result.items()):
         if v == '':
-            correct_result.pop(k)
-    return correct_result
+            result.pop(k)
+    return result
+
+
+def check_the_copy_of_img(diff, reference, method_name):
+    """ Copy the image and check it, in case the modified data is not saved to disk. """
+    try:
+        shutil.copy(ENV.test_img, ENV.test_img_copy)
+        with Image(ENV.test_img_copy) as img:
+            diff(reference, getattr(img, method_name)())
+    finally:
+        os.remove(ENV.test_img_copy)
+

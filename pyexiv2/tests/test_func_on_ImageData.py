@@ -1,19 +1,17 @@
-# -*- coding: utf-8 -*-
 from .base import *
+from .test_func import test_read_exif, test_read_iptc, test_read_xmp, test_read_raw_xmp, test_read_comment, test_read_icc
 
 
-@check_md5
-def test_read_all():
-    with open(path, 'rb') as f:
-        with ImageData(f.read()) as img:
-            compare_dict(testdata.EXIF, img.read_exif())
-            compare_dict(testdata.IPTC, img.read_iptc())
-            compare_dict(testdata.XMP, img.read_xmp())
-            assert len(img.read_raw_xmp()) == 4593
+def setup_function():
+    if ENV.skip_test:
+        pytest.skip()
+    shutil.copy(ENV.original_img, ENV.test_img)  # Before each test, make a temporary copy of the image
+    with open(ENV.test_img, 'rb') as f:
+        ENV.img = ImageData(f.read())
 
 
 def test_modify_exif():
-    with open(path, 'rb+') as f:
+    with open(ENV.test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             changes = {'Exif.Image.ImageDescription': 'test-中文-',
                        'Exif.Image.Artist': ''}
@@ -22,17 +20,17 @@ def test_modify_exif():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            correct_result = generate_the_correct_result(testdata.EXIF, changes)
+            expected_result = simulate_updating_metadata(reference.EXIF, changes)
             result = img.read_exif()
             ignored_keys = ['Exif.Image.ExifTag']
             for key in ignored_keys:
-                correct_result.pop(key)
+                expected_result.pop(key)
                 result.pop(key)
-            compare_dict(correct_result, result)
+            diff_dict(expected_result, result)
 
 
 def test_modify_iptc():
-    with open(path, 'rb+') as f:
+    with open(ENV.test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             changes = {'Iptc.Application2.ObjectName': 'test-中文-',
                        'Iptc.Application2.Copyright': '',
@@ -42,12 +40,12 @@ def test_modify_iptc():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            correct_result = generate_the_correct_result(testdata.IPTC, changes)
-            compare_dict(correct_result, img.read_iptc())
+            expected_result = simulate_updating_metadata(reference.IPTC, changes)
+            diff_dict(expected_result, img.read_iptc())
 
 
 def test_modify_xmp():
-    with open(path, 'rb+') as f:
+    with open(ENV.test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             changes = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',
                        'Xmp.xmp.Rating': '',
@@ -57,16 +55,18 @@ def test_modify_xmp():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            correct_result = generate_the_correct_result(testdata.XMP, changes)
-            compare_dict(correct_result, img.read_xmp())
+            expected_result = simulate_updating_metadata(reference.XMP, changes)
+            diff_dict(expected_result, img.read_xmp())
 
 
 def test_clear_all():
-    with open(path, 'rb+') as f:
+    with open(ENV.test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             img.clear_exif()
             img.clear_iptc()
             img.clear_xmp()
+            img.clear_comment()
+            img.clear_icc()
             f.seek(0)
             f.write(img.get_bytes())
         f.seek(0)
@@ -74,13 +74,6 @@ def test_clear_all():
             assert img.read_exif() == {}
             assert img.read_iptc() == {}
             assert img.read_xmp() == {}
+            assert img.read_comment() == ''
+            assert img.read_icc() == b''
 
-
-def test_error_log():
-    with open(path, 'rb') as f:
-        with ImageData(f.read()) as img:
-            with pytest.raises(RuntimeError):
-                img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
-            set_log_level(4)
-            img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
-            set_log_level(2)    # recover the log level

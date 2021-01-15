@@ -1,31 +1,55 @@
-- [Tutorial](./Tutorial.md)
-- [中文教程](./Tutorial-cn.md)
-
 # Tutorial
+
+Language: [English](./Tutorial.md) | [中文](./Tutorial-cn.md)
+
+TOC:
+<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [API list](#api-list)
+- [class Image](#class-image)
+  - [Image.read_*()](#imageread_)
+  - [Image.modify_*()](#imagemodify_)
+  - [Image.clear_*()](#imageclear_)
+  - [Image.*_comment()](#image_comment)
+- [class ImageData](#class-imagedata)
+- [Data types](#data-types)
+- [Log](#log)
+
+<!-- /code_chunk_output -->
 
 ## API list
 
 ```py
 class Image:
     def __init__(self, filename, encoding='utf-8')
+    def close(self)
+
     def read_exif(self, encoding='utf-8') -> dict
     def read_iptc(self, encoding='utf-8') -> dict
     def read_xmp(self, encoding='utf-8') -> dict
     def read_raw_xmp(self, encoding='utf-8') -> str
+    def read_comment(self, encoding='utf-8') -> str
+    def read_icc(self, encoding='utf-8') -> bytes
 
     def modify_exif(self, data: dict, encoding='utf-8')
     def modify_iptc(self, data: dict, encoding='utf-8')
     def modify_xmp(self, data: dict, encoding='utf-8')
+    def modify_comment(self, data: str, encoding='utf-8')
+    def modify_icc(self, data: bytes)
 
     def clear_exif(self)
     def clear_iptc(self)
     def clear_xmp(self)
-    
-    def close(self)
+    def clear_comment(self)
+    def clear_icc(self)
+
 
 class ImageData(Image):
     def __init__(self, data: bytes)
     def get_bytes(self) -> bytes
+
 
 set_log_level(level=2)
 ```
@@ -115,9 +139,35 @@ set_log_level(level=2)
 - Calling `img.clear_exif()` will delete all EXIF metadata of the image. Once cleared, pyexiv2 may not be able to recover it completely.
 - Use `img.clear_iptc()` and `img.clear_xmp()` in the similar way.
 
+### Image.*_comment()
+
+- It is mainly used to read and write JPEG COM (Comment) segment, which does not belong to EXIF, IPTC or XMP metadata.
+  - [related issue](https://github.com/Exiv2/exiv2/issues/1445#issuecomment-753951580)
+- Sample:
+    ```py
+    >>> img.modify_comment('Hello World!   \n你好！\n')
+    >>> img.read_comment()
+    'Hello World!   \n你好！\n'
+    >>> img.clear_comment()
+    >>> img.read_comment()
+    ''
+    ```
+- It can also be used to handle images that are not in JPEG format, but may have no effect or cause exceptions:
+    ```py
+    >>> img = pyexiv2.Image('2.gif')
+    >>> img.read_comment()
+    ''
+    >>> img.modify_comment('Hello World!')
+    RuntimeError: Setting Image comment in GIF images is not supported
+    >>> img.clear_comment()
+    >>> img.read_comment()
+    ''
+    >>> img.close()
+    ```
+
 ## class ImageData
 
-- Class `ImageData`, inherited from class `Image`, is used to open an image from bytes data. 
+- Class `ImageData`, inherited from class `Image`, is used to open an image from bytes data.
 - Example of reading:
     ```py
     with open(r'.\pyexiv2\tests\1.jpg', 'rb') as f:
@@ -155,7 +205,7 @@ set_log_level(level=2)
     ```
     You can call `img.read_raw_xmp()` to get the raw XMP metadata without splitting.
 
-## log
+## Log
 
 - Exiv2 has five levels of handling logs：
     - 0 : debug
