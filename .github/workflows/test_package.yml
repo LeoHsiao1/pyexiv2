@@ -5,6 +5,7 @@ name: Test package
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   Test_run:
@@ -15,7 +16,7 @@ jobs:
         os: [ubuntu-18.04, macOS-10.15, windows-2019]
         python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
     steps:
-    - name: git pull
+    - name: Checkout repository
       uses: actions/checkout@v1
       with:
         ref: master

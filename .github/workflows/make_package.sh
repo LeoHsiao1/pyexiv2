@@ -60,7 +60,7 @@ make_wheels(){
 
 # Make wheel packages for Linux platform
 plat_tag=linux
-plat_name=manylinux2014_x86_64
+plat_name=manylinux1_x86_64
 rm_files='libexiv2.dylib  exiv2.dll'
 make_wheels
 
