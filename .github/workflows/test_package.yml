@@ -38,6 +38,7 @@ jobs:
 
     - name: Test
       run: |
+        python -c "import os; print(os.environ.get('NAME_FOR_IMPORT_PYEXIV2'))"
         pytest -v
       env:
         NAME_FOR_IMPORT_PYEXIV2: pyexiv2
