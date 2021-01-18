@@ -19,11 +19,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       EXIV2_BUILD_NAME: exiv2-0.27.2-Linux64
-      EXIV2_BUILDS_URL: https://www.exiv2.org/builds/${{ EXIV2_BUILD_NAME }}.tar.gz
-      EXIV2_DIR: ${{ GITHUB_WORKSPACE }}/${{ EXIV2_BUILD_NAME }}
-      LIB_DIR: ${{ GITHUB_WORKSPACE }}/pyexiv2/lib
-
     steps:
+    - name: Set environment variables
+      run: |
+        echo  EXIV2_BUILDS_URL=https://www.exiv2.org/builds/${EXIV2_BUILD_NAME}.tar.gz  >>  $GITHUB_ENV
+        echo  EXIV2_DIR: ${GITHUB_WORKSPACE}/${EXIV2_BUILD_NAME}                        >>  $GITHUB_ENV
+        echo  LIB_DIR=${GITHUB_WORKSPACE}/pyexiv2/lib                                   >>  $GITHUB_ENV
+    
     - name: Checkout repository
       uses: actions/checkout@v2
 
