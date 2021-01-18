@@ -1,6 +1,6 @@
 # Build pyexiv2 on Linux, MacOS, and Windows.
 
-name: Test push
+name: Build
 
 on:
   push:
@@ -18,10 +18,10 @@ jobs:
         python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
     runs-on: ${{ matrix.os }}
     env:
-      EXIV2_BUILDS_URL: https://www.exiv2.org/builds/
-      EXIV2_BUILD_NAME: Linux64.tar.gz
-      EXIV2_DIR: ${{ secrets.PASSWORD }}/exiv2-0.27.2-Linux64
-      LIB_DIR: ${{ secrets.PASSWORD }}/pyexiv2/lib
+      EXIV2_BUILD_NAME: exiv2-0.27.2-Linux64
+      EXIV2_BUILDS_URL: https://www.exiv2.org/builds/${{ EXIV2_BUILD_NAME }}.tar.gz
+      EXIV2_DIR: ${{ GITHUB_WORKSPACE }}/${{ EXIV2_BUILD_NAME }}
+      LIB_DIR: ${{ GITHUB_WORKSPACE }}/pyexiv2/lib
 
     steps:
     - name: Checkout repository
@@ -29,7 +29,7 @@ jobs:
 
     - name: Download Exiv2 build
       run: |
-        curl -O   $EXIV2_BUILDS_URL/$EXIV2_BUILD_NAME
+        curl -O   $EXIV2_BUILDS_URL
         tar  -zxf $EXIV2_BUILD_NAME
         cp   -f   $EXIV2_DIR/lib/libexiv2.so.0.27.2   $LIB_DIR/libexiv2.so
 
