@@ -22,9 +22,11 @@ jobs:
     steps:
     - name: Set environment variables
       run: |
+        set -u
         echo  EXIV2_BUILDS_URL=https://www.exiv2.org/builds/${EXIV2_BUILD_NAME}.tar.gz  >>  $GITHUB_ENV
-        echo  EXIV2_DIR: ${GITHUB_WORKSPACE}/${EXIV2_BUILD_NAME}                        >>  $GITHUB_ENV
+        echo  EXIV2_DIR=${GITHUB_WORKSPACE}/${EXIV2_BUILD_NAME}                         >>  $GITHUB_ENV
         echo  LIB_DIR=${GITHUB_WORKSPACE}/pyexiv2/lib                                   >>  $GITHUB_ENV
+        echo  SUB_LIB_DIR=${GITHUB_WORKSPACE}/pyexiv2/lib/py3${python-version}-linux    >>  $GITHUB_ENV
     
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -32,7 +34,7 @@ jobs:
     - name: Download Exiv2 build
       run: |
         curl -O   $EXIV2_BUILDS_URL
-        tar  -zxf $EXIV2_BUILD_NAME
+        tar  -zxf ${EXIV2_BUILD_NAME}.tar.gz
         cp   -f   $EXIV2_DIR/lib/libexiv2.so.0.27.2   $LIB_DIR/libexiv2.so
 
     - name: Set up Python ${{ matrix.python-version }}
@@ -47,7 +49,8 @@ jobs:
     - name: Build
       run: |
         cd $LIB_DIR
-        g++ exiv2api.cpp -o py3${python-version}-linux/exiv2api.so
+        mkdir -p $SUB_LIB_DIR
+        g++ exiv2api.cpp -o $SUB_LIB_DIR/exiv2api.so \
           -O3 -Wall -std=c++11 -shared -fPIC \
           `python -m pybind11 --includes` \
           -I $EXIV2_DIR/include -L $EXIV2_DIR/lib -l exiv2
