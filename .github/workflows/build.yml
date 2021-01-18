@@ -1,0 +1,55 @@
+# Build pyexiv2 on Linux, MacOS, and Windows.
+
+name: Test push
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  job1:
+    name: Build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ubuntu-18.04
+        python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
+    runs-on: ${{ matrix.os }}
+    env:
+      EXIV2_BUILDS_URL: https://www.exiv2.org/builds/
+      EXIV2_BUILD_NAME: Linux64.tar.gz
+      EXIV2_DIR: ${{ secrets.PASSWORD }}/exiv2-0.27.2-Linux64
+      LIB_DIR: ${{ secrets.PASSWORD }}/pyexiv2/lib
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Download Exiv2 build
+      run: |
+        curl -O   $EXIV2_BUILDS_URL/$EXIV2_BUILD_NAME
+        tar  -zxf $EXIV2_BUILD_NAME
+        cp   -f   $EXIV2_DIR/lib/libexiv2.so.0.27.2   $LIB_DIR/libexiv2.so
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install pybind11 pytest psutil
+
+    - name: Build
+      run: |
+        cd $LIB_DIR
+        g++ exiv2api.cpp -o py3${python-version}-linux/exiv2api.so
+          -O3 -Wall -std=c++11 -shared -fPIC \
+          `python -m pybind11 --includes` \
+          -I $EXIV2_DIR/include -L $EXIV2_DIR/lib -l exiv2
+
+    - name: Test
+      run: |
+        pytest -v
