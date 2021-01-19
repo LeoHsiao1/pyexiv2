@@ -70,7 +70,6 @@
     ```sh
     EXIV2_DIR=/Users/leo/Documents/exiv2-0.27.2-Darwin
     LIB_DIR=/Users/leo/Documents/pyexiv2/pyexiv2/lib/
-    cp ${EXIV2_DIR}/lib/libexiv2.0.27.2.dylib ${EXIV2_DIR}/lib/libexiv2.dylib
     cp ${EXIV2_DIR}/lib/libexiv2.0.27.2.dylib ${LIB_DIR}/libexiv2.dylib
     ```
 
