@@ -1,0 +1,115 @@
+# Build pyexiv2 on Linux, MacOS, and Windows.
+
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  job1:
+    name: Build on Linux
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04]
+        python_version: [3.5, 3.6, 3.7, 3.8, 3.9]
+    runs-on: ${{ matrix.os }}
+    env:
+      PLATFORM_NAME: linux
+      EXIV2_BUILD_NAME: exiv2-0.27.2-Linux64
+      EXIV2_BUILD_EXT: .tar.gz
+    steps:
+    - name: Set environment variables
+      run: |
+        set -u
+        echo  EXIV2_BUILDS_URL=https://www.exiv2.org/builds/${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT} >>  $GITHUB_ENV
+        echo  EXIV2_DIR=`pwd`/${EXIV2_BUILD_NAME}                                                 >>  $GITHUB_ENV
+        echo  LIB_DIR=`pwd`/pyexiv2/lib                                                           >>  $GITHUB_ENV
+        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${python_version/./}-${PLATFORM_NAME}               >>  $GITHUB_ENV
+
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Download Exiv2 build
+      run: |
+        curl -O   $EXIV2_BUILDS_URL
+        tar  -zxf ${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT}
+        cp   -f   $EXIV2_DIR/lib/libexiv2.so.0.27.2   $LIB_DIR/libexiv2.so
+
+    - name: Set up Python ${{ matrix.python_version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python_version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install pybind11 pytest psutil
+
+    - name: Build
+      run: |
+        cd $LIB_DIR
+        mkdir -p $SUB_LIB_DIR
+        g++ exiv2api.cpp -o $SUB_LIB_DIR/exiv2api.so \
+          -O3 -Wall -std=c++11 -shared -fPIC \
+          `python -m pybind11 --includes` \
+          -I $EXIV2_DIR/include -L $EXIV2_DIR/lib -l exiv2
+
+    - name: Test
+      run: |
+        pytest -v
+
+  job2:
+    name: Build on MacOS
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04]
+        python_version: [3.5, 3.6, 3.7, 3.8, 3.9]
+    runs-on: ${{ matrix.os }}
+    env:
+      PLATFORM_NAME: darwin
+      EXIV2_BUILD_NAME: exiv2-0.27.2-Darwin
+      EXIV2_BUILD_EXT: .tar.gz
+    steps:
+    - name: Set environment variables
+      run: |
+        set -u
+        echo  EXIV2_BUILDS_URL=https://www.exiv2.org/builds/${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT} >>  $GITHUB_ENV
+        echo  EXIV2_DIR=`pwd`/${EXIV2_BUILD_NAME}                                                 >>  $GITHUB_ENV
+        echo  LIB_DIR=`pwd`/pyexiv2/lib                                                           >>  $GITHUB_ENV
+        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${python_version/./}-${PLATFORM_NAME}               >>  $GITHUB_ENV
+
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Download Exiv2 build
+      run: |
+        curl -O   $EXIV2_BUILDS_URL
+        tar  -zxf ${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT}
+        cp   -f   $EXIV2_DIR/lib/libexiv2.0.27.2.dylib  $EXIV2_DIR/lib/libexiv2.dylib
+        cp   -f   $EXIV2_DIR/lib/libexiv2.0.27.2.dylib  $LIB_DIR/libexiv2.dylib
+
+    - name: Set up Python ${{ matrix.python_version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python_version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install pybind11 pytest psutil
+
+    - name: Build
+      run: |
+        cd $LIB_DIR
+        mkdir -p $SUB_LIB_DIR
+        g++ exiv2api.cpp -o $SUB_LIB_DIR/exiv2api.so \
+          -O3 -Wall -std=c++11 -shared -fPIC \
+          `python -m pybind11 --includes` \
+          -I $EXIV2_DIR/include -L $EXIV2_DIR/lib -l exiv2 -undefined dynamic_lookup
+
+    - name: Test
+      run: |
+        pytest -v

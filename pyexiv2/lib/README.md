@@ -51,6 +51,7 @@
 4. Compile:
     ```sh
     cd $LIB_DIR
+    mkdir -p py3${py_version}-linux
     g++ exiv2api.cpp -o py3${py_version}-linux/exiv2api.so -O3 -Wall -std=c++11 -shared -fPIC `python3.$py_version -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2
     ```
 
@@ -90,6 +91,10 @@
 
 1. Download the release version of Exiv2 project.
     - msvc64 : <https://www.exiv2.org/archive.html>
+    - For example:
+        ```sh
+        curl -O https://www.exiv2.org/releases/exiv2-0.27.2-2017msvc64.zip
+        ```
 
 2. Install `Visual Studio 2017` (must use the same version of Visual Studio as the Exiv2 build) , and set the environment variables it needs.
 
