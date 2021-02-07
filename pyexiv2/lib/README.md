@@ -38,7 +38,7 @@
     ```sh
     EXIV2_DIR=/root/exiv2-0.27.2-Linux64   # According to your download location
     LIB_DIR=/root/pyexiv2/pyexiv2/lib/
-    cp ${EXIV2_DIR}/lib/libexiv2.so.0.27.2 $LIB_DIR/libexiv2.so
+    cp $EXIV2_DIR/lib/libexiv2.so.0.27.2 $LIB_DIR/libexiv2.so
     ```
 
 3. Set up the python interpreter. For example:
@@ -52,7 +52,12 @@
     ```sh
     cd $LIB_DIR
     mkdir -p py3${py_version}-linux
-    g++ exiv2api.cpp -o py3${py_version}-linux/exiv2api.so -O3 -Wall -std=c++11 -shared -fPIC `python3.$py_version -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2
+    g++ exiv2api.cpp -o py3${py_version}-linux/exiv2api.so \
+        -O3 -Wall -std=c++11 -shared -fPIC \
+        `python3.$py_version -m pybind11 --includes` \
+        -I $EXIV2_DIR/include \
+        -L $EXIV2_DIR/lib \
+        -l exiv2
     ```
 
 ## Compile steps on Darwin
@@ -82,9 +87,14 @@
 4. Compile:
     ```sh
     cd $LIB_DIR
-    g++ exiv2api.cpp -o py3${py_version}-darwin/exiv2api.so -O3 -Wall -std=c++11 -shared -fPIC `python3.$py_version -m pybind11 --includes` -I ${EXIV2_DIR}/include -L ${EXIV2_DIR}/lib -l exiv2 -undefined dynamic_lookup
+    g++ exiv2api.cpp -o py3${py_version}-darwin/exiv2api.so \
+        -O3 -Wall -std=c++11 -shared -fPIC \
+        `python3.$py_version -m pybind11 --includes` \
+        -I $EXIV2_DIR/include \
+        -L $EXIV2_DIR/lib \
+        -l exiv2 \
+        -undefined dynamic_lookup
     ```
-
 
 ## Compile steps on Windows
 
@@ -108,7 +118,7 @@
 4. Compile:
     ```batch
     set py_version=8
-    set py_home=C:\Users\Leo\AppData\Local\Programs\Python\Python3%py_version%
+    set py_home=%APPDATA%\..\Local\Programs\Python\Python3%py_version%
     cl /MD /LD exiv2api.cpp /EHsc -I %EXIV2_DIR%\include -I %py_home%\include -I %py_home%\Lib\site-packages\pybind11\include /link %EXIV2_DIR%\lib\exiv2.lib %py_home%\libs\python3%py_version%.lib /OUT:py3%py_version%-win\exiv2api.pyd
     del exiv2api.exp exiv2api.obj exiv2api.lib
     ```

@@ -55,9 +55,11 @@ jobs:
         rm -rf  $SUB_LIB_DIR
         mkdir   $SUB_LIB_DIR
         g++ exiv2api.cpp -o $SUB_LIB_DIR/exiv2api.so \
-          -O3 -Wall -std=c++11 -shared -fPIC \
-          `python -m pybind11 --includes` \
-          -I $EXIV2_DIR/include -L $EXIV2_DIR/lib -l exiv2
+            -O3 -Wall -std=c++11 -shared -fPIC \
+            `python -m pybind11 --includes` \
+            -I $EXIV2_DIR/include \
+            -L $EXIV2_DIR/lib \
+            -l exiv2
 
     - name: Test
       run: |
@@ -109,9 +111,12 @@ jobs:
         rm -rf  $SUB_LIB_DIR
         mkdir   $SUB_LIB_DIR
         g++ exiv2api.cpp -o $SUB_LIB_DIR/exiv2api.so \
-          -O3 -Wall -std=c++11 -shared -fPIC \
-          `python -m pybind11 --includes` \
-          -I $EXIV2_DIR/include -L $EXIV2_DIR/lib -l exiv2 -undefined dynamic_lookup
+            -O3 -Wall -std=c++11 -shared -fPIC \
+            `python -m pybind11 --includes` \
+            -I $EXIV2_DIR/include \
+            -L $EXIV2_DIR/lib \
+            -l exiv2 \
+            -undefined dynamic_lookup
 
     - name: Test
       run: |
@@ -163,7 +168,7 @@ jobs:
         cd      %LIB_DIR%
         rm -rf  %SUB_LIB_DIR%
         mkdir   %SUB_LIB_DIR%
-        set PY_HOME=C:\Users\Leo\AppData\Local\Programs\Python\Python3%PYTHON_VERSION%
+        set PY_HOME=%APPDATA%\..\Local\Programs\Python\Python3%PYTHON_VERSION%
         cl /MD /LD exiv2api.cpp /EHsc ^
           -I %EXIV2_DIR%\include ^
           -I %PY_HOME%\include ^
