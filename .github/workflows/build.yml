@@ -116,3 +116,62 @@ jobs:
     - name: Test
       run: |
         pytest -v
+
+  job3:
+    name: Build on Windows
+    if: false                 # TODO: disable this job until you finish writing the build step
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019]
+        python_version: [3.5, 3.6, 3.7, 3.8, 3.9]
+    runs-on: ${{ matrix.os }}
+    env:
+      PLATFORM_NAME: win
+      EXIV2_BUILD_NAME: exiv2-0.27.2-2017msvc64
+      EXIV2_BUILD_EXT: .zip
+      PYTHON_VERSION: ${{ matrix.python_version }}
+    steps:
+    - name: Set environment variables
+      run: |
+        echo  EXIV2_BUILDS_URL=https://www.exiv2.org/builds/%EXIV2_BUILD_NAME%%EXIV2_BUILD_EXT% >>  %GITHUB_ENV%
+        echo  EXIV2_DIR=%CD%\%EXIV2_BUILD_NAME%                                                 >>  %GITHUB_ENV%
+        echo  LIB_DIR=%CD%\pyexiv2\lib                                                          >>  %GITHUB_ENV%
+        echo  SUB_LIB_DIR=%CD%\pyexiv2\lib\py%PYTHON_VERSION:.=%-%PLATFORM_NAME%                >>  %GITHUB_ENV%
+
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Download Exiv2 build
+      run: |
+        curl -O   %EXIV2_BUILDS_URL%
+        python -m zipfile -e %EXIV2_BUILD_NAME%%EXIV2_BUILD_EXT% .
+        copy      %EXIV2_DIR%\bin\exiv2.dll   %LIB_DIR%
+
+    - name: Set up Python ${{ matrix.python_version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python_version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install pybind11 pytest psutil
+
+    # TODO: how to install cl.exe to build
+    - name: Build
+      run: |
+        cd      %LIB_DIR%
+        rm -rf  %SUB_LIB_DIR%
+        mkdir   %SUB_LIB_DIR%
+        set PY_HOME=C:\Users\Leo\AppData\Local\Programs\Python\Python3%PYTHON_VERSION%
+        cl /MD /LD exiv2api.cpp /EHsc ^
+          -I %EXIV2_DIR%\include ^
+          -I %PY_HOME%\include ^
+          -I %PY_HOME%\Lib\site-packages\pybind11\include ^
+          /link %EXIV2_DIR%\lib\exiv2.lib ^
+          %PY_HOME%\libs\python3%PYTHON_VERSION%.lib ^
+          /OUT:py3%PYTHON_VERSION%-win\exiv2api.pyd
+
+    - name: Test
+      run: |
+        pytest -v
