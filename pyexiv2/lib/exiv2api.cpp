@@ -5,7 +5,7 @@
 #include <iostream>
 
 namespace py = pybind11;
-const std::string COMMA = ", ";
+const std::string separator = ", ";     // In the output of exiv2, it is used to split multiple values of a metadata tag
 const char *EXCEPTION_HINT = "Caught Exiv2 exception: ";
 std::stringstream error_log;
 
@@ -224,13 +224,13 @@ public:
             {
                 Exiv2::Value::AutoPtr exiv2_value = Exiv2::Value::create(Exiv2::string);
                 int pos = 0;
-                int COMMA_pos = 0;
-                while (COMMA_pos != std::string::npos)
+                int separator_pos = 0;
+                while (separator_pos != std::string::npos)
                 {
-                    COMMA_pos = value.find(COMMA, pos);
-                    exiv2_value->read(value.substr(pos, COMMA_pos - pos));
+                    separator_pos = value.find(separator, pos);
+                    exiv2_value->read(value.substr(pos, separator_pos - pos));
                     iptcData.add(Exiv2::IptcKey(key), exiv2_value.get());
-                    pos = COMMA_pos + COMMA.length();
+                    pos = separator_pos + separator.length();
                 }
             }
             else
@@ -261,12 +261,12 @@ public:
             if (typeName == "array")
             {
                 int pos = 0;
-                int COMMA_pos = 0;
-                while (COMMA_pos != std::string::npos)
+                int separator_pos = 0;
+                while (separator_pos != std::string::npos)
                 {
-                    COMMA_pos = value.find(COMMA, pos);
-                    xmpData[key] = value.substr(pos, COMMA_pos - pos);
-                    pos = COMMA_pos + COMMA.length();
+                    separator_pos = value.find(separator, pos);
+                    xmpData[key] = value.substr(pos, separator_pos - pos);
+                    pos = separator_pos + separator.length();
                 }
             }
             else

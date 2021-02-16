@@ -1,7 +1,7 @@
 from .lib import exiv2api
 
 
-COMMA = ', '
+separator = ', '
 
 
 class Image:
@@ -80,7 +80,7 @@ class Image:
             decoded_line = [i.decode(encoding) for i in line]
             key, value, typeName = decoded_line
             if typeName in ['XmpBag', 'XmpSeq']:
-                value = value.split(COMMA)
+                value = value.split(separator)
             pre_value = data.get(key)
             if pre_value == None:
                 data[key] = value
@@ -97,7 +97,7 @@ class Image:
             typeName = 'str'
             if isinstance(value, (list, tuple)):
                 typeName = 'array'
-                value = COMMA.join(value)
+                value = separator.join(value)
             line = [key, value, typeName]
             table.append(line)
         return table
