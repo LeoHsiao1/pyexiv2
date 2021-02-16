@@ -39,7 +39,7 @@ class Image:
         self._exif = self.img.read_exif()
         data = self._parse(self._exif, encoding)
 
-        # decode some tags
+        # Decode some tags
         for tag in reference.EXIF_TAGS_ENCODED_IN_UCS2:
             value = data.get(tag)
             if value:
@@ -49,7 +49,15 @@ class Image:
 
     def read_iptc(self, encoding='utf-8') -> dict:
         self._iptc = self.img.read_iptc()
-        return self._parse(self._iptc, encoding)
+        data = self._parse(self._iptc, encoding)
+
+        # For repeatable tags, even if they do not have multiple values, their values are converted to List type
+        for tag in reference.IPTC_TAGS_REPEATABLE:
+            value = data.get(tag)
+            if isinstance(value, str):
+                data[tag] = [value]
+
+        return data
 
     def read_xmp(self, encoding='utf-8') -> dict:
         self._xmp = self.img.read_xmp()
@@ -66,7 +74,7 @@ class Image:
         return self.img.read_icc()
 
     def modify_exif(self, data: dict, encoding='utf-8'):
-        # encode some tags
+        # Encode some tags
         for tag in reference.EXIF_TAGS_ENCODED_IN_UCS2:
             value = data.get(tag)
             if value:
@@ -93,33 +101,37 @@ class Image:
         data = {}
         for line in table:
             decoded_line = [i.decode(encoding) for i in line]
-            key, value, typeName = decoded_line
+            tag, value, typeName = decoded_line
             if typeName in ['XmpBag', 'XmpSeq']:
                 value = value.split(separator)
-            pre_value = data.get(key)
+
+            # Get the value of the tag
+            # Convert the values to a list of strings if the tag has multiple values
+            pre_value = data.get(tag)
             if pre_value == None:
-                data[key] = value
+                data[tag] = value
             elif isinstance(pre_value, str):
-                data[key] = [pre_value, value]
+                data[tag] = [pre_value, value]
             elif isinstance(pre_value, list):
-                data[key].append(value)
+                data[tag].append(value)
+
         return data
 
     def _dumps(self, data: dict) -> list:
-        """ Convert the metadata dict into a table that the C++ API can read. """
+        """ Convert the metadata dict into a table. """
         table = []
-        for key, value in data.items():
+        for tag, value in data.items():
             typeName = 'str'
             if isinstance(value, (list, tuple)):
                 typeName = 'array'
                 value = separator.join(value)
-            line = [key, value, typeName]
+            line = [tag, value, typeName]
             table.append(line)
         return table
 
     def _decode_ucs2(self, text):
         """
-        Converts text from UCS2 encoding to UTF8 encoding.
+        Convert text from UCS2 encoding to UTF8 encoding.
         For example:
         >>> img._decode_ucs2('116 0 101 0 115 0 116 0')
         'test'
@@ -129,7 +141,7 @@ class Image:
 
     def _encode_ucs2(self, text):
         """
-        Converts text from UTF8 encoding to UCS2 encoding.
+        Convert text from UTF8 encoding to UCS2 encoding.
         For example:
         >>> img._encode_ucs2('test')
         '116 0 101 0 115 0 116 0'

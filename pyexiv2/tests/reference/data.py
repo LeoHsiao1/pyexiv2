@@ -39,7 +39,7 @@ IPTC = {'Iptc.Envelope.CharacterSet'     : '\x1b%G',
         'Iptc.Application2.Keywords'     : ['tag1', 'tag2', 'tag3'],
         'Iptc.Application2.DateCreated'  : '2019-08-12',
         'Iptc.Application2.TimeCreated'  : '19:44:04+00:00',
-        'Iptc.Application2.Byline'       : 'test-中文-',
+        'Iptc.Application2.Byline'       : ['test-中文-'],
         'Iptc.Application2.Copyright'    : 'test-中文-',
         'Iptc.Application2.Caption'      : 'test-中文-',
         }
