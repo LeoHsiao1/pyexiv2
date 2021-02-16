@@ -99,8 +99,8 @@ set_log_level(level=2)
 - Sample:
     ```py
     >>> # Prepare the XMP data you want to modify
-    >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # This will overwrite its original value, or add it if it doesn't exist
-    ...          'Xmp.xmp.Rating': ''}                              # Set an empty str explicitly to delete the datum
+    >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # Assign a value to a tag. This will overwrite its original value, or add it if it doesn't exist
+    ...          'Xmp.xmp.Rating': ''}                              # Assigning an empty string will delete the tag
     >>> img.modify_xmp(dict1)
     >>>
     >>> dict2 = img.read_xmp()       # Check the result
@@ -111,7 +111,7 @@ set_log_level(level=2)
     >>> img.close()
     ```
     - Use `img.modify_exif()` and `img.modify_iptc()` in the same way.
-- If you try to modify a non-standard tag, you may cause an exception. Such as below:
+- If you try to modify a non-standard tag, you may cause an exception. For example:
     ```py
     >>> img.modify_exif({'Exif.Image.mytag001': 'test'})    # Failed
     RuntimeError: Invalid tag name or ifdId `mytag001', ifdId 1
@@ -121,7 +121,7 @@ set_log_level(level=2)
     ```
 - Some special tags cannot be modified by pyexiv2. For example:
     ```py
-    >>> img.modify_exif({'Exif.Photo.MakerNote': 'test,,,'})
+    >>> img.modify_exif({'Exif.Photo.MakerNote': 'test'})
     >>> img.read_exif()['Exif.Photo.MakerNote']
     ''
     ```
@@ -190,20 +190,19 @@ set_log_level(level=2)
 
 ## Data types
 
-- The value of the image metadata might be of type Short, Long, byte, Ascii, and so on. Most of them will be converted to String type by pyexiv2 when reading.
-- Some metadata is a list of strings. For example:
+- The value of the metadata tag might be of type Short, Long, byte, Ascii, and so on. Most of them will be converted to String type by pyexiv2 when reading.
+- Some tags has multiple values, which pyexiv2 converts to a list of strings. For example:
     ```py
     >>> img.modify_xmp({'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']})
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1', 'tag2', 'tag3']
     ```
-    If the string contains `', '` , it will be split. For example:
+    pyexiv2 uses `', '` as a separator to split multiple values. So it might split the string you want to write. For example:
     ```py
     >>> img.modify_xmp({'Xmp.dc.subject': 'tag1,tag2, tag3'})
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1,tag2', 'tag3']
     ```
-    You can call `img.read_raw_xmp()` to get the raw XMP metadata without splitting.
 
 ## Log
 

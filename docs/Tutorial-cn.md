@@ -98,8 +98,8 @@ set_log_level(level=2)
 
 - 示例:
     ```py
-    >>> # 准备要修改的XMP数据
-    >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # 这将覆盖该标签的原始值，如果不存在该标签则将其添加
+    >>> # 准备要修改的 XMP 数据
+    >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # 给一个标签赋值。这将覆盖该标签的原始值，如果不存在该标签则添加它
     ...          'Xmp.xmp.Rating': ''}                              # 赋值一个空字符串会删除该标签
     >>> img.modify_xmp(dict1)
     >>>
@@ -111,7 +111,7 @@ set_log_level(level=2)
     >>> img.close()
     ```
     - 以同样的方式使用 `img.modify_exif()` 和 `img.modify_iptc()`。
-- 如果你尝试修改一个非标准的标签，则可能引发一个异常。如下：
+- 如果你尝试修改一个非标准的标签，则可能引发一个异常。例如：
     ```py
     >>> img.modify_exif({'Exif.Image.mytag001': 'test'})    # 失败
     RuntimeError: Invalid tag name or ifdId `mytag001', ifdId 1
@@ -121,7 +121,7 @@ set_log_level(level=2)
     ```
 - 某些特殊的标签不能被 pyexiv2 修改。例如：
     ```py
-    >>> img.modify_exif({'Exif.Photo.MakerNote': 'test,,,'})
+    >>> img.modify_exif({'Exif.Photo.MakerNote': 'test'})
     >>> img.read_exif()['Exif.Photo.MakerNote']
     ''
     ```
@@ -190,20 +190,19 @@ set_log_level(level=2)
 
 ## 数据类型
 
-- 图片元数据的值可能是 Short、Long、byte、Ascii 等类型。读取时，大多数将被 pyexiv2 转换为 String 类型。
-- 某些元数据是字符串列表。例如：
+- 元数据标签的值可能是 Short、Long、byte、Ascii 等类型。读取时，大多数将被 pyexiv2 转换为 String 类型。
+- 某些标签有多个值，会被 pyexiv2 转换成一个字符串列表。例如：
     ```py
     >>> img.modify_xmp({'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']})
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1', 'tag2', 'tag3']
     ```
-    如果字符串中包含  `', '` ，它会被分割。如下：
+    pyexiv2 使用 `', '` 作为分隔符，分割多个值。因此，它可能会分割你想要写入的字符串。例如：
     ```py
     >>> img.modify_xmp({'Xmp.dc.subject': 'tag1,tag2, tag3'})
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1,tag2', 'tag3']
     ```
-    你可以调用 `img.read_raw_xmp()` 以获得未分割的 XMP 元数据。
 
 ## 日志
 
