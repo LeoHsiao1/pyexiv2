@@ -1,4 +1,5 @@
 from .lib import exiv2api
+from . import reference
 
 
 separator = ', '
@@ -36,7 +37,15 @@ class Image:
 
     def read_exif(self, encoding='utf-8') -> dict:
         self._exif = self.img.read_exif()
-        return self._parse(self._exif, encoding)
+        data = self._parse(self._exif, encoding)
+
+        # decode some tags
+        for tag in reference.EXIF_TAGS_ENCODED_IN_UCS2:
+            value = data.get(tag)
+            if value:
+                data[tag] = self._decode_ucs2(value)
+
+        return data
 
     def read_iptc(self, encoding='utf-8') -> dict:
         self._iptc = self.img.read_iptc()
@@ -57,6 +66,12 @@ class Image:
         return self.img.read_icc()
 
     def modify_exif(self, data: dict, encoding='utf-8'):
+        # encode some tags
+        for tag in reference.EXIF_TAGS_ENCODED_IN_UCS2:
+            value = data.get(tag)
+            if value:
+                data[tag] = self._encode_ucs2(value)
+
         self.img.modify_exif(self._dumps(data), encoding)
 
     def modify_iptc(self, data: dict, encoding='utf-8'):
@@ -101,6 +116,27 @@ class Image:
             line = [key, value, typeName]
             table.append(line)
         return table
+
+    def _decode_ucs2(self, text):
+        """
+        Converts text from UCS2 encoding to UTF8 encoding.
+        For example:
+        >>> img._decode_ucs2('116 0 101 0 115 0 116 0')
+        'test'
+        """
+        hex_str = ''.join(['{:02x}'.format(int(i)) for i in text.split()])
+        return bytes.fromhex(hex_str).decode('utf-16le')
+
+    def _encode_ucs2(self, text):
+        """
+        Converts text from UTF8 encoding to UCS2 encoding.
+        For example:
+        >>> img._encode_ucs2('test')
+        '116 0 101 0 115 0 116 0'
+        """
+        hex_str = text.encode('utf-16le').hex()
+        int_list = [int(''.join(i), base=16) for i in zip(*[iter(hex_str)] * 2)]
+        return ' '.join([str(i) for i in int_list])
 
     def clear_exif(self):
         self.img.clear_exif()
