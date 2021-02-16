@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ######
+# This script is used to make the distribution packages for pyexiv2.
 # Execute this script with `bash .github/workflows/make_package.sh`.
 # If you execute this script in WSL, you need to grant "Full control" to "Authenticated Users" in the Windows File settings for the folder.
 ######
