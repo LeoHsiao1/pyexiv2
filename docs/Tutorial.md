@@ -142,7 +142,7 @@ set_log_level(level=2)
 ### Image.*_comment()
 
 - It is mainly used to read and write JPEG COM (Comment) segment, which does not belong to EXIF, IPTC or XMP metadata.
-  - [related issue](https://github.com/Exiv2/exiv2/issues/1445#issuecomment-753951580)
+  - [related issue](https://github.com/Exiv2/exiv2/issues/1445)
 - Sample:
     ```py
     >>> img.modify_comment('Hello World!   \n你好！\n')
