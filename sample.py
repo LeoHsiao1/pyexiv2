@@ -39,3 +39,5 @@ with open(r'.\pyexiv2\tests\1.jpg', 'rb+') as f:
         result = img.read_iptc()
 
 
+
+
