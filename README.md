@@ -3,6 +3,7 @@
 Read/Write metadata(including [EXIF](https://en.wikipedia.org/wiki/Exif), [IPTC](https://en.wikipedia.org/wiki/International_Press_Telecommunications_Council), [XMP](https://en.wikipedia.org/wiki/Extensible_Metadata_Platform)), [comment](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial.md#image_comment) and [ICC Profile](https://en.wikipedia.org/wiki/ICC_profile) embedded in digital images.
 - Install: `pip install pyexiv2`
 - [Source code on GitHub](https://github.com/LeoHsiao1/pyexiv2)
+- There was another project called [pyexiv2] (https://launchpad.net/pyexiv2), but it is based on Python2, hasn't been updated since 2011.
 
 ## Features
 
