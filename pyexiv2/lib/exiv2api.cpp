@@ -162,8 +162,9 @@ public:
 
     py::object read_raw_xmp()
     {
-        /*  When readMetadata() is called, Exiv2 reads the raw XMP text,
-            stores it in a string called XmpPacket, then parses it into an XmpData instance.
+        /*
+        When readMetadata() is called, Exiv2 reads the raw XMP text,
+        stores it in a string called XmpPacket, then parses it into an XmpData instance.
         */
         return py::bytes((*img)->xmpPacket());
     }
@@ -180,23 +181,36 @@ public:
 
     void modify_exif(py::list table, py::str encoding)
     {
+        // Create an empty container for storing data
         Exiv2::ExifData &exifData = (*img)->exifData();
+
+        // Iterate the input table. each line contains a key and a value
         for (auto _line : table){
+
+            // Convert _line from auto type to py::list type
             py::list line;
             for (auto item : _line)
-                line.append(item);          // can't use item[0] here, so convert to py::list
+                line.append(item);
+
+            // Extract the fields in line
             std::string key = py::bytes(line[0].attr("encode")(encoding));
             std::string value = py::bytes(line[1].attr("encode")(encoding));
 
+            // Locate the key
             Exiv2::ExifData::iterator key_pos = exifData.findKey(Exiv2::ExifKey(key));
+
+            // Delete the existing key to set a new value, otherwise the key may contain multiple values.
             if (key_pos != exifData.end())
-                exifData.erase(key_pos);    // delete the existing tag to set a new value, otherwise the old value may be retained
+                exifData.erase(key_pos);
+
+            // Skip the key if its value is empty, so that the key will be deleted.
             if (value == "")
-                continue;                   // skip the tag if value == ""
-            exifData[key] = value;          // set a value to the tag
+                continue;
+
+            exifData[key] = value;
         }
         (*img)->setExifData(exifData);
-        (*img)->writeMetadata();            // Save the cached metadata to disk
+        (*img)->writeMetadata();        // Save the metadata from memory to disk
         check_error_log();
     }
 
@@ -219,6 +233,7 @@ public:
             if (value == "")
                 continue;
 
+            // assign the value to the key
             if (typeName == "array")
             {
                 Exiv2::Value::AutoPtr exiv2_value = Exiv2::Value::create(Exiv2::string);
@@ -284,7 +299,7 @@ public:
         std::string data_str = py::bytes(data.attr("encode")(encoding));
         (*img)->setXmpPacket(data_str);
         (*img)->writeMetadata();
-        (*img)->writeXmpFromPacket();   // Refresh the parsed XMP data
+        (*img)->writeXmpFromPacket();   // Refresh the parsed XMP data in memory
         check_error_log();
     }
 
