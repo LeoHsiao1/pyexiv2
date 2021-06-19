@@ -61,16 +61,22 @@ jobs:
             -L $EXIV2_DIR/lib \
             -l exiv2
 
-    - uses: actions/upload-artifact@v2
+    - name: Copy artifact
+      run: |
+        cp $SUB_LIB_DIR/exiv2api.so .
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
       with:
         name: artifact
         path: |
-          $SUB_LIB_DIR/exiv2api.so
+          exiv2api.so
         retention-days: 1
 
     - name: Test
       run: |
         pytest -v
+
 
   job2:
     name: Build on MacOS
@@ -125,16 +131,22 @@ jobs:
             -l exiv2 \
             -undefined dynamic_lookup
 
-    - uses: actions/upload-artifact@v2
+    - name: Copy artifact
+      run: |
+        cp $SUB_LIB_DIR/exiv2api.so .
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
       with:
         name: artifact
         path: |
-          $SUB_LIB_DIR/exiv2api.so
+          exiv2api.so
         retention-days: 1
 
     - name: Test
       run: |
         pytest -v
+
 
   job3:
     name: Build on Windows
