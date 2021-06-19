@@ -197,7 +197,7 @@ set_log_level(level=2)
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1', 'tag2', 'tag3']
     ```
-    pyexiv2 使用 `', '` 作为分隔符，分割多个值。因此，它可能会分割你想要写入的字符串。例如：
+    对于这些标签，pyexiv2 使用 `", "` 作为多个值的分隔符。因此，它可能会自动分割你想写入的字符串。例如：
     ```py
     >>> img.modify_xmp({'Xmp.dc.subject': 'tag1,tag2, tag3'})
     >>> img.read_xmp()['Xmp.dc.subject']
