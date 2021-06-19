@@ -70,7 +70,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ matrix.os }}_python-${{ matrix.python_version }}_lib
+        name: py${{ matrix.python_version }}-linux
         path: |
           exiv2api.so
         retention-days: 1
@@ -141,7 +141,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ matrix.os }}_python-${{ matrix.python_version }}_lib
+        name: py${{ matrix.python_version }}-darwin
         path: |
           exiv2api.so
         retention-days: 1
