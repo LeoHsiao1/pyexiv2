@@ -63,7 +63,7 @@ def simulate_updating_metadata(raw_dict: dict, changes: dict) -> dict:
     result = raw_dict.copy()
     result.update(changes)
     for k, v in list(result.items()):
-        if v == '':
+        if v == None:
             result.pop(k)
     return result
 

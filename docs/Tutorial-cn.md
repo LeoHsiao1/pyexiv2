@@ -100,17 +100,17 @@ set_log_level(level=2)
     ```py
     >>> # 准备要修改的 XMP 数据
     >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # 给一个标签赋值。这将覆盖该标签的原始值，如果不存在该标签则添加它
-    ...          'Xmp.xmp.Rating': ''}                              # 赋值一个空字符串会删除该标签
+    ...          'Xmp.xmp.Rating': ''}                              # 赋值 None 会删除该标签
     >>> img.modify_xmp(dict1)
     >>>
     >>> dict2 = img.read_xmp()       # 检查结果
     >>> dict2['Xmp.xmp.CreateDate']
-    '2019-06-23T19:45:17.834'        # 这个标签已经被修改了
+    '2019-06-23T19:45:17.834'        # 这个标签被修改了
     >>> dict2['Xmp.xmp.Rating']
-    KeyError: 'Xmp.xmp.Rating'       # 这个标签已经被删除了
+    KeyError: 'Xmp.xmp.Rating'       # 这个标签被删除了
     >>> img.close()
     ```
-    - 以同样的方式使用 `img.modify_exif()` 和 `img.modify_iptc()`。
+    - `img.modify_exif()` 和 `img.modify_iptc()` 的用法同理。
 - 如果你尝试修改一个非标准的标签，则可能引发一个异常。例如：
     ```py
     >>> img.modify_exif({'Exif.Image.mytag001': 'test'})    # 失败
@@ -137,7 +137,7 @@ set_log_level(level=2)
 ### Image.clear_*()
 
 - 调用 `img.clear_exif()` 将删除图片的所有 EXIF 元数据。一旦清除元数据，pyexiv2 可能无法完全恢复它。
-- 按类似的方式使用 `img.clear_iptc()` 和 `img.clear_xmp()` .
+- `img.clear_iptc()` 和 `img.clear_xmp()` 的用法同理。
 
 ### Image.*_comment()
 

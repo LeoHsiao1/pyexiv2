@@ -100,7 +100,7 @@ set_log_level(level=2)
     ```py
     >>> # Prepare the XMP data you want to modify
     >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # Assign a value to a tag. This will overwrite its original value, or add it if it doesn't exist
-    ...          'Xmp.xmp.Rating': ''}                              # Assigning an empty string will delete the tag
+    ...          'Xmp.xmp.Rating': None}                            # Assign None to delete the tag
     >>> img.modify_xmp(dict1)
     >>>
     >>> dict2 = img.read_xmp()       # Check the result

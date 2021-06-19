@@ -193,8 +193,9 @@ public:
                 line.append(item);
 
             // Extract the fields in line
-            std::string key = py::bytes(line[0].attr("encode")(encoding));
-            std::string value = py::bytes(line[1].attr("encode")(encoding));
+            std::string key      = py::bytes(line[0].attr("encode")(encoding));
+            std::string value    = py::bytes(line[1].attr("encode")(encoding));
+            std::string typeName = py::bytes(line[2].attr("encode")(encoding));
 
             // Locate the key
             Exiv2::ExifData::iterator key_pos = exifData.findKey(Exiv2::ExifKey(key));
@@ -203,11 +204,10 @@ public:
             if (key_pos != exifData.end())
                 exifData.erase(key_pos);
 
-            // Skip the key if its value is empty, so that the key will be deleted.
-            if (value == "")
+            if      (typeName == "_delete")
                 continue;
-
-            exifData[key] = value;
+            else if (typeName == "string")
+                exifData[key] = value;
         }
         (*img)->setExifData(exifData);
         (*img)->writeMetadata();        // Save the metadata from memory to disk
@@ -221,8 +221,8 @@ public:
             py::list line;
             for (auto item : _line)
                 line.append(item);
-            std::string key = py::bytes(line[0].attr("encode")(encoding));
-            std::string value = py::bytes(line[1].attr("encode")(encoding));
+            std::string key      = py::bytes(line[0].attr("encode")(encoding));
+            std::string value    = py::bytes(line[1].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
 
             Exiv2::IptcData::iterator key_pos = iptcData.findKey(Exiv2::IptcKey(key));
@@ -230,11 +230,12 @@ public:
                 iptcData.erase(key_pos);
                 key_pos = iptcData.findKey(Exiv2::IptcKey(key));
             }
-            if (value == "")
-                continue;
 
-            // assign the value to the key
-            if (typeName == "array")
+            if      (typeName == "_delete")
+                continue;
+            else if (typeName == "string")
+                iptcData[key] = value;
+            else if (typeName == "array")
             {
                 Exiv2::Value::AutoPtr exiv2_value = Exiv2::Value::create(Exiv2::string);
                 int pos = 0;
@@ -247,8 +248,6 @@ public:
                     pos = separator_pos + separator.length();
                 }
             }
-            else
-                iptcData[key] = value;
         }
         (*img)->setIptcData(iptcData);
         (*img)->writeMetadata();
@@ -270,10 +269,12 @@ public:
             Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
             if (key_pos != xmpData.end())
                 xmpData.erase(key_pos);
-            if (value == "")
-                continue;
 
-            if (typeName == "array")
+            if      (typeName == "_delete")
+                continue;
+            else if (typeName == "string")
+                xmpData[key] = value;
+            else if (typeName == "array")
             {
                 int pos = 0;
                 int separator_pos = 0;
@@ -286,8 +287,6 @@ public:
                 }
                 xmpData.add(Exiv2::XmpKey(key), parsed_value.get());
             }
-            else
-                xmpData[key] = value;
         }
         (*img)->setXmpData(xmpData);
         (*img)->writeMetadata();

@@ -120,10 +120,13 @@ class Image:
         """ Convert the metadata dict into a table. """
         table = []
         for tag, value in data.items():
-            typeName = 'str'
-            if isinstance(value, (list, tuple)):
+            typeName = 'string'
+            if value == None:
+                typeName = '_delete'
+                value    = ''
+            elif isinstance(value, (list, tuple)):
                 typeName = 'array'
-                value = separator.join(value)
+                value    = separator.join(value)
             line = [tag, value, typeName]
             table.append(line)
         return table
