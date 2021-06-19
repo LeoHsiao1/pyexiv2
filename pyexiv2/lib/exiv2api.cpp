@@ -24,7 +24,6 @@ public:
 
     void destroy(){
         if(data){
-            // std::cout << "deleting" << data << std::endl;
             free(data);
             data = NULL;
         }
@@ -277,6 +276,15 @@ public:
         check_error_log();
     }
 
+    void modify_raw_xmp(py::str data, py::str encoding)
+    {
+        std::string data_str = py::bytes(data.attr("encode")(encoding));
+        (*img)->setXmpPacket(data_str);
+        (*img)->writeMetadata();
+        (*img)->writeXmpFromPacket();   // Refresh the parsed XMP data
+        check_error_log();
+    }
+
     void modify_comment(py::str data, py::str encoding)
     {
         std::string data_str = py::bytes(data.attr("encode")(encoding));
@@ -329,6 +337,8 @@ public:
     }
 };
 
+
+// Convert this CPP file into a Python module. Declares the API that needs to be mapped.
 PYBIND11_MODULE(exiv2api, m)
 {
     m.doc() = "Expose the API of exiv2 to Python.";
@@ -354,6 +364,7 @@ PYBIND11_MODULE(exiv2api, m)
         .def("modify_exif"       , &Image::modify_exif)
         .def("modify_iptc"       , &Image::modify_iptc)
         .def("modify_xmp"        , &Image::modify_xmp)
+        .def("modify_raw_xmp"    , &Image::modify_raw_xmp)
         .def("modify_comment"    , &Image::modify_comment)
         .def("modify_icc"        , &Image::modify_icc)
         .def("clear_exif"        , &Image::clear_exif)

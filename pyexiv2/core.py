@@ -84,6 +84,9 @@ class Image:
     def modify_xmp(self, data: dict, encoding='utf-8'):
         self.img.modify_xmp(self._dumps(data), encoding)
 
+    def modify_raw_xmp(self, data: str, encoding='utf-8'):
+        self.img.modify_raw_xmp(data, encoding)
+
     def modify_comment(self, data: str, encoding='utf-8'):
         self.img.modify_comment(data, encoding)
 
