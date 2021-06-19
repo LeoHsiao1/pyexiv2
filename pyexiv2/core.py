@@ -36,8 +36,7 @@ class Image:
                     setattr(self, attr, None)
 
     def read_exif(self, encoding='utf-8') -> dict:
-        self._exif = self.img.read_exif()
-        data = self._parse(self._exif, encoding)
+        data = self._parse(self.img.read_exif(), encoding)
 
         # Decode some tags
         for tag in reference.EXIF_TAGS_ENCODED_IN_UCS2:
@@ -48,8 +47,7 @@ class Image:
         return data
 
     def read_iptc(self, encoding='utf-8') -> dict:
-        self._iptc = self.img.read_iptc()
-        data = self._parse(self._iptc, encoding)
+        data = self._parse(self.img.read_iptc(), encoding)
 
         # For repeatable tags, even if they do not have multiple values, their values are converted to List type
         for tag in reference.IPTC_TAGS_REPEATABLE:
@@ -60,12 +58,10 @@ class Image:
         return data
 
     def read_xmp(self, encoding='utf-8') -> dict:
-        self._xmp = self.img.read_xmp()
-        return self._parse(self._xmp, encoding)
+        return self._parse(self.img.read_xmp(), encoding)
 
     def read_raw_xmp(self, encoding='utf-8') -> str:
-        self._raw_xmp = self.img.read_raw_xmp()
-        return self._raw_xmp.decode(encoding)
+        return self.img.read_raw_xmp().decode(encoding)
 
     def read_comment(self, encoding='utf-8') -> str:
         return self.img.read_comment().decode(encoding)
