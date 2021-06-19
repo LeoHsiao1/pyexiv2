@@ -26,7 +26,7 @@ reset_workdir(){
 }
 
 # Install dependencies
-# python3 -m pip install setuptools wheel twine
+# python3 -m pip install setuptools wheel twine 
 
 # Clear dist directory
 rm -rf dist/*
