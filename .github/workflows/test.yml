@@ -26,6 +26,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        ldd --version
         python -m pip install pytest psutil
 
     - name: Test
