@@ -5,7 +5,6 @@
 #include <iostream>
 
 namespace py = pybind11;
-const std::string separator = ", ";     // In the output of exiv2, it is used to split multiple values of a metadata tag
 const char *EXCEPTION_HINT = "Caught Exiv2 exception: ";
 std::stringstream error_log;
 
@@ -189,8 +188,8 @@ public:
 
             // Convert _line from auto type to py::list type
             py::list line;
-            for (auto item : _line)
-                line.append(item);
+            for (auto field : _line)
+                line.append(field);
 
             // Extract the fields in line
             std::string key      = py::bytes(line[0].attr("encode")(encoding));
@@ -219,10 +218,9 @@ public:
         Exiv2::IptcData &iptcData = (*img)->iptcData();
         for (auto _line : table){
             py::list line;
-            for (auto item : _line)
-                line.append(item);
+            for (auto field : _line)
+                line.append(field);
             std::string key      = py::bytes(line[0].attr("encode")(encoding));
-            std::string value    = py::bytes(line[1].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
 
             Exiv2::IptcData::iterator key_pos = iptcData.findKey(Exiv2::IptcKey(key));
@@ -234,18 +232,17 @@ public:
             if      (typeName == "_delete")
                 continue;
             else if (typeName == "string")
+            {
+                std::string value = py::bytes(line[1].attr("encode")(encoding));
                 iptcData[key] = value;
+            }
             else if (typeName == "array")
             {
-                Exiv2::Value::AutoPtr exiv2_value = Exiv2::Value::create(Exiv2::string);
-                int pos = 0;
-                int separator_pos = 0;
-                while (separator_pos != std::string::npos)
-                {
-                    separator_pos = value.find(separator, pos);
-                    exiv2_value->read(value.substr(pos, separator_pos - pos));
-                    iptcData.add(Exiv2::IptcKey(key), exiv2_value.get());
-                    pos = separator_pos + separator.length();
+                Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::string);
+                for (auto item: line[1]){
+                    std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
+                    value->read(item_str);
+                    iptcData.add(Exiv2::IptcKey(key), value.get());
                 }
             }
         }
@@ -259,12 +256,10 @@ public:
         Exiv2::XmpData &xmpData = (*img)->xmpData();
         for (auto _line : table){
             py::list line;
-            for (auto item : _line)
-                line.append(item);
+            for (auto field : _line)
+                line.append(field);
             std::string key = py::bytes(line[0].attr("encode")(encoding));
-            std::string value = py::bytes(line[1].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
-            Exiv2::Value::AutoPtr parsed_value;
 
             Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
             if (key_pos != xmpData.end())
@@ -273,19 +268,18 @@ public:
             if      (typeName == "_delete")
                 continue;
             else if (typeName == "string")
+            {
+                std::string value = py::bytes(line[1].attr("encode")(encoding));
                 xmpData[key] = value;
+            }
             else if (typeName == "array")
             {
-                int pos = 0;
-                int separator_pos = 0;
-                parsed_value = Exiv2::Value::create(Exiv2::xmpSeq);
-                while (separator_pos != std::string::npos)
-                {
-                    separator_pos = value.find(separator, pos);
-                    parsed_value->read(value.substr(pos, separator_pos - pos));
-                    pos = separator_pos + separator.length();
+                Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::xmpSeq);
+                for (auto item: line[1]){
+                    std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
+                    value->read(item_str);
                 }
-                xmpData.add(Exiv2::XmpKey(key), parsed_value.get());
+                xmpData.add(Exiv2::XmpKey(key), value.get());
             }
         }
         (*img)->setXmpData(xmpData);

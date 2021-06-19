@@ -2,9 +2,6 @@ from .lib import exiv2api
 from . import reference
 
 
-separator = ', '
-
-
 class Image:
     """
     Open an image based on the file path. Read and write the metadata of the image.
@@ -102,7 +99,7 @@ class Image:
             decoded_line = [i.decode(encoding) for i in line]
             tag, value, typeName = decoded_line
             if typeName in ['XmpBag', 'XmpSeq']:
-                value = value.split(separator)
+                value = value.split(', ')
 
             # Get the value of the tag
             # Convert the values to a list of strings if the tag has multiple values
@@ -120,13 +117,16 @@ class Image:
         """ Convert the metadata dict into a table. """
         table = []
         for tag, value in data.items():
-            typeName = 'string'
+            tag      = str(tag)
             if value == None:
                 typeName = '_delete'
                 value    = ''
             elif isinstance(value, (list, tuple)):
                 typeName = 'array'
-                value    = separator.join(value)
+                value    = list(value)
+            else:
+                typeName = 'string'
+                value    = str(value)
             line = [tag, value, typeName]
             table.append(line)
         return table
