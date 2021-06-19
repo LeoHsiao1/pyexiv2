@@ -39,7 +39,6 @@ jobs:
       run: |
         curl -O   $EXIV2_BUILDS_URL
         tar  -zxf ${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT}
-        cp   -f   ${EXIV2_DIR}/lib/libexiv2.so.${EXIV2_VERSION}   ${EXIV2_DIR}/lib/libexiv2.so
         cp   -f   ${EXIV2_DIR}/lib/libexiv2.so.${EXIV2_VERSION}   ${LIB_DIR}/libexiv2.so
 
     - name: Set up Python ${{ matrix.python_version }}
