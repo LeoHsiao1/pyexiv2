@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04]
+        os: [ubuntu-20.04]
         python_version: [3.5, 3.6, 3.7, 3.8, 3.9]
     runs-on: ${{ matrix.os }}
     env:
@@ -39,7 +39,8 @@ jobs:
       run: |
         curl -O   $EXIV2_BUILDS_URL
         tar  -zxf ${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT}
-        cp   -f   $EXIV2_DIR/lib/libexiv2.so.${EXIV2_VERSION}   $LIB_DIR/libexiv2.so
+        cp   -f   ${EXIV2_DIR}/lib/libexiv2.so.${EXIV2_VERSION}   ${EXIV2_DIR}/lib/libexiv2.so
+        cp   -f   ${EXIV2_DIR}/lib/libexiv2.so.${EXIV2_VERSION}   ${LIB_DIR}/libexiv2.so
 
     - name: Set up Python ${{ matrix.python_version }}
       uses: actions/setup-python@v2
@@ -48,6 +49,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        # apt install python3-dev
         python -m pip install pybind11 pytest psutil
 
     - name: Build
@@ -76,7 +78,7 @@ jobs:
 
     - name: Test
       run: |
-        pytest -v
+        python -m pytest -v
 
 
   job2:
@@ -147,7 +149,7 @@ jobs:
 
     - name: Test
       run: |
-        pytest -v
+        python -m pytest -v
 
 
   job3:

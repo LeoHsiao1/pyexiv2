@@ -14,14 +14,14 @@
 ├── libexiv2.so     # Copied from the Exiv2 library for Linux
 └── README.md
 ```
+- The distribution of pyexiv2 includes precompiled files, which can also be compiled by users.
 - The principle of the pyexiv2 library:
   1. Write exiv2api.cpp to call the C++ API of the exiv2 library.
   2. Use Pybind11 to compile exiv2api.cpp into a Python module.
   3. Import the exiv2api module in the Python interpreter and call its API.
 - The build results of exiv2api.cpp is not compatible with different platforms, or even with different minor versions of the Python interpreter.
 - If the build results provided here do not apply to your platform, please compile it yourself. Then modify the code in `./__init__.py` so that it can successfully execute `import exiv2api`.
-- The current release version of Exiv2 is `0.27.2`.
-- It is not necessary to compile all versions of exiv2api.cpp and save them to the git repository, except when release a new version.
+- Currently using version 0.27.4 of exiv2.
 
 ## Compile steps on Linux
 
@@ -30,15 +30,16 @@
     - For example:
         ```sh
         cd /root/
-        curl -O https://www.exiv2.org/builds/exiv2-0.27.2-Linux64.tar.gz
-        tar -zxvf exiv2-0.27.2-Linux64.tar.gz
+        curl -O https://www.exiv2.org/builds/exiv2-0.27.4-Linux64.tar.gz
+        tar -zxvf exiv2-0.27.4-Linux64.tar.gz
         ```
 
 2. Prepare the environment:
     ```sh
-    EXIV2_DIR=/root/exiv2-0.27.2-Linux64   # According to your download location
+    EXIV2_DIR=/root/exiv2-0.27.4-Linux64   # According to your download location
     LIB_DIR=/root/pyexiv2/pyexiv2/lib/
-    cp $EXIV2_DIR/lib/libexiv2.so.0.27.2 $LIB_DIR/libexiv2.so
+    cp $EXIV2_DIR/lib/libexiv2.so.0.27.4  $EXIV2_DIR/lib/libexiv2.so
+    cp $EXIV2_DIR/lib/libexiv2.so.0.27.4  $LIB_DIR/libexiv2.so
     ```
 
 3. Set up the python interpreter. For example:
@@ -67,21 +68,21 @@
     - For example:
         ```sh
         cd /Users/leo/Documents/
-        curl -O https://www.exiv2.org/builds/exiv2-0.27.2-Darwin.tar.gz
-        tar -zxvf exiv2-0.27.2-Darwin.tar.gz
+        curl -O https://www.exiv2.org/builds/exiv2-0.27.4-Darwin.tar.gz
+        tar -zxvf exiv2-0.27.4-Darwin.tar.gz
         ```
 
 2. Prepare the environment:
     ```sh
-    EXIV2_DIR=/Users/leo/Documents/exiv2-0.27.2-Darwin
+    EXIV2_DIR=/Users/leo/Documents/exiv2-0.27.4-Darwin
     LIB_DIR=/Users/leo/Documents/pyexiv2/pyexiv2/lib/
-    cp ${EXIV2_DIR}/lib/libexiv2.0.27.2.dylib ${LIB_DIR}/libexiv2.dylib
+    cp ${EXIV2_DIR}/lib/libexiv2.0.27.4.dylib ${LIB_DIR}/libexiv2.dylib
     ```
 
 3. Set up the python interpreter. For example:
     ```sh
     py_version=8
-    python3.$py_version -m pip install pybind11     # -i https://pypi.tuna.tsinghua.edu.cn/simple
+    python3.$py_version -m pip install pybind11
     ```
 
 4. Compile:
@@ -102,15 +103,15 @@
     - msvc64 : <https://www.exiv2.org/archive.html>
     - For example:
         ```sh
-        curl -O https://www.exiv2.org/releases/exiv2-0.27.2-2017msvc64.zip
+        curl -O https://www.exiv2.org/releases/exiv2-0.27.4-2019msvc64.zip
         ```
 
-2. Install `Visual Studio 2017` (must use the same version of Visual Studio as the Exiv2 build) , and set the environment variables it needs.
+2. Install `Visual Studio 2019` (must use the same version of Visual Studio as the Exiv2 build) , and set the environment variables it needs.
 
 3. Prepare the environment:
     ```batch
-    "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-    set EXIV2_DIR=C:\Users\Leo\Downloads\exiv2-0.27.2-2017msvc64
+    "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+    set EXIV2_DIR=C:\Users\Leo\Downloads\exiv2-0.27.4-2019msvc64
     cd pyexiv2\lib
     copy %EXIV2_DIR%\bin\exiv2.dll .
     ```
