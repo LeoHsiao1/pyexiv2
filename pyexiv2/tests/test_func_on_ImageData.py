@@ -14,7 +14,7 @@ def test_modify_exif():
     with open(ENV.test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             changes = {'Exif.Image.ImageDescription': 'test-中文-',
-                       'Exif.Image.Artist': ''}
+                       'Exif.Image.Artist': None}
             img.modify_exif(changes)
             f.seek(0)
             f.write(img.get_bytes())
@@ -33,7 +33,7 @@ def test_modify_iptc():
     with open(ENV.test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             changes = {'Iptc.Application2.ObjectName': 'test-中文-',
-                       'Iptc.Application2.Copyright': '',
+                       'Iptc.Application2.Copyright': None,
                        'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3']}
             img.modify_iptc(changes)
             f.seek(0)
@@ -48,7 +48,7 @@ def test_modify_xmp():
     with open(ENV.test_img, 'rb+') as f:
         with ImageData(f.read()) as img:
             changes = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',
-                       'Xmp.xmp.Rating': '',
+                       'Xmp.xmp.Rating': None,
                        'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']}
             img.modify_xmp(changes)
             f.seek(0)

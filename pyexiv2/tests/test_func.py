@@ -71,7 +71,7 @@ def test_read_icc():
 
 def test_modify_exif():
     changes = {'Exif.Image.ImageDescription': 'test-中文-',
-               'Exif.Image.Artist': ''}
+               'Exif.Image.Artist': None}
     ENV.img.modify_exif(changes)
 
     # Check the modified data
@@ -97,7 +97,7 @@ def test_modify_exif():
 
 def test_modify_iptc():
     changes = {'Iptc.Application2.ObjectName': 'test-中文-',
-               'Iptc.Application2.Copyright': '',
+               'Iptc.Application2.Copyright': None,
                'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3']}
     ENV.img.modify_iptc(changes)
     expected_result = simulate_updating_metadata(reference.IPTC, changes)
@@ -107,12 +107,20 @@ def test_modify_iptc():
 
 def test_modify_xmp():
     changes = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',
-               'Xmp.xmp.Rating': '',
+               'Xmp.xmp.Rating': None,
                'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']}
     ENV.img.modify_xmp(changes)
     expected_result = simulate_updating_metadata(reference.XMP, changes)
     diff_dict(expected_result, ENV.img.read_xmp())
     check_the_copy_of_img(diff_dict, expected_result, 'read_xmp')
+
+
+def test_modify_raw_xmp():
+    ENV.img.clear_xmp()
+    ENV.img.modify_raw_xmp(reference.RAW_XMP)
+    diff_text(reference.RAW_XMP, ENV.img.read_raw_xmp())
+    check_the_copy_of_img(diff_text, reference.RAW_XMP, 'read_raw_xmp')
+    test_read_xmp()
 
 
 def test_modify_comment():

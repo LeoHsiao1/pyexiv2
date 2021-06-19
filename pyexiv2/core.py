@@ -2,9 +2,6 @@ from .lib import exiv2api
 from . import reference
 
 
-separator = ', '
-
-
 class Image:
     """
     Open an image based on the file path. Read and write the metadata of the image.
@@ -36,8 +33,7 @@ class Image:
                     setattr(self, attr, None)
 
     def read_exif(self, encoding='utf-8') -> dict:
-        self._exif = self.img.read_exif()
-        data = self._parse(self._exif, encoding)
+        data = self._parse(self.img.read_exif(), encoding)
 
         # Decode some tags
         for tag in reference.EXIF_TAGS_ENCODED_IN_UCS2:
@@ -48,8 +44,7 @@ class Image:
         return data
 
     def read_iptc(self, encoding='utf-8') -> dict:
-        self._iptc = self.img.read_iptc()
-        data = self._parse(self._iptc, encoding)
+        data = self._parse(self.img.read_iptc(), encoding)
 
         # For repeatable tags, even if they do not have multiple values, their values are converted to List type
         for tag in reference.IPTC_TAGS_REPEATABLE:
@@ -60,12 +55,10 @@ class Image:
         return data
 
     def read_xmp(self, encoding='utf-8') -> dict:
-        self._xmp = self.img.read_xmp()
-        return self._parse(self._xmp, encoding)
+        return self._parse(self.img.read_xmp(), encoding)
 
     def read_raw_xmp(self, encoding='utf-8') -> str:
-        self._raw_xmp = self.img.read_raw_xmp()
-        return self._raw_xmp.decode(encoding)
+        return self.img.read_raw_xmp().decode(encoding)
 
     def read_comment(self, encoding='utf-8') -> str:
         return self.img.read_comment().decode(encoding)
@@ -88,6 +81,9 @@ class Image:
     def modify_xmp(self, data: dict, encoding='utf-8'):
         self.img.modify_xmp(self._dumps(data), encoding)
 
+    def modify_raw_xmp(self, data: str, encoding='utf-8'):
+        self.img.modify_raw_xmp(data, encoding)
+
     def modify_comment(self, data: str, encoding='utf-8'):
         self.img.modify_comment(data, encoding)
 
@@ -103,7 +99,7 @@ class Image:
             decoded_line = [i.decode(encoding) for i in line]
             tag, value, typeName = decoded_line
             if typeName in ['XmpBag', 'XmpSeq']:
-                value = value.split(separator)
+                value = value.split(', ')
 
             # Get the value of the tag
             # Convert the values to a list of strings if the tag has multiple values
@@ -121,10 +117,16 @@ class Image:
         """ Convert the metadata dict into a table. """
         table = []
         for tag, value in data.items():
-            typeName = 'str'
-            if isinstance(value, (list, tuple)):
+            tag      = str(tag)
+            if value == None:
+                typeName = '_delete'
+                value    = ''
+            elif isinstance(value, (list, tuple)):
                 typeName = 'array'
-                value = separator.join(value)
+                value    = list(value)
+            else:
+                typeName = 'string'
+                value    = str(value)
             line = [tag, value, typeName]
             table.append(line)
         return table
