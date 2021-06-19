@@ -85,7 +85,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-11]
+        os: [macos-10.15]
         python_version: [3.5, 3.6, 3.7, 3.8, 3.9]
     runs-on: ${{ matrix.os }}
     env:
