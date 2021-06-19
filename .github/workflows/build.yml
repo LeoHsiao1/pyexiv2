@@ -1,11 +1,11 @@
-# Build pyexiv2 on Linux, MacOS, and Windows.
+# Build pyexiv2 on Linux, MacOS, and Windows, then test.
 
 name: Build
 
 on:
-  # push:
-  #   branches:
-  #     - master
+  push:
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:

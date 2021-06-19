@@ -1,6 +1,6 @@
-# Each time you push, run the test cases in current commit.
+# Run the test cases for each commit, without build.
 
-name: Test push
+name: Test
 
 on:
   push:
