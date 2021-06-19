@@ -250,6 +250,7 @@ public:
             std::string key = py::bytes(line[0].attr("encode")(encoding));
             std::string value = py::bytes(line[1].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
+            Exiv2::Value::AutoPtr parsed_value;
 
             Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
             if (key_pos != xmpData.end())
@@ -261,12 +262,14 @@ public:
             {
                 int pos = 0;
                 int separator_pos = 0;
+                parsed_value = Exiv2::Value::create(Exiv2::xmpSeq);
                 while (separator_pos != std::string::npos)
                 {
                     separator_pos = value.find(separator, pos);
-                    xmpData[key] = value.substr(pos, separator_pos - pos);
+                    parsed_value->read(value.substr(pos, separator_pos - pos));
                     pos = separator_pos + separator.length();
                 }
+                xmpData.add(Exiv2::XmpKey(key), parsed_value.get());
             }
             else
                 xmpData[key] = value;
