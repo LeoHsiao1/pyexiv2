@@ -115,6 +115,14 @@ def test_modify_xmp():
     check_the_copy_of_img(diff_dict, expected_result, 'read_xmp')
 
 
+def test_modify_raw_xmp():
+    ENV.img.clear_xmp()
+    ENV.img.modify_raw_xmp(reference.RAW_XMP)
+    diff_text(reference.RAW_XMP, ENV.img.read_raw_xmp())
+    check_the_copy_of_img(diff_text, reference.RAW_XMP, 'read_raw_xmp')
+    test_read_xmp()
+
+
 def test_modify_comment():
     comment = 'Hello!  \n你好！\n' * 1000
     ENV.img.modify_comment(comment)
