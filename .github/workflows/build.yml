@@ -19,9 +19,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       PLATFORM_NAME: linux
-      EXIV2_BUILD_NAME: exiv2-0.27.2-Linux64
+      EXIV2_VERSION: 0.27.4
+      EXIV2_BUILD_NAME: exiv2-0.27.4-Linux64
       EXIV2_BUILD_EXT: .tar.gz
-      PYTHON_VERSION: ${{ matrix.python_version }}
+      PYTHON_VERSION: ${{matrix.python_version}}
     steps:
     - name: Set environment variables
       run: |
@@ -38,7 +39,7 @@ jobs:
       run: |
         curl -O   $EXIV2_BUILDS_URL
         tar  -zxf ${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT}
-        cp   -f   $EXIV2_DIR/lib/libexiv2.so.0.27.2   $LIB_DIR/libexiv2.so
+        cp   -f   $EXIV2_DIR/lib/libexiv2.so.${EXIV2_VERSION}   $LIB_DIR/libexiv2.so
 
     - name: Set up Python ${{ matrix.python_version }}
       uses: actions/setup-python@v2
@@ -88,7 +89,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       PLATFORM_NAME: darwin
-      EXIV2_BUILD_NAME: exiv2-0.27.2-Darwin
+      EXIV2_VERSION: 0.27.4
+      EXIV2_BUILD_NAME: exiv2-0.27.4-Darwin
       EXIV2_BUILD_EXT: .tar.gz
       PYTHON_VERSION: ${{ matrix.python_version }}
     steps:
@@ -107,7 +109,7 @@ jobs:
       run: |
         curl -O   $EXIV2_BUILDS_URL
         tar  -zxf ${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT}
-        cp   -f   $EXIV2_DIR/lib/libexiv2.0.27.2.dylib  $LIB_DIR/libexiv2.dylib
+        cp   -f   $EXIV2_DIR/lib/libexiv2.${EXIV2_VERSION}.dylib  $LIB_DIR/libexiv2.dylib
 
     - name: Set up Python ${{ matrix.python_version }}
       uses: actions/setup-python@v2
@@ -159,7 +161,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       PLATFORM_NAME: win
-      EXIV2_BUILD_NAME: exiv2-0.27.2-2017msvc64
+      EXIV2_VERSION: 0.27.4
+      EXIV2_BUILD_NAME: exiv2-0.27.4-2017msvc64
       EXIV2_BUILD_EXT: .zip
       PYTHON_VERSION: ${{ matrix.python_version }}
     steps:
