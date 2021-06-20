@@ -67,7 +67,7 @@ make_wheels
 
 # Make wheel packages for MacOS platform
 plat_tag=darwin
-plat_name=macosx_10_14_x86_64
+plat_name=macosx_10_15_x86_64
 rm_files='libexiv2.so  exiv2.dll'
 make_wheels
 
