@@ -11,6 +11,7 @@ on:
 jobs:
   job1:
     name: Build on Linux
+    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -82,6 +83,7 @@ jobs:
 
   job2:
     name: Build on MacOS
+    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -153,7 +155,6 @@ jobs:
 
   job3:
     name: Build on Windows
-    if: false                 # TODO: disable this job until you finish writing the build step
     strategy:
       fail-fast: false
       matrix:
@@ -163,7 +164,7 @@ jobs:
     env:
       PLATFORM_NAME: win
       EXIV2_VERSION: 0.27.4
-      EXIV2_BUILD_NAME: exiv2-0.27.4-2017msvc64
+      EXIV2_BUILD_NAME: exiv2-0.27.4-2019msvc64
       EXIV2_BUILD_EXT: .zip
       PYTHON_VERSION: ${{ matrix.python_version }}
     steps:
@@ -192,12 +193,13 @@ jobs:
       run: |
         python -m pip install pybind11 pytest psutil
 
-    # TODO: how to install cl.exe to build
+    # TODO: how to build with cl.exe
     - name: Build
       run: |
         cd      %LIB_DIR%
         rm -rf  %SUB_LIB_DIR%
         mkdir   %SUB_LIB_DIR%
+        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         set PY_HOME=%APPDATA%\..\Local\Programs\Python\Python3%PYTHON_VERSION%
         cl /MD /LD exiv2api.cpp /EHsc ^
           -I %EXIV2_DIR%\include ^
