@@ -36,10 +36,23 @@ TOC:
       ...
       ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.so'))
       self._handle = _dlopen(self._name, mode)
-  OSError: /lib64/libm.so.6: version `GLIBC_2.29' not found (required by /usr/local/lib/python3.6/site-packages/pyexiv2/lib/libexiv2.so)
+  OSError: /lib64/libm.so.6: version `GLIBC_2.29' not found (required by /usr/local/lib/python3.8/site-packages/pyexiv2/lib/libexiv2.so)
   ```
   - This is because pyexiv2 was compiled with GLIBC 2.29, which was released in January 2019. You need to upgrade your GLIBC library, or upgrade your Linux distribution.
   - You can execute `ldd --version` to see the version of the GLIBC library.
+
+- When using pyexiv2 on MacOS, you may encounter the following exception:
+  ```py
+  >>> import pyexiv2
+  Traceback (most recent call last):
+      ...
+      ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.dylib'))
+      self._handle = _dlopen(self._name, mode)
+  OSError: dlopen(/Library/Python/3.8/site-packages/pyexiv2/lib/libexiv2.dylib, 6): Library not loaded: /usr/local/lib/libintl.8.dylib
+  Referenced from: /Library/Python/3.8/site-packages/pyexiv2/lib/libexiv2.dylib
+  Reason: image not found
+  ```
+  - This is because libintl.8.dylib is missing. You need to execute `brew install gettext` .
 
 - When using pyexiv2 on Windows, you may encounter the following exception:
   ```py
@@ -50,7 +63,7 @@ TOC:
       self._handle = _dlopen(self._name, mode)
   FileNotFoundError: Could not find module '...\lib\site-packages\pyexiv2\lib\exiv2.dll' (or one of its dependencies). Try using the full path with constructor syntax.
   ```
-  - This is because the exiv2.dll file for the path does not exist, or Windows PC need to install [Microsoft Visual C++ 2015-2019](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019).
+  - This is because the exiv2.dll file for the path does not exist, or you need to install [Microsoft Visual C++ 2015-2019](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019).
 
 ## API list
 
