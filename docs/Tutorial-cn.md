@@ -7,7 +7,9 @@
 
 <!-- code_chunk_output -->
 
-- [API列表](#api列表)
+- [安装](#安装)
+  - [常见问题](#常见问题)
+- [API 列表](#api-列表)
 - [类 Image](#类-image)
   - [Image.read_*()](#imageread_)
   - [Image.modify_*()](#imagemodify_)
@@ -19,7 +21,38 @@
 
 <!-- /code_chunk_output -->
 
-## API列表
+## 安装
+
+- pyexiv2 是一个 Python 第三方库，基于 C++ 和 Python 开发。
+- 你可以执行 `pip install pyexiv2` 来安装 pyexiv2 的已编译包，它支持运行在 Linux、MacOS 和 Windows 上，采用 CPython 解释器（64 bit，包括 `3.5` `3.6` `3.7` `3.8` `3.9`）。
+- 如果你想在其它平台上运行 pyexiv2 ，你可以下载源代码然后编译它。参考 [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md)。
+
+### 常见问题
+
+- 在 Linux 上使用 pyexiv2 时，你可能遇到以下异常：
+  ```py
+  >>> import pyexiv2
+  Traceback (most recent call last):
+      ...
+      ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.so'))
+      self._handle = _dlopen(self._name, mode)
+  OSError: /lib64/libm.so.6: version `GLIBC_2.29' not found (required by /usr/local/lib/python3.6/site-packages/pyexiv2/lib/libexiv2.so)
+  ```
+  - 这是因为 pyexiv2 在编译时使用了 GLIBC 2.29 ，它在 2019 年 1 月发布。你需要升级你的 GLIBC 库，或者升级 Linux 发行版。
+  - 你可以执行 `ldd --version` 查看 GLIBC 库的版本。
+
+- 在 Windows 上使用 pyexiv2 时，你可能遇到以下异常：
+  ```py
+  >>> import pyexiv2
+  Traceback (most recent call last):
+      ...
+      ctypes.CDLL(os.path.join(lib_dir, 'exiv2.dll'))
+      self._handle = _dlopen(self._name, mode)
+  FileNotFoundError: Could not find module '...\lib\site-packages\pyexiv2\lib\exiv2.dll' (or one of its dependencies). Try using the full path with constructor syntax.
+  ```
+  - 这是因为该路径的 exiv2.dll 文件不存在，或者 Windows 电脑需要安装 [Microsoft Visual C++ Redistributable for Visual Studio 2019](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019)
+
+## API 列表
 
 ```py
 class Image:

@@ -7,6 +7,8 @@ TOC:
 
 <!-- code_chunk_output -->
 
+- [Install](#install)
+  - [FAQ](#faq)
 - [API list](#api-list)
 - [class Image](#class-image)
   - [Image.read_*()](#imageread_)
@@ -18,6 +20,37 @@ TOC:
 - [Log](#log)
 
 <!-- /code_chunk_output -->
+
+## Installation
+
+- pyexiv2 is a third party library for Python, based on C++ and Python.
+- You can execute `pip install pyexiv2` to install the compiled package of pyexiv2, which supports running on Linux, MacOS and Windows, with CPython interpreter(64bit, including `3.5` `3.6` `3.7` `3.8` `3.9`).
+- If you want to run pyexiv2 on another platform, You can download the source code and compile it. See [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md).
+
+### FAQ
+
+- When using pyexiv2 on Linux, you may encounter the following exception:
+  ```py
+  >>> import pyexiv2
+  Traceback (most recent call last):
+      ...
+      ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.so'))
+      self._handle = _dlopen(self._name, mode)
+  OSError: /lib64/libm.so.6: version `GLIBC_2.29' not found (required by /usr/local/lib/python3.6/site-packages/pyexiv2/lib/libexiv2.so)
+  ```
+  - This is because pyexiv2 was compiled with GLIBC 2.29, which was released in January 2019. You need to upgrade your GLIBC library, or upgrade your Linux distribution.
+  - You can execute `ldd --version` to see the version of the GLIBC library.
+
+- When using pyexiv2 on Windows, you may encounter the following exception:
+  ```py
+  >>> import pyexiv2
+  Traceback (most recent call last):
+      ...
+      ctypes.CDLL(os.path.join(lib_dir, 'exiv2.dll'))
+      self._handle = _dlopen(self._name, mode)
+  FileNotFoundError: Could not find module '...\lib\site-packages\pyexiv2\lib\exiv2.dll' (or one of its dependencies). Try using the full path with constructor syntax.
+  ```
+  - This is because the exiv2.dll file for the path does not exist, or Windows PC need to install [Microsoft Visual C++ Redistributable for Visual Studio 2019](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019).
 
 ## API list
 
