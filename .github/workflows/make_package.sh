@@ -55,17 +55,11 @@ make_wheels(){
         rm -rf $TEST_DIR
         cd $LIB_DIR
         ls $EXIV2_LIB_FILES | grep -v $EXIV2_LIB_FILE | xargs rm -f
-        find . -maxdepth 1 -type d -name 'py3*' | grep -v py3${version}-${plat_type} | xargs rm -rf
+        find . -maxdepth 1 -type d -name 'py3.*' | grep -v py3.${version}-${plat_type} | xargs rm -rf
         cd $WORK_DIR
         python3 setup.py bdist_wheel --python-tag cp3${version}  --plat-name ${plat_name}
     done
 }
-
-## Make wheel packages for any platform
-# plat_type=
-# plat_name=any
-# EXIV2_LIB_FILE=$EXIV2_LIB_FILES
-# make_wheels
 
 # Make wheel packages for Linux platform
 plat_type=linux
