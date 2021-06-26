@@ -36,7 +36,7 @@
 
 2. Prepare the environment:
     ```sh
-    EXIV2_DIR=/root/exiv2-0.27.4-Linux64   # According to your download location
+    EXIV2_DIR=/mnt/c/Users/Leo/Downloads/exiv2-0.27.4-Linux64   # According to your download location
     LIB_DIR=$PWD/pyexiv2/lib/
     cp $EXIV2_DIR/lib/libexiv2.so.0.27.4  $EXIV2_DIR/lib/libexiv2.so
     cp $EXIV2_DIR/lib/libexiv2.so.0.27.4  $LIB_DIR/libexiv2.so
@@ -45,7 +45,6 @@
 3. Set up the python interpreter. For example:
     ```sh
     py_version=8
-    # docker run -it --rm --name python3.$py_version -e "py_version=$py_version" -e "EXIV2_DIR=$EXIV2_DIR" -e "LIB_DIR=$LIB_DIR" -v /root:/root python:3.$py_version-buster sh
     python3.$py_version -m pip install pybind11
     ```
 

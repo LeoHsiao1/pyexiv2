@@ -41,6 +41,19 @@
   - 这是因为 pyexiv2 在编译时使用了 GLIBC 2.29 ，它在 2019 年 1 月发布。你需要升级你的 GLIBC 库，或者升级 Linux 发行版。
   - 你可以执行 `ldd --version` 查看 GLIBC 库的版本。
 
+- 在 MacOS 上使用 pyexiv2 时，你可能遇到以下异常：
+  ```py
+  >>> import pyexiv2
+  Traceback (most recent call last):
+      ...
+      ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.dylib'))
+      self._handle = _dlopen(self._name, mode)
+  OSError: dlopen(/Library/Python/3.8/site-packages/pyexiv2/lib/libexiv2.dylib, 6): Library not loaded: /usr/local/lib/libintl.8.dylib
+  Referenced from: /Library/Python/3.8/site-packages/pyexiv2/lib/libexiv2.dylib
+  Reason: image not found
+  ```
+  - 这是因为 libintl.8.dylib 不存在。你需要执行 `brew install gettext` 。
+
 - 在 Windows 上使用 pyexiv2 时，你可能遇到以下异常：
   ```py
   >>> import pyexiv2
@@ -50,7 +63,7 @@
       self._handle = _dlopen(self._name, mode)
   FileNotFoundError: Could not find module '...\lib\site-packages\pyexiv2\lib\exiv2.dll' (or one of its dependencies). Try using the full path with constructor syntax.
   ```
-  - 这是因为该路径的 exiv2.dll 文件不存在，或者 Windows 电脑需要安装 [Microsoft Visual C++ Redistributable for Visual Studio 2019](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019)
+  - 这是因为该路径的 exiv2.dll 文件不存在，或者你需要安装 [Microsoft Visual C++ 2015-20199](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019)
 
 ## API 列表
 
@@ -85,7 +98,8 @@ class ImageData(Image):
     def get_bytes(self) -> bytes
 
 
-set_log_level(level=2)
+def enableBMFF(enable=True)
+def set_log_level(level=2)
 ```
 
 ## 类 Image
@@ -127,6 +141,8 @@ set_log_level(level=2)
 - 使用 `Image.read_*()` 是安全的。这些方法永远不会影响图片文件（md5不变）。
 - 如果 XMP 元数据包含 `\v` 或 `\f`，它将被空格 ` ` 代替。
 - 元数据的读取速度与元数据的数量成反比，不管图片的大小如何。
+- 访问 BMFF 文件（CR3、HEIF、HEIC 和 AVIF）的功能默认是禁用的，可以通过调用 `pyexiv2.enableBMFF()` 来启用。
+    > 注意：BMFF 文件可能涉及到专利权。pyexiv2 不负责识别任何此类专利权。pyexiv2 不对使用此代码所产生的法律后果负责。
 
 ### Image.modify_*()
 

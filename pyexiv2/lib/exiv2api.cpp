@@ -8,36 +8,11 @@ namespace py = pybind11;
 const char *EXCEPTION_HINT = "Caught Exiv2 exception: ";
 std::stringstream error_log;
 
-class Buffer{
-public:
-    char *data;
-    long size;
-
-    Buffer(const char *data_, long size_){
-        size = size_;
-        data = (char *)calloc(size, sizeof(char));
-        if(data == NULL)
-            throw std::runtime_error("Failed to allocate memory.");
-        memcpy(data, data_, size);
-    }
-
-    void destroy(){
-        if(data){
-            free(data);
-            data = NULL;
-        }
-    }
-
-    py::bytes dump(){
-        return py::bytes((char *)data, size);
-    }
-};
-
 void check_error_log()
 {
     std::string str = error_log.str();
     if(str != ""){
-        error_log.clear();  // Clear it so it can be used again
+        error_log.clear();  // Clear it so that it can be used again
         error_log.str("");
         throw std::runtime_error(str);
     }
@@ -83,6 +58,16 @@ void init()
     Exiv2::LogMsg::setHandler(logHandler);
 }
 
+py::str version()
+{
+    return Exiv2::version();
+}
+
+bool enableBMFF(bool enable)
+{
+    return Exiv2::enableBMFF(enable);
+}
+
 #define read_block                                                     \
     {                                                                  \
         py::list table;                                                \
@@ -102,6 +87,31 @@ void init()
         check_error_log();                                             \
         return table;                                                  \
     }
+
+class Buffer{
+public:
+    char *data;
+    long size;
+
+    Buffer(const char *data_, long size_){
+        size = size_;
+        data = (char *)calloc(size, sizeof(char));
+        if(data == NULL)
+            throw std::runtime_error("Failed to allocate memory.");
+        memcpy(data, data_, size);
+    }
+
+    void destroy(){
+        if(data){
+            free(data);
+            data = NULL;
+        }
+    }
+
+    py::bytes dump(){
+        return py::bytes((char *)data, size);
+    }
+};
 
 class Image{
 public:
@@ -348,13 +358,14 @@ public:
     }
 };
 
-
-// Convert this CPP file into a Python module. Declares the API that needs to be mapped.
+// Declare the API that needs to be mapped, to convert this CPP file into a Python module.
 PYBIND11_MODULE(exiv2api, m)
 {
     m.doc() = "Expose the API of exiv2 to Python.";
     m.def("set_log_level", &set_log_level);
     m.def("init"         , &init);
+    m.def("version"      , &version);
+    m.def("enableBMFF"   , &enableBMFF);
     py::class_<Buffer>(m, "Buffer")
         .def(py::init<const char *, long>())
         .def_readonly("data"      , &Buffer::data)

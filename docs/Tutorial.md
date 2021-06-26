@@ -7,7 +7,7 @@ TOC:
 
 <!-- code_chunk_output -->
 
-- [Install](#install)
+- [Installation](#installation)
   - [FAQ](#faq)
 - [API list](#api-list)
 - [class Image](#class-image)
@@ -24,7 +24,7 @@ TOC:
 ## Installation
 
 - pyexiv2 is a third party library for Python, based on C++ and Python.
-- You can execute `pip install pyexiv2` to install the compiled package of pyexiv2, which supports running on Linux, MacOS and Windows, with CPython interpreter(64bit, including `3.5` `3.6` `3.7` `3.8` `3.9`).
+- You can execute `pip install pyexiv2` to install the compiled package of pyexiv2, which supports running on Linux, MacOS and Windows, with CPython interpreter(x64, including `3.5` `3.6` `3.7` `3.8` `3.9`).
 - If you want to run pyexiv2 on another platform, You can download the source code and compile it. See [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md).
 
 ### FAQ
@@ -36,10 +36,23 @@ TOC:
       ...
       ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.so'))
       self._handle = _dlopen(self._name, mode)
-  OSError: /lib64/libm.so.6: version `GLIBC_2.29' not found (required by /usr/local/lib/python3.6/site-packages/pyexiv2/lib/libexiv2.so)
+  OSError: /lib64/libm.so.6: version `GLIBC_2.29' not found (required by /usr/local/lib/python3.8/site-packages/pyexiv2/lib/libexiv2.so)
   ```
   - This is because pyexiv2 was compiled with GLIBC 2.29, which was released in January 2019. You need to upgrade your GLIBC library, or upgrade your Linux distribution.
   - You can execute `ldd --version` to see the version of the GLIBC library.
+
+- When using pyexiv2 on MacOS, you may encounter the following exception:
+  ```py
+  >>> import pyexiv2
+  Traceback (most recent call last):
+      ...
+      ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.dylib'))
+      self._handle = _dlopen(self._name, mode)
+  OSError: dlopen(/Library/Python/3.8/site-packages/pyexiv2/lib/libexiv2.dylib, 6): Library not loaded: /usr/local/lib/libintl.8.dylib
+  Referenced from: /Library/Python/3.8/site-packages/pyexiv2/lib/libexiv2.dylib
+  Reason: image not found
+  ```
+  - This is because libintl.8.dylib is missing. You need to execute `brew install gettext` .
 
 - When using pyexiv2 on Windows, you may encounter the following exception:
   ```py
@@ -50,7 +63,7 @@ TOC:
       self._handle = _dlopen(self._name, mode)
   FileNotFoundError: Could not find module '...\lib\site-packages\pyexiv2\lib\exiv2.dll' (or one of its dependencies). Try using the full path with constructor syntax.
   ```
-  - This is because the exiv2.dll file for the path does not exist, or Windows PC need to install [Microsoft Visual C++ Redistributable for Visual Studio 2019](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019).
+  - This is because the exiv2.dll file for the path does not exist, or you need to install [Microsoft Visual C++ 2015-2019](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019).
 
 ## API list
 
@@ -85,7 +98,8 @@ class ImageData(Image):
     def get_bytes(self) -> bytes
 
 
-set_log_level(level=2)
+def enableBMFF(enable=True)
+def set_log_level(level=2)
 ```
 
 ## class Image
@@ -127,6 +141,8 @@ set_log_level(level=2)
 - It is safe to use `Image.read_*()`. These methods never affect image files (md5 unchanged).
 - If the XMP metadata contains `\v` or `\f`, it will be replaced with space ` `.
 - The speed of reading metadata is inversely proportional to the amount of metadata, regardless of the size of the image.
+- Access to BMFF files (CR3, HEIF, HEIC, and AVIF) is disabled by default, which can be enabled by calling `pyexiv2.enableBMFF()`.
+    > Attention: BMFF Support may be the subject of patent rights. pyexiv2 shall not be held responsible for identifying any such patent rights. pyexiv2 shall not be held responsible for the legal consequences of the use of this code.
 
 ### Image.modify_*()
 

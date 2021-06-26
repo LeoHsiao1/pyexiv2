@@ -1,3 +1,8 @@
+import pyexiv2
+
+pyexiv2.exiv2api.version()
+
+
 from pyexiv2 import Image
 
 img = Image(r'.\pyexiv2\tests\1.jpg')
