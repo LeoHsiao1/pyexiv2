@@ -6,12 +6,13 @@
 # If you execute this script in WSL, you need to grant "Full control" to "Authenticated Users" in the Windows File settings for the folder.
 ######
 
-set -e
+set -eu
 echo WORK_DIR: `pwd`
 
 WORK_DIR=`pwd`
 LIB_DIR=`pwd`/pyexiv2/lib
 TEST_DIR=`pwd`/pyexiv2/tests
+EXIV2_LIB_FILES='libexiv2.so  libexiv2.dylib  exiv2.dll'
 
 if [ ! -f setup.py ]
 then
@@ -34,7 +35,7 @@ rm -rf dist/*
 ## Make a source package without compiled files
 # reset_workdir
 # cd $LIB_DIR
-# rm -rf libexiv2.so  libexiv2.dylib  exiv2.dll  py3*
+# rm -rf  $EXIV2_LIB_FILES  py3*
 # cd $WORK_DIR
 # python3 setup.py sdist
 
@@ -52,7 +53,7 @@ make_wheels(){
         reset_workdir
         rm -rf $TEST_DIR
         cd $LIB_DIR
-        rm -rf $rm_files
+        ls $EXIV2_LIB_FILES | grep -v $EXIV2_LIB_FILE | xargs rm -f
         find . -maxdepth 1 -type d -name 'py3*' | grep -v py3${version}-${plat_type} | xargs rm -rf
         cd $WORK_DIR
         python3 setup.py bdist_wheel --python-tag cp3${version}  --plat-name ${plat_name}
@@ -62,25 +63,25 @@ make_wheels(){
 ## Make wheel packages for any platform
 # plat_type=
 # plat_name=any
-# rm_files=''
+# EXIV2_LIB_FILE=$EXIV2_LIB_FILES
 # make_wheels
 
 ## Make wheel packages for Linux platform
 plat_type=linux
 plat_name=manylinux2014_x86_64
-rm_files='libexiv2.dylib  exiv2.dll'
+EXIV2_LIB_FILE='libexiv2.so'
 make_wheels
 
 ## Make wheel packages for MacOS platform
 plat_type=darwin
 plat_name=macosx_10_14_x86_64.macosx_11_0_x86_64
-rm_files='libexiv2.so  exiv2.dll'
+EXIV2_LIB_FILE='libexiv2.dylib'
 make_wheels
 
 ## Make wheel packages for Windows platform
 plat_type=win
 plat_name=win_amd64
-rm_files='libexiv2.so  libexiv2.dylib'
+EXIV2_LIB_FILE='exiv2.dll'
 make_wheels
 
 reset_workdir
