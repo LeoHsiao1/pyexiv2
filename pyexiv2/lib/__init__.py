@@ -18,7 +18,7 @@ lib_dir = os.path.dirname(__file__)
 # Recognize the system
 sys_name = platform.system() or 'Unknown'
 if sys_name == 'Linux':
-    ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.so')) # import the exiv2 library at first, otherwise the Python interpreter can not find it.
+    ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.so'))
     sys.path.append(os.path.join(lib_dir, 'py{}-linux'.format(py_version.replace('.', ''))))
     import exiv2api
 elif sys_name == 'Darwin':

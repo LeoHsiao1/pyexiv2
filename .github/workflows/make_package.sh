@@ -26,19 +26,19 @@ reset_workdir(){
 }
 
 # Install dependencies
-# python3 -m pip install setuptools wheel twine 
+python3 -m pip install setuptools wheel twine 
 
 # Clear dist directory
 rm -rf dist/*
 
-# Make a source package without 
-reset_workdir
-cd $LIB_DIR
-rm -rf libexiv2.so  libexiv2.dylib  exiv2.dll  py3*  # remove all compiled files
-cd $WORK_DIR
-python3 setup.py sdist
+## Make a source package without compiled files
+# reset_workdir
+# cd $LIB_DIR
+# rm -rf libexiv2.so  libexiv2.dylib  exiv2.dll  py3*
+# cd $WORK_DIR
+# python3 setup.py sdist
 
-# Make a wheel package that contains all compiled files
+## Make a wheel package that contains all compiled files
 # reset_workdir
 # rm -rf $TEST_DIR
 # python3 setup.py bdist_wheel --python-tag cp3
@@ -53,33 +53,37 @@ make_wheels(){
         rm -rf $TEST_DIR
         cd $LIB_DIR
         rm -rf $rm_files
-        find . -maxdepth 1 -type d -name 'py3*' | grep -v py3${version}-${plat_tag} | xargs rm -rf
+        find . -maxdepth 1 -type d -name 'py3*' | grep -v py3${version}-${plat_type} | xargs rm -rf
         cd $WORK_DIR
         python3 setup.py bdist_wheel --python-tag cp3${version}  --plat-name ${plat_name}
     done
 }
 
-# Make wheel packages for Linux platform
-plat_tag=linux
-plat_name=manylinux1_x86_64
+## Make wheel packages for any platform
+# plat_type=
+# plat_name=any
+# rm_files=''
+# make_wheels
+
+## Make wheel packages for Linux platform
+plat_type=linux
+plat_name=manylinux2014_x86_64
 rm_files='libexiv2.dylib  exiv2.dll'
 make_wheels
 
-# Make wheel packages for MacOS platform
-plat_tag=darwin
-plat_name=macosx_10_15_x86_64
+## Make wheel packages for MacOS platform
+plat_type=darwin
+plat_name=macosx_10_14_x86_64.macosx_11_0_x86_64
 rm_files='libexiv2.so  exiv2.dll'
 make_wheels
 
-# Make wheel packages for Windows platform
-plat_tag=win
+## Make wheel packages for Windows platform
+plat_type=win
 plat_name=win_amd64
 rm_files='libexiv2.so  libexiv2.dylib'
 make_wheels
-
 
 reset_workdir
 
 # upload to pypi.org
 twine upload dist/*
-
