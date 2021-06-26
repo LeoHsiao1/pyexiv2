@@ -7,7 +7,7 @@ TOC:
 
 <!-- code_chunk_output -->
 
-- [Install](#install)
+- [Installation](#installation)
   - [FAQ](#faq)
 - [API list](#api-list)
 - [class Image](#class-image)
@@ -24,7 +24,7 @@ TOC:
 ## Installation
 
 - pyexiv2 is a third party library for Python, based on C++ and Python.
-- You can execute `pip install pyexiv2` to install the compiled package of pyexiv2, which supports running on Linux, MacOS and Windows, with CPython interpreter(64bit, including `3.5` `3.6` `3.7` `3.8` `3.9`).
+- You can execute `pip install pyexiv2` to install the compiled package of pyexiv2, which supports running on Linux, MacOS and Windows, with CPython interpreter(x64, including `3.5` `3.6` `3.7` `3.8` `3.9`).
 - If you want to run pyexiv2 on another platform, You can download the source code and compile it. See [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md).
 
 ### FAQ
@@ -50,7 +50,7 @@ TOC:
       self._handle = _dlopen(self._name, mode)
   FileNotFoundError: Could not find module '...\lib\site-packages\pyexiv2\lib\exiv2.dll' (or one of its dependencies). Try using the full path with constructor syntax.
   ```
-  - This is because the exiv2.dll file for the path does not exist, or Windows PC need to install [Microsoft Visual C++ Redistributable for Visual Studio 2019](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019).
+  - This is because the exiv2.dll file for the path does not exist, or Windows PC need to install [Microsoft Visual C++ 2015-2019](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019).
 
 ## API list
 
