@@ -61,12 +61,6 @@ make_wheels(){
     done
 }
 
-## Make wheel packages for any platform
-# plat_type=
-# plat_name=any
-# EXIV2_LIB_FILE=$EXIV2_LIB_FILES
-# make_wheels
-
 # Make wheel packages for Linux platform
 plat_type=linux
 plat_name=manylinux2014_x86_64
