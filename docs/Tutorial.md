@@ -98,7 +98,8 @@ class ImageData(Image):
     def get_bytes(self) -> bytes
 
 
-set_log_level(level=2)
+def enableBMFF(enable=True)
+def set_log_level(level=2)
 ```
 
 ## class Image
@@ -140,6 +141,8 @@ set_log_level(level=2)
 - It is safe to use `Image.read_*()`. These methods never affect image files (md5 unchanged).
 - If the XMP metadata contains `\v` or `\f`, it will be replaced with space ` `.
 - The speed of reading metadata is inversely proportional to the amount of metadata, regardless of the size of the image.
+- Access to BMFF files (CR3, HEIF, HEIC, and AVIF) is disabled by default, which can be enabled by calling `pyexiv2.enableBMFF()`.
+    > Attention: BMFF Support may be the subject of patent rights. pyexiv2 shall not be held responsible for identifying any such patent rights. pyexiv2 shall not be held responsible for the legal consequences of the use of this code.
 
 ### Image.modify_*()
 
