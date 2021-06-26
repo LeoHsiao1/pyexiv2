@@ -7,18 +7,19 @@
 ######
 
 set -eu
-echo WORK_DIR: `pwd`
-
-WORK_DIR=`pwd`
-LIB_DIR=`pwd`/pyexiv2/lib
-TEST_DIR=`pwd`/pyexiv2/tests
-EXIV2_LIB_FILES='libexiv2.so  libexiv2.dylib  exiv2.dll'
+WORK_DIR=`git rev-parse --show-toplevel`
+echo WORK_DIR: $WORK_DIR
 
 if [ ! -f setup.py ]
 then
-    echo '[ERROR] The current directory is not the project root directory.'
+    echo '[ERROR] WORK_DIR is valid.'
     exit 1
 fi
+
+LIB_DIR=$WORK_DIR/pyexiv2/lib
+TEST_DIR=$WORK_DIR/pyexiv2/tests
+DIST_DIR=$WORK_DIR/dist
+EXIV2_LIB_FILES='libexiv2.so  libexiv2.dylib  exiv2.dll'
 
 reset_workdir(){
     cd $WORK_DIR
@@ -30,7 +31,7 @@ reset_workdir(){
 python3 -m pip install setuptools wheel twine 
 
 # Clear dist directory
-rm -rf dist/*
+rm -rf $DIST_DIR/*
 
 ## Make a source package without compiled files
 # reset_workdir
@@ -43,7 +44,7 @@ rm -rf dist/*
 # reset_workdir
 # rm -rf $TEST_DIR
 # python3 setup.py bdist_wheel --python-tag cp3
-# cd dist
+# cd $DIST_DIR
 # whl_name=`ls *cp3-none-any.whl`
 # mv $whl_name ${whl_name/-none-any/}
 
@@ -66,19 +67,25 @@ make_wheels(){
 # EXIV2_LIB_FILE=$EXIV2_LIB_FILES
 # make_wheels
 
-## Make wheel packages for Linux platform
+# Make wheel packages for Linux platform
 plat_type=linux
 plat_name=manylinux2014_x86_64
 EXIV2_LIB_FILE='libexiv2.so'
 make_wheels
 
-## Make wheel packages for MacOS platform
+# Make wheel packages for MacOS platform
 plat_type=darwin
-plat_name=macosx_10_14_x86_64.macosx_11_0_x86_64
+plat_name=macosx_10_14_x86_64
 EXIV2_LIB_FILE='libexiv2.dylib'
 make_wheels
+# Add plat_name for MacOS platform
+cd $DIST_DIR
+for f in `ls | grep ${plat_name}`
+do
+    mv  $f  ${f/.whl/.macosx_11_0_x86_64.whl}
+done
 
-## Make wheel packages for Windows platform
+# Make wheel packages for Windows platform
 plat_type=win
 plat_name=win_amd64
 EXIV2_LIB_FILE='exiv2.dll'
@@ -87,4 +94,4 @@ make_wheels
 reset_workdir
 
 # upload to pypi.org
-twine upload dist/*
+twine upload $DIST_DIR/*
