@@ -205,5 +205,9 @@ def set_log_level(level=2):
         raise ValueError('Invalid log level.')
 
 
+def enableBMFF(enable=True):
+    return exiv2api.enableBMFF(enable)
+
+
 exiv2api.init()
 set_log_level(2)
