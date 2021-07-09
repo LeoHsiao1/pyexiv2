@@ -13,12 +13,14 @@ from . import data
 
 
 class ENV:
+    skip_test       = False
     pyexiv2_module  = os.environ.get('PYEXIV2_MODULE', '..')
     test_dir        = os.path.dirname(__file__)
+    test_data_dir   = os.path.join(test_dir, 'data')
     original_img    = os.path.join(test_dir, '1.jpg')
     test_img        = os.path.join(test_dir, 'test.jpg')
     test_img_copy   = os.path.join(test_dir, 'test-copy.jpg')
-    skip_test       = False
+    heic_img        = os.path.join(test_data_dir, '1.heic')
 
 
 if   ENV.pyexiv2_module == '..':
@@ -52,7 +54,7 @@ def diff_dict(dict1, dict2):
 
 
 def check_img_md5():
-    with open(ENV.original_img, "rb") as f1, open(ENV.test_img, "rb") as f2:
+    with open(ENV.original_img, 'rb') as f1, open(ENV.test_img, 'rb') as f2:
         v1 = hashlib.md5(f1.read()).digest()
         v2 = hashlib.md5(f2.read()).digest()
         assert v1 == v2, 'The MD5 value of the image has changed.'

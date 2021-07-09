@@ -180,3 +180,18 @@ def test_log_level():
     ENV.img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
     set_log_level(2)    # recover the log level
 
+
+def test_enableBMFF():
+    with pytest.raises(RuntimeError):
+        with Image(ENV.heic_img) as img:
+            pass
+
+    assert enableBMFF() == True
+    with Image(ENV.heic_img) as img:
+        assert img.read_exif()
+
+    assert enableBMFF(False) == True
+    with pytest.raises(RuntimeError):
+        with Image(ENV.heic_img) as img:
+            pass
+

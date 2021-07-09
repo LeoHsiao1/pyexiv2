@@ -206,6 +206,7 @@ def set_log_level(level=2):
 
 
 def enableBMFF(enable=True):
+    """ Enable or disable reading BMFF images. Return True on success. """
     return exiv2api.enableBMFF(enable)
 
 
