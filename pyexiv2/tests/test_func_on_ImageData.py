@@ -5,7 +5,7 @@ from .test_func import test_read_exif, test_read_iptc, test_read_xmp, test_read_
 def setup_function():
     if ENV.skip_test:
         pytest.skip()
-    shutil.copy(ENV.original_img, ENV.test_img)  # Before each test, make a temporary copy of the image
+    shutil.copy(ENV.jpg_img, ENV.test_img)  # Before each test, make a temporary copy of the image
     with open(ENV.test_img, 'rb') as f:
         ENV.img = ImageData(f.read())
 
