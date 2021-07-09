@@ -1,6 +1,13 @@
 from .base import *
 
 
+def test_version():
+    try:
+        assert exiv2api.version() == '0.27.4'
+    except:
+        ENV.skip_test = True
+        raise
+
 def test_open_img_by_path():
     try:
         img = Image(ENV.test_img)
@@ -166,7 +173,7 @@ def test_clear_icc():
     check_the_copy_of_img(diff_text, b'', 'read_icc')
 
 
-def test_error_log():
+def test_log_level():
     with pytest.raises(RuntimeError):
         ENV.img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
     set_log_level(4)
