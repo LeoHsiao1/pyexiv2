@@ -20,7 +20,7 @@ def test_modify_exif():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            expected_result = simulate_updating_metadata(reference.EXIF, changes)
+            expected_result = simulate_updating_metadata(data.EXIF, changes)
             result = img.read_exif()
             ignored_keys = ['Exif.Image.ExifTag']
             for key in ignored_keys:
@@ -40,7 +40,7 @@ def test_modify_iptc():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            expected_result = simulate_updating_metadata(reference.IPTC, changes)
+            expected_result = simulate_updating_metadata(data.IPTC, changes)
             diff_dict(expected_result, img.read_iptc())
 
 
@@ -55,7 +55,7 @@ def test_modify_xmp():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            expected_result = simulate_updating_metadata(reference.XMP, changes)
+            expected_result = simulate_updating_metadata(data.XMP, changes)
             diff_dict(expected_result, img.read_xmp())
 
 

@@ -38,4 +38,4 @@ jobs:
         python -c "from pyexiv2 import Image; print(Image.__doc__)"
         pytest -v
       env:
-        NAME_FOR_IMPORT_PYEXIV2: pyexiv2
+        PYEXIV2_MODULE: pyexiv2
