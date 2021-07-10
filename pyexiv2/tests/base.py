@@ -9,28 +9,30 @@ from functools import wraps
 import psutil
 import pytest
 
-from . import reference
+from . import data
 
 
 class ENV:
-    name_for_import_pyexiv2  = os.environ.get('NAME_FOR_IMPORT_PYEXIV2', '..')
-    test_dir      = os.path.dirname(__file__)
-    original_img  = os.path.join(test_dir, '1.jpg')
-    test_img      = os.path.join(test_dir, 'test.jpg')
-    test_img_copy = os.path.join(test_dir, 'test-copy.jpg')
-    skip_test     = False
+    skip_test       = False
+    pyexiv2_module  = os.environ.get('PYEXIV2_MODULE', '..')
+    test_dir        = os.path.dirname(__file__)
+    data_dir        = os.path.join(test_dir, 'data')
+    jpg_img         = os.path.join(data_dir, '1.jpg')
+    heic_img        = os.path.join(data_dir, '1.heic')
+    test_img        = os.path.join(test_dir, 'test.jpg')
+    test_img_copy   = os.path.join(test_dir, 'test-copy.jpg')
 
 
-if   ENV.name_for_import_pyexiv2 == '..':
-    from ..         import Image, ImageData, set_log_level
-elif ENV.name_for_import_pyexiv2 == 'pyexiv2':
-    from pyexiv2    import Image, ImageData, set_log_level
+if   ENV.pyexiv2_module == '..':
+    from ..      import *
+elif ENV.pyexiv2_module == 'pyexiv2':
+    from pyexiv2 import *
 
 
 def setup_function():
     if ENV.skip_test:
         pytest.skip()
-    shutil.copy(ENV.original_img, ENV.test_img)  # Before each test, make a temporary copy of the image
+    shutil.copy(ENV.jpg_img, ENV.test_img)  # Before each test, make a temporary copy of the image
     ENV.img = Image(ENV.test_img)
 
 
@@ -52,7 +54,7 @@ def diff_dict(dict1, dict2):
 
 
 def check_img_md5():
-    with open(ENV.original_img, "rb") as f1, open(ENV.test_img, "rb") as f2:
+    with open(ENV.jpg_img, 'rb') as f1, open(ENV.test_img, 'rb') as f2:
         v1 = hashlib.md5(f1.read()).digest()
         v2 = hashlib.md5(f2.read()).digest()
         assert v1 == v2, 'The MD5 value of the image has changed.'

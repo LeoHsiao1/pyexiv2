@@ -1,6 +1,13 @@
 from .base import *
 
 
+def test_version():
+    try:
+        assert exiv2api.version() == '0.27.4'
+    except:
+        ENV.skip_test = True
+        raise
+
 def test_open_img_by_path():
     try:
         img = Image(ENV.test_img)
@@ -34,38 +41,38 @@ def _test_chinese_path():
     try:
         with Image(chinese_path, encoding='gbk') as img:
             exif = img.read_exif()
-        diff_dict(reference.EXIF, exif)
+        diff_dict(data.EXIF, exif)
     finally:
         os.remove(chinese_path)
 
 
 def test_read_exif():
-    diff_dict(reference.EXIF, ENV.img.read_exif())
+    diff_dict(data.EXIF, ENV.img.read_exif())
     check_img_md5()
 
 
 def test_read_iptc():
-    diff_dict(reference.IPTC, ENV.img.read_iptc())
+    diff_dict(data.IPTC, ENV.img.read_iptc())
     check_img_md5()
 
 
 def test_read_xmp():
-    diff_dict(reference.XMP, ENV.img.read_xmp())
+    diff_dict(data.XMP, ENV.img.read_xmp())
     check_img_md5()
 
 
 def test_read_raw_xmp():
-    diff_text(reference.RAW_XMP, ENV.img.read_raw_xmp())
+    diff_text(data.RAW_XMP, ENV.img.read_raw_xmp())
     check_img_md5()
 
 
 def test_read_comment():
-    diff_text(reference.COMMENT, ENV.img.read_comment())
+    diff_text(data.COMMENT, ENV.img.read_comment())
     check_img_md5()
 
 
 def test_read_icc():
-    diff_text(reference.RGB_ICC, ENV.img.read_icc())
+    diff_text(data.RGB_ICC, ENV.img.read_icc())
     check_img_md5()
 
 
@@ -75,7 +82,7 @@ def test_modify_exif():
     ENV.img.modify_exif(changes)
 
     # Check the modified data
-    expected_result = simulate_updating_metadata(reference.EXIF, changes)
+    expected_result = simulate_updating_metadata(data.EXIF, changes)
     result = ENV.img.read_exif()
     ignored_keys = ['Exif.Image.ExifTag']
     for key in ignored_keys:
@@ -100,7 +107,7 @@ def test_modify_iptc():
                'Iptc.Application2.Copyright': None,
                'Iptc.Application2.Keywords': ['tag1', 'tag2', 'tag3']}
     ENV.img.modify_iptc(changes)
-    expected_result = simulate_updating_metadata(reference.IPTC, changes)
+    expected_result = simulate_updating_metadata(data.IPTC, changes)
     diff_dict(expected_result, ENV.img.read_iptc())
     check_the_copy_of_img(diff_dict, expected_result, 'read_iptc')
 
@@ -110,16 +117,16 @@ def test_modify_xmp():
                'Xmp.xmp.Rating': None,
                'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']}
     ENV.img.modify_xmp(changes)
-    expected_result = simulate_updating_metadata(reference.XMP, changes)
+    expected_result = simulate_updating_metadata(data.XMP, changes)
     diff_dict(expected_result, ENV.img.read_xmp())
     check_the_copy_of_img(diff_dict, expected_result, 'read_xmp')
 
 
 def test_modify_raw_xmp():
     ENV.img.clear_xmp()
-    ENV.img.modify_raw_xmp(reference.RAW_XMP)
-    diff_text(reference.RAW_XMP, ENV.img.read_raw_xmp())
-    check_the_copy_of_img(diff_text, reference.RAW_XMP, 'read_raw_xmp')
+    ENV.img.modify_raw_xmp(data.RAW_XMP)
+    diff_text(data.RAW_XMP, ENV.img.read_raw_xmp())
+    check_the_copy_of_img(diff_text, data.RAW_XMP, 'read_raw_xmp')
     test_read_xmp()
 
 
@@ -131,9 +138,9 @@ def test_modify_comment():
 
 
 def test_modify_icc():
-    ENV.img.modify_icc(reference.GRAY_ICC)
-    diff_text(reference.GRAY_ICC, ENV.img.read_icc())
-    check_the_copy_of_img(diff_text, reference.GRAY_ICC, 'read_icc')
+    ENV.img.modify_icc(data.GRAY_ICC)
+    diff_text(data.GRAY_ICC, ENV.img.read_icc())
+    check_the_copy_of_img(diff_text, data.GRAY_ICC, 'read_icc')
 
 
 def test_clear_exif():
@@ -166,10 +173,25 @@ def test_clear_icc():
     check_the_copy_of_img(diff_text, b'', 'read_icc')
 
 
-def test_error_log():
+def test_log_level():
     with pytest.raises(RuntimeError):
         ENV.img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
     set_log_level(4)
     ENV.img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
     set_log_level(2)    # recover the log level
+
+
+def test_enableBMFF():
+    with pytest.raises(RuntimeError):
+        with Image(ENV.heic_img) as img:
+            pass
+
+    assert enableBMFF() == True
+    with Image(ENV.heic_img) as img:
+        assert img.read_exif()
+
+    assert enableBMFF(False) == True
+    with pytest.raises(RuntimeError):
+        with Image(ENV.heic_img) as img:
+            pass
 

@@ -5,7 +5,7 @@ from .test_func import test_read_exif, test_read_iptc, test_read_xmp, test_read_
 def setup_function():
     if ENV.skip_test:
         pytest.skip()
-    shutil.copy(ENV.original_img, ENV.test_img)  # Before each test, make a temporary copy of the image
+    shutil.copy(ENV.jpg_img, ENV.test_img)  # Before each test, make a temporary copy of the image
     with open(ENV.test_img, 'rb') as f:
         ENV.img = ImageData(f.read())
 
@@ -20,7 +20,7 @@ def test_modify_exif():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            expected_result = simulate_updating_metadata(reference.EXIF, changes)
+            expected_result = simulate_updating_metadata(data.EXIF, changes)
             result = img.read_exif()
             ignored_keys = ['Exif.Image.ExifTag']
             for key in ignored_keys:
@@ -40,7 +40,7 @@ def test_modify_iptc():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            expected_result = simulate_updating_metadata(reference.IPTC, changes)
+            expected_result = simulate_updating_metadata(data.IPTC, changes)
             diff_dict(expected_result, img.read_iptc())
 
 
@@ -55,7 +55,7 @@ def test_modify_xmp():
             f.write(img.get_bytes())
         f.seek(0)
         with ImageData(f.read()) as img:
-            expected_result = simulate_updating_metadata(reference.XMP, changes)
+            expected_result = simulate_updating_metadata(data.XMP, changes)
             diff_dict(expected_result, img.read_xmp())
 
 
