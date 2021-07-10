@@ -63,7 +63,7 @@
       self._handle = _dlopen(self._name, mode)
   FileNotFoundError: Could not find module '...\lib\site-packages\pyexiv2\lib\exiv2.dll' (or one of its dependencies). Try using the full path with constructor syntax.
   ```
-  - 这是因为该路径的 exiv2.dll 文件不存在，或者你需要安装 [Microsoft Visual C++ 2015-20199](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019)
+  - 这是因为该路径的 exiv2.dll 文件不存在，或者你需要安装 [Microsoft Visual C++ 2015-2019](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019)
 
 ## API 列表
 
@@ -139,7 +139,7 @@ def set_log_level(level=2)
     ```
    另一个例子：中国地区的 Windows 电脑通常用 GBK 编码文件路径，因此它们不能被 utf-8 解码。
 - 使用 `Image.read_*()` 是安全的。这些方法永远不会影响图片文件（md5不变）。
-- 如果 XMP 元数据包含 `\v` 或 `\f`，它将被空格 ` ` 代替。
+- 读取 XMP 元数据时，空白字符 `\v` 和 `\f` 会被替换为空格 ` ` 。
 - 元数据的读取速度与元数据的数量成反比，不管图片的大小如何。
 - 访问 BMFF 文件（CR3、HEIF、HEIC 和 AVIF）的功能默认是禁用的，可以通过调用 `pyexiv2.enableBMFF()` 来启用。
     > 注意：BMFF 文件可能涉及到专利权。pyexiv2 不负责识别任何此类专利权。pyexiv2 不对使用此代码所产生的法律后果负责。

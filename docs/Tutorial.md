@@ -134,12 +134,12 @@ def set_log_level(level=2)
   If you encounter an error because the image path or metadata contains non-ASCII characters, try changing the encoding. For example:
     ```python
     img = Image(path, encoding='utf-8')
-    img = Image(path, encoding='gbk')
+    img = Image(path, encoding='GBK')
     img = Image(path, encoding='ISO-8859-1')
     ```
   Another example: Windows computers in China usually encoded file paths by GBK, so they cannot be decoded by utf-8.
 - It is safe to use `Image.read_*()`. These methods never affect image files (md5 unchanged).
-- If the XMP metadata contains `\v` or `\f`, it will be replaced with space ` `.
+- When reading XMP metadata, the whitespace characters `\v` and `\f` are replaced with the space ` `.
 - The speed of reading metadata is inversely proportional to the amount of metadata, regardless of the size of the image.
 - Access to BMFF files (CR3, HEIF, HEIC, and AVIF) is disabled by default, which can be enabled by calling `pyexiv2.enableBMFF()`.
     > Attention: BMFF Support may be the subject of patent rights. pyexiv2 shall not be held responsible for identifying any such patent rights. pyexiv2 shall not be held responsible for the legal consequences of the use of this code.
