@@ -1,0 +1,151 @@
+name: Build exiv2
+
+on:
+  workflow_dispatch:
+    inputs:
+      refs:
+        description: 'Input a refs of Exiv2 to build'
+        required: true
+        default: v0.27.4
+
+jobs:
+  job1:
+    name: Build on Linux
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: Exiv2/exiv2
+          refs: ${{ github.event.inputs.ref }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install ninja-build
+          sudo apt-get install gettext
+          pip3 install conan==1.36.0
+
+      - name: Conan common config
+        run: |
+          conan profile new --detect default
+          conan profile update settings.build_type=Release default
+          conan profile update settings.compiler.libcxx=libstdc++11 default
+
+      - name: Run Conan
+        run: |
+          mkdir build && cd build
+          conan profile list
+          conan profile show default
+          conan install .. -o webready=False --build missing
+
+      - name: Build packaged release
+        run: |
+          cd build
+          cmake -GNinja -DEXIV2_TEAM_PACKAGING=ON -DBUILD_SHARED_LIBS=ON -DEXIV2_ENABLE_WEBREADY=OFF -DEXIV2_ENABLE_NLS=ON -DCMAKE_BUILD_TYPE=Release -DEXIV2_ENABLE_BMFF=ON -DEXIV2_TEAM_WARNINGS_AS_ERRORS=ON ..
+          cmake --build . -t package
+          tree -L 3
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: exiv2-linux64
+          path: ./build/exiv2-*.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+
+  job2:
+    name: Build on MacOS
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: Exiv2/exiv2
+          refs: ${{ github.event.inputs.ref }}
+
+      - name: Install dependencies
+        run: |
+          brew install ninja
+          brew install tree
+          brew install gettext
+          pip3 install conan==1.36.0
+
+      - name: Run Conan
+        run: |
+          mkdir build && cd build
+          conan profile new --detect default
+          conan profile show default
+          conan install .. -o webready=False --build missing
+          # Hack: Delete cmake_find_package generated files to fix compilation on mac.
+          rm Find*
+
+      - name: Build packaged release
+        run: |
+          cd build
+          cmake -GNinja -DEXIV2_TEAM_PACKAGING=ON -DBUILD_SHARED_LIBS=ON -DEXIV2_ENABLE_WEBREADY=OFF -DEXIV2_ENABLE_NLS=ON -DCMAKE_BUILD_TYPE=Release -DEXIV2_ENABLE_BMFF=ON -DEXIV2_TEAM_WARNINGS_AS_ERRORS=ON -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
+          cmake --build . -t package
+          tree -L 3
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: exiv2-macos
+          path: ./build/exiv2-*.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+
+  job3:
+    name: Build on Windows
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: Exiv2/exiv2
+          refs: ${{ github.event.inputs.ref }}
+
+      - name: Set up Visual Studio shell
+        uses: egor-tensin/vs-shell@v2
+
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@master
+        with:
+          version: 1.10.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Restore conan cache
+        uses: actions/cache@v2
+        with:
+            path: ${{github.workspace}}/conanCache
+            key: ${{runner.os}}-packaged-win-release-${{ hashFiles('conanfile.py') }}
+
+      - name: Install Conan & Common config
+        run: |
+          pip.exe install conan
+          conan profile new --detect default
+          conan profile update settings.build_type=Release default
+          conan config set storage.path=$Env:GITHUB_WORKSPACE/conanCache
+          conan config get storage.path
+          tree /f ./conanCache
+
+      - name: Run Conan
+        run: |
+          md build
+          cd build
+          conan profile list
+          conan install .. --build missing
+          dir ..
+          tree /f ../conanCache
+
+      - name: Build packaged release
+        run: |
+          cd build
+          cmake -GNinja -DEXIV2_TEAM_PACKAGING=ON -DBUILD_SHARED_LIBS=ON -DEXIV2_ENABLE_WEBREADY=OFF -DEXIV2_ENABLE_NLS=OFF -DCMAKE_BUILD_TYPE=Release -DEXIV2_ENABLE_BMFF=ON -DEXIV2_TEAM_WARNINGS_AS_ERRORS=ON ..
+          cmake --build . -t package
+          tree -L 3
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: exiv2-win
+          path: ./build/exiv2-*.zip
+          if-no-files-found: error
+          retention-days: 1
