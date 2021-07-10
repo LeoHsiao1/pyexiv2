@@ -4,8 +4,6 @@ name: Build
 
 on:
   push:
-    branches:
-      - master
   workflow_dispatch:
 
 jobs:
@@ -32,8 +30,7 @@ jobs:
         echo  LIB_DIR=`pwd`/pyexiv2/lib                                                           >>  $GITHUB_ENV
         echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION/./}-${PLATFORM_NAME}               >>  $GITHUB_ENV
 
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
     - name: Download Exiv2 build
       run: |
@@ -103,8 +100,7 @@ jobs:
         echo  LIB_DIR=`pwd`/pyexiv2/lib                                                           >>  $GITHUB_ENV
         echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION/./}-${PLATFORM_NAME}               >>  $GITHUB_ENV
 
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
     - name: Download Exiv2 build
       run: |
@@ -166,8 +162,7 @@ jobs:
       EXIV2_BUILD_EXT: .zip
       PYTHON_VERSION: ${{ matrix.python_version }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
     - name: Set environment variables
       shell: cmd
@@ -183,7 +178,9 @@ jobs:
         call env.bat
         curl -O   %EXIV2_BUILDS_URL%
         python -m zipfile -e %EXIV2_BUILD_NAME%%EXIV2_BUILD_EXT% .
-        copy      %EXIV2_DIR%\bin\exiv2.dll   %LIB_DIR%
+
+        :: copy      %EXIV2_DIR%\bin\exiv2.dll   %LIB_DIR%
+        :: Do not use the official current release exiv2.dll as it does not set `EXIV2_ENABLE_BMFF=ON` at compile time.
 
     - name: Set up Python ${{ matrix.python_version }}
       uses: actions/setup-python@v2
