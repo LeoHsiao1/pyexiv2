@@ -4,8 +4,6 @@ name: Build
 
 on:
   push:
-    branches:
-      - master
   workflow_dispatch:
 
 jobs:
@@ -32,8 +30,7 @@ jobs:
         echo  LIB_DIR=`pwd`/pyexiv2/lib                                                           >>  $GITHUB_ENV
         echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION/./}-${PLATFORM_NAME}               >>  $GITHUB_ENV
 
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
     - name: Download Exiv2 build
       run: |
@@ -103,8 +100,7 @@ jobs:
         echo  LIB_DIR=`pwd`/pyexiv2/lib                                                           >>  $GITHUB_ENV
         echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION/./}-${PLATFORM_NAME}               >>  $GITHUB_ENV
 
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
     - name: Download Exiv2 build
       run: |
@@ -166,8 +162,7 @@ jobs:
       EXIV2_BUILD_EXT: .zip
       PYTHON_VERSION: ${{ matrix.python_version }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
     - name: Set environment variables
       shell: cmd
