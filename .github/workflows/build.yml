@@ -178,7 +178,9 @@ jobs:
         call env.bat
         curl -O   %EXIV2_BUILDS_URL%
         python -m zipfile -e %EXIV2_BUILD_NAME%%EXIV2_BUILD_EXT% .
-        copy      %EXIV2_DIR%\bin\exiv2.dll   %LIB_DIR%
+
+        :: copy      %EXIV2_DIR%\bin\exiv2.dll   %LIB_DIR%
+        :: Do not use the official current release exiv2.dll as it does not set `EXIV2_ENABLE_BMFF=ON` at compile time.
 
     - name: Set up Python ${{ matrix.python_version }}
       uses: actions/setup-python@v2
