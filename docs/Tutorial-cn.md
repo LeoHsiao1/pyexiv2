@@ -231,6 +231,7 @@ def set_log_level(level=2)
             changes = {'Iptc.Application2.ObjectName': 'test'}
             img.modify_iptc(changes)
             f.seek(0)
+            f.truncate()
             # 获取图片的字节数据并保存到文件中
             f.write(img.get_bytes())
         f.seek(0)
