@@ -231,6 +231,7 @@ def set_log_level(level=2)
             changes = {'Iptc.Application2.ObjectName': 'test'}
             img.modify_iptc(changes)
             f.seek(0)
+            f.truncate()
             # Get the bytes data of the image and save it to the file
             f.write(img.get_bytes())
         f.seek(0)
