@@ -31,7 +31,7 @@ reset_workdir(){
 python3 -m pip install setuptools wheel twine 
 
 # Clear dist directory
-rm -rf $DIST_DIR/*
+rm -rf $DIST_DIR
 
 ## Make a source package without compiled files
 # reset_workdir
