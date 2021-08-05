@@ -68,37 +68,37 @@ TOC:
 ## API list
 
 ```py
-version = str()
+version       = str()
 exiv2_version = str()
 
 
 class Image:
     def __init__(self, filename, encoding='utf-8')
-    def close(self)
+    def close   (self)
 
-    def read_exif(self, encoding='utf-8') -> dict
-    def read_iptc(self, encoding='utf-8') -> dict
-    def read_xmp(self, encoding='utf-8') -> dict
-    def read_raw_xmp(self, encoding='utf-8') -> str
-    def read_comment(self, encoding='utf-8') -> str
-    def read_icc(self, encoding='utf-8') -> bytes
+    def read_exif     (self, encoding='utf-8') -> dict
+    def read_iptc     (self, encoding='utf-8') -> dict
+    def read_xmp      (self, encoding='utf-8') -> dict
+    def read_raw_xmp  (self, encoding='utf-8') -> str
+    def read_comment  (self, encoding='utf-8') -> str
+    def read_icc      (self, encoding='utf-8') -> bytes
 
-    def modify_exif(self, data: dict, encoding='utf-8')
-    def modify_iptc(self, data: dict, encoding='utf-8')
-    def modify_xmp(self, data: dict, encoding='utf-8')
-    def modify_raw_xmp(self, data: str, encoding='utf-8')
-    def modify_comment(self, data: str, encoding='utf-8')
-    def modify_icc(self, data: bytes)
+    def modify_exif   (self, data: dict, encoding='utf-8')
+    def modify_iptc   (self, data: dict, encoding='utf-8')
+    def modify_xmp    (self, data: dict, encoding='utf-8')
+    def modify_raw_xmp(self, data: str,  encoding='utf-8')
+    def modify_comment(self, data: str,  encoding='utf-8')
+    def modify_icc    (self, data: bytes)
 
-    def clear_exif(self)
-    def clear_iptc(self)
-    def clear_xmp(self)
-    def clear_comment(self)
-    def clear_icc(self)
+    def clear_exif    (self)
+    def clear_iptc    (self)
+    def clear_xmp     (self)
+    def clear_comment (self)
+    def clear_icc     (self)
 
 
 class ImageData(Image):
-    def __init__(self, data: bytes)
+    def __init__ (self, data: bytes)
     def get_bytes(self) -> bytes
 
 
