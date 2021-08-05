@@ -3,7 +3,8 @@ from .base import *
 
 def test_version():
     try:
-        assert exiv2api.version() == '0.27.4'
+        from .base import __exiv2_version__
+        assert __exiv2_version__ == '0.27.4'
     except:
         ENV.skip_test = True
         raise

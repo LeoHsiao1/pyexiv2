@@ -1,6 +1,20 @@
 """
-Read and modify metadata of digital image, including EXIF, IPTC, XMP.
+Read/Write metadata(including EXIF, IPTC, XMP), comment and ICC Profile embedded in digital images.
 """
 
 
 from .core import *
+
+
+__version__ = '2.6.4'
+__exiv2_version__ = exiv2api.version()
+
+
+__all__ = [
+  '__version__',
+  '__exiv2_version__',
+  'Image',
+  'ImageData',
+  'enableBMFF',
+  'set_log_level',
+]
