@@ -2,10 +2,6 @@ from .lib import exiv2api
 from . import reference
 
 
-version = '2.6.4'
-exiv2_version = exiv2api.version()
-
-
 class Image:
     """
     Open an image based on the file path. Read and write the metadata of the image.

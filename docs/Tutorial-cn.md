@@ -68,10 +68,6 @@
 ## API 列表
 
 ```py
-version       = str()
-exiv2_version = str()
-
-
 class Image:
     def __init__(self, filename, encoding='utf-8')
     def close   (self)

@@ -9,7 +9,7 @@ with open('README.md', encoding='utf-8') as f:
 
 setuptools.setup(
     name='pyexiv2',
-    version=pyexiv2.version,
+    version=pyexiv2.__version__,
     author='LeoHsiao',
     author_email='leohsiao@foxmail.com',
     description='Read/Write metadata(including EXIF, IPTC, XMP), comment and ICC Profile embedded in digital images.',

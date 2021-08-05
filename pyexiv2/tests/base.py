@@ -32,7 +32,8 @@ elif ENV.pyexiv2_module == 'pyexiv2':
 def setup_function():
     if ENV.skip_test:
         pytest.skip()
-    shutil.copy(ENV.jpg_img, ENV.test_img)  # Before each test, make a temporary copy of the image
+    # Before each test, make a temporary copy of the image
+    shutil.copy(ENV.jpg_img, ENV.test_img)
     ENV.img = Image(ENV.test_img)
 
 
