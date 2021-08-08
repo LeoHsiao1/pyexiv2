@@ -1,6 +1,6 @@
-from pyexiv2 import Image
+import pyexiv2
 
-img = Image(r'.\pyexiv2\tests\1.jpg')
+img = pyexiv2.Image(r'./pyexiv2/tests/data/1.jpg')
 img.read_exif()
 img.read_iptc()
 img.read_xmp()

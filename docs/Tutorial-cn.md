@@ -117,6 +117,14 @@ def set_log_level(level=2)
     with pyexiv2.Image(r'.\pyexiv2\tests\1.jpg') as img:
         data = img.read_exif()
     ```
+- pyexiv2 支持包含 Unicode 字符的图片路径、元数据。大部分函数都有一个默认参数：`encoding='utf-8'`。
+  如果你因为图片路径、元数据包含非 ASCII 码字符而遇到错误，请尝试更换编码。例如：
+    ```python
+    img = pyexiv2.Image(path, encoding='utf-8')
+    img = pyexiv2.Image(path, encoding='GBK')
+    img = pyexiv2.Image(path, encoding='ISO-8859-1')
+    ```
+   另一个例子：中国地区的 Windows 电脑通常用 GBK 编码文件路径，因此它们不能被 utf-8 解码。
 
 ### Image.read_*()
 
@@ -130,14 +138,6 @@ def set_log_level(level=2)
     {'Xmp.dc.format': 'image/jpeg', 'Xmp.dc.rights': 'lang="x-default" TEST', 'Xmp.dc.subject': 'TEST', ...}
     >>> img.close()
     ```
-- pyexiv2 支持包含 Unicode 字符的图片路径、元数据。大部分函数都有一个默认参数：`encoding='utf-8'`。
-  如果你因为图片路径、元数据包含非 ASCII 码字符而遇到错误，请尝试更换编码。例如：
-    ```python
-    img = pyexiv2.Image(path, encoding='utf-8')
-    img = pyexiv2.Image(path, encoding='GBK')
-    img = pyexiv2.Image(path, encoding='ISO-8859-1')
-    ```
-   另一个例子：中国地区的 Windows 电脑通常用 GBK 编码文件路径，因此它们不能被 utf-8 解码。
 - 使用 `Image.read_*()` 是安全的。这些方法永远不会影响图片文件（md5不变）。
 - 读取 XMP 元数据时，空白字符 `\v` 和 `\f` 会被替换为空格 ` ` 。
 - 元数据的读取速度与元数据的数量成反比，不管图片的大小如何。
