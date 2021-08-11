@@ -14,14 +14,15 @@
 ├── libexiv2.so     # Copied from the Exiv2 library for Linux
 └── README.md
 ```
-- The distribution of pyexiv2 includes precompiled files, which can also be compiled by users.
+- The distribution of pyexiv2 includes compiled files, which can also be compiled by users.
+  - You can also fork the project and use the the [build workflow](../../.github/workflows/build.yml) on GitHub, instead of compiling on your computer.
+- The build results of pyexiv2 is not compatible with different platforms, or even with different minor versions of the Python interpreter.
+  - If the build results provided here are not compatible with your platform, you can compile it yourself. Then modify the code in `./__init__.py` so that it can successfully execute `import exiv2api`.
 - The principle of the pyexiv2 library:
   1. Write exiv2api.cpp to call the C++ API of the exiv2 library.
   2. Use Pybind11 to compile exiv2api.cpp into a Python module.
   3. Import the exiv2api module in the Python interpreter and call its API.
-- The build results of exiv2api.cpp is not compatible with different platforms, or even with different minor versions of the Python interpreter.
-- If the build results provided here do not apply to your platform, please compile it yourself. Then modify the code in `./__init__.py` so that it can successfully execute `import exiv2api`.
-- Currently using version 0.27.4 of exiv2.
+- The current version of Exiv2 is 0.27.4 .
 
 ## Compile steps on Linux
 

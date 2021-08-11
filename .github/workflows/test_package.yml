@@ -1,4 +1,4 @@
-# Test the pyexiv2 packages uploaded to pypi.org , by executing the test cases in master branch.
+# Test the pyexiv2 packages uploaded to pypi.org .
 
 name: Test package
 

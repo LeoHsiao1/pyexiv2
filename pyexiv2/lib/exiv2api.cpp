@@ -4,19 +4,11 @@
 #include <sstream>
 #include <iostream>
 
+
 namespace py = pybind11;
 const char *EXCEPTION_HINT = "Caught Exiv2 exception: ";
 std::stringstream error_log;
 
-void check_error_log()
-{
-    std::string str = error_log.str();
-    if(str != ""){
-        error_log.clear();  // Clear it so that it can be used again
-        error_log.str("");
-        throw std::runtime_error(str);
-    }
-}
 
 void logHandler(int level, const char *msg)
 {
@@ -29,13 +21,25 @@ void logHandler(int level, const char *msg)
         break;
 
     case Exiv2::LogMsg::error:
-        // For unknown reasons, the exception thrown here cannot be caught, so save the log to error_log
+        // For unknown reasons, the exception thrown here cannot be caught by pybind11, so temporarily save the log to error_log.
         // throw std::exception(msg);
         error_log << msg;
         break;
 
     default:
         return;
+    }
+}
+
+/* The error log should be checked at the end of each operation.
+   If there is a C++ error, it is converted to a Python exception. */
+void check_error_log()
+{
+    std::string str = error_log.str();
+    if(str != ""){
+        error_log.clear();  // Clear it so that it can be used again
+        error_log.str("");
+        throw std::runtime_error(str);
     }
 }
 
@@ -63,6 +67,7 @@ py::str version()
     return Exiv2::version();
 }
 
+// Ensure the current exiv2 version is equal to or greater than 0.27.4, which adds function Exiv2::enableBMFF().
 #if EXIV2_TEST_VERSION(0,27,4)
 bool enableBMFF(bool enable)
 {
@@ -236,7 +241,7 @@ public:
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
 
             Exiv2::IptcData::iterator key_pos = iptcData.findKey(Exiv2::IptcKey(key));
-            while (key_pos != iptcData.end()){  // use the while loop because the iptc key may repeat
+            while (key_pos != iptcData.end()){  // Use the while loop because the iptc key may repeat
                 iptcData.erase(key_pos);
                 key_pos = iptcData.findKey(Exiv2::IptcKey(key));
             }
@@ -359,6 +364,7 @@ public:
         check_error_log();
     }
 };
+
 
 // Declare the API that needs to be mapped, to convert this CPP file into a Python module.
 PYBIND11_MODULE(exiv2api, m)

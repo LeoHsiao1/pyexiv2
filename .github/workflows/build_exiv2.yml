@@ -1,3 +1,5 @@
+# Build exiv2 to get its dynamic library for pyexiv2.
+
 name: Build exiv2
 
 on:
