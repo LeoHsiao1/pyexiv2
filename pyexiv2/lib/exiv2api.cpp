@@ -63,10 +63,12 @@ py::str version()
     return Exiv2::version();
 }
 
+#if EXIV2_TEST_VERSION(0,27,4)
 bool enableBMFF(bool enable)
 {
     return Exiv2::enableBMFF(enable);
 }
+#endif
 
 #define read_block                                                     \
     {                                                                  \
@@ -365,7 +367,9 @@ PYBIND11_MODULE(exiv2api, m)
     m.def("set_log_level", &set_log_level);
     m.def("init"         , &init);
     m.def("version"      , &version);
+#if EXIV2_TEST_VERSION(0,27,4)
     m.def("enableBMFF"   , &enableBMFF);
+#endif
     py::class_<Buffer>(m, "Buffer")
         .def(py::init<const char *, long>())
         .def_readonly("data"      , &Buffer::data)
