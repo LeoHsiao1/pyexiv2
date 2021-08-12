@@ -21,7 +21,7 @@ void logHandler(int level, const char *msg)
         break;
 
     case Exiv2::LogMsg::error:
-        // For unknown reasons, the exception thrown here cannot be caught by pybind11, so temporarily save the log to error_log.
+        // For unknown reasons, the exception thrown here cannot be caught by pybind11, so temporarily save it to error_log.
         // throw std::exception(msg);
         error_log << msg;
         break;
@@ -43,6 +43,11 @@ void check_error_log()
     }
 }
 
+void init()
+{
+    Exiv2::LogMsg::setHandler(logHandler);
+}
+
 void set_log_level(int level)
 {
     if (level == 0)
@@ -55,11 +60,6 @@ void set_log_level(int level)
         Exiv2::LogMsg::setLevel(Exiv2::LogMsg::error);
     if (level == 4)
         Exiv2::LogMsg::setLevel(Exiv2::LogMsg::mute);
-}
-
-void init()
-{
-    Exiv2::LogMsg::setHandler(logHandler);
 }
 
 py::str version()
