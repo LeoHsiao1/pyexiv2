@@ -11,20 +11,23 @@ TOC:
   - [FAQ](#faq)
 - [API list](#api-list)
 - [class Image](#class-image)
-  - [Image.read_*()](#imageread_)
-  - [Image.modify_*()](#imagemodify_)
-  - [Image.clear_*()](#imageclear_)
-  - [Image.*_comment()](#image_comment)
+  - [close](#close)
+  - [read](#read)
+  - [modify](#modify)
+  - [clear](#clear)
+  - [comment](#comment)
+  - [icc](#icc)
 - [class ImageData](#class-imagedata)
 - [Data types](#data-types)
 - [Log](#log)
+- [BMFF](#bmff)
 
 <!-- /code_chunk_output -->
 
 ## Installation
 
 - pyexiv2 is a third party library for Python, based on C++ and Python.
-- You can execute `pip install pyexiv2` to install the compiled package of pyexiv2, which supports running on Linux, MacOS and Windows, with CPython interpreter(x64, including `3.5` `3.6` `3.7` `3.8` `3.9`).
+- You can execute `pip install pyexiv2` to install the compiled package of pyexiv2, which supports running on 64bit Linux, MacOS and Windows, with CPython(≥3.5) interpreter.
 - If you want to run pyexiv2 on another platform, You can download the source code and compile it. See [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md).
 
 ### FAQ
@@ -111,24 +114,28 @@ def set_log_level(level=2)
     >>> data = img.read_exif()
     >>> img.close()
     ```
-- When you're done with the image, remember to call `img.close()` to free the memory for storing image data. Not calling this method causes a memory leak, but it doesn't lock the file descriptor.
-- Opening an image by keyword `with` will close the image automatically. For example:
-    ```py
-    with pyexiv2.Image(r'.\pyexiv2\tests\1.jpg') as img:
-        data = img.read_exif()
-    ```
 - pyexiv2 supports Unicode characters that contained in image path or metadata. Most functions have a default parameter: `encoding='utf-8'`.
-  If you encounter an error because the image path or metadata contains non-ASCII characters, try changing the encoding. For example:
+  - If you encounter an error because the image path or metadata contains non-ASCII characters, try changing the encoding. For example:
     ```python
     img = Image(path, encoding='utf-8')
     img = Image(path, encoding='GBK')
     img = Image(path, encoding='ISO-8859-1')
     ```
-  Another example: Windows computers in China usually encoded file paths by GBK, so they cannot be decoded by utf-8.
+  - Another example: Windows computers in China usually encoded file paths by GBK, so they cannot be decoded by utf-8.
 
-### Image.read_*()
+### close
 
-- Sample:
+- When you're done with the image, remember to call `img.close()` to free the memory for storing image data.
+    - Not calling this method causes a memory leak, but it doesn't lock the file descriptor.
+- Opening an image by keyword `with` will close the image automatically. For example:
+    ```py
+    with pyexiv2.Image(r'.\pyexiv2\tests\1.jpg') as img:
+        data = img.read_exif()
+    ```
+
+### read
+
+- An example of reading metadata:
     ```py
     >>> img.read_exif()
     {'Exif.Image.DateTime': '2019:06:23 19:45:17', 'Exif.Image.Artist': 'TEST', 'Exif.Image.Rating': '4', ...}
@@ -138,21 +145,18 @@ def set_log_level(level=2)
     {'Xmp.dc.format': 'image/jpeg', 'Xmp.dc.rights': 'lang="x-default" TEST', 'Xmp.dc.subject': 'TEST', ...}
     >>> img.close()
     ```
-- It is safe to use `Image.read_*()`. These methods never affect image files (md5 unchanged).
+- It is safe to call `Image.read_*()`. These methods never affect image files (md5 unchanged).
 - When reading XMP metadata, the whitespace characters `\v` and `\f` are replaced with the space ` `.
 - The speed of reading metadata is inversely proportional to the amount of metadata, regardless of the size of the image.
-- Access to BMFF files (CR3, HEIF, HEIC, and AVIF) is disabled by default, which can be enabled by calling `pyexiv2.enableBMFF()`.
-    > Attention: BMFF Support may be the subject of patent rights. pyexiv2 shall not be held responsible for identifying any such patent rights. pyexiv2 shall not be held responsible for the legal consequences of the use of this code.
 
-### Image.modify_*()
+### modify
 
-- Sample:
+- An example of modifing metadata:
     ```py
     >>> # Prepare the XMP data you want to modify
     >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # Assign a value to a tag. This will overwrite its original value, or add it if it doesn't exist
     ...          'Xmp.xmp.Rating': None}                            # Assign None to delete the tag
     >>> img.modify_xmp(dict1)
-    >>>
     >>> dict2 = img.read_xmp()       # Check the result
     >>> dict2['Xmp.xmp.CreateDate']
     '2019-06-23T19:45:17.834'        # This tag has been modified
@@ -184,14 +188,14 @@ def set_log_level(level=2)
     ```
 - The speed of modifying metadata is inversely proportional to the size of the image.
 
-### Image.clear_*()
+### clear
 
 - Calling `img.clear_exif()` will delete all EXIF metadata of the image. Once cleared, pyexiv2 may not be able to recover it completely.
 - Use `img.clear_iptc()` and `img.clear_xmp()` in the similar way.
 
-### Image.*_comment()
+### comment
 
-- It is mainly used to read and write JPEG COM (Comment) segment, which does not belong to EXIF, IPTC or XMP metadata.
+- `img.read_comment()`、`img.modify_comment()`、`img.clear_comment()` are used to access JPEG COM (Comment) segment in the image, which does not belong to EXIF, IPTC or XMP metadata.
   - [related issue](https://github.com/Exiv2/exiv2/issues/1445)
 - Sample:
     ```py
@@ -215,21 +219,26 @@ def set_log_level(level=2)
     >>> img.close()
     ```
 
+### icc
+
+- `img.read_icc()`、`img.modify_icc()`、`img.clear_icc()` is used to access [ICC profile](https://en.wikipedia.org/wiki/ICC_profile) in the image.
+
 ## class ImageData
 
 - Class `ImageData`, inherited from class `Image`, is used to open an image from bytes data.
-- Example of reading:
+- An example of reading metadata:
     ```py
     with open(r'.\pyexiv2\tests\1.jpg', 'rb') as f:
         with pyexiv2.ImageData(f.read()) as img:
             data = img.read_exif()
     ```
-- Example of modifing:
+- An example of modifing metadata:
     ```py
     with open(r'.\pyexiv2\tests\1.jpg', 'rb+') as f:
         with pyexiv2.ImageData(f.read()) as img:
             changes = {'Iptc.Application2.ObjectName': 'test'}
             img.modify_iptc(changes)
+            # Empty the original file
             f.seek(0)
             f.truncate()
             # Get the bytes data of the image and save it to the file
@@ -264,14 +273,19 @@ def set_log_level(level=2)
     - 3 : error
     - 4 : mute
 
-- The default log level is `warn`, so that the lower logs will not be handled.
 - The `error` log will be converted to an exception and thrown. Other logs will be printed to stdout.
+- The default log level is `warn`, so that the lower logs will not be reported.
 - Call the function `pyexiv2.set_log_level()` to set the level of handling logs. For example:
     ```py
-    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'}) # An error that was not caught is displayed
+    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'}) # An error is reported
     RuntimeError: XMP Toolkit error 102: Indexing applied to non-array
     Failed to encode XMP metadata.
 
     >>> pyexiv2.set_log_level(4)
-    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'}) # No error displayed
+    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'}) # No error reported
     ```
+
+## BMFF
+
+- Access to BMFF files (CR3, HEIF, HEIC, and AVIF) is disabled by default, which can be enabled by calling `pyexiv2.enableBMFF()`.
+    > Attention: BMFF Support may be the subject of patent rights. pyexiv2 shall not be held responsible for identifying any such patent rights. pyexiv2 shall not be held responsible for the legal consequences of the use of this code.
