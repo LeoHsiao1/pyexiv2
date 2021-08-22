@@ -147,9 +147,9 @@ def set_log_level(level=2)
     {'Xmp.dc.format': 'image/jpeg', 'Xmp.dc.rights': 'lang="x-default" TEST', 'Xmp.dc.subject': 'TEST', ...}
     >>> img.close()
     ```
+- The speed of reading metadata is inversely proportional to the amount of metadata, regardless of the size of the image.
 - It is safe to call `Image.read_*()`. These methods never affect image files (md5 unchanged).
 - When reading XMP metadata, the whitespace characters `\v` and `\f` are replaced with the space ` `.
-- The speed of reading metadata is inversely proportional to the amount of metadata, regardless of the size of the image.
 
 ### modify
 
@@ -167,17 +167,31 @@ def set_log_level(level=2)
     >>> img.close()
     ```
     - Use `img.modify_exif()` and `img.modify_iptc()` in the same way.
-- If you try to modify a non-standard tag, you may cause an exception. For example:
+- The speed of modifying metadata is inversely proportional to the size of the image.
+- Modifying a non-standard tag may cause an exception. For example:
     ```py
-    >>> img.modify_exif({'Exif.Image.mytag001': 'test'})    # Failed
-    RuntimeError: Invalid tag name or ifdId `mytag001', ifdId 1
-    >>> img.modify_xmp({'Xmp.dc.mytag001': 'test'})         # Successful
-    >>> img.read_xmp()['Xmp.dc.mytag001']
-    'test'
+    >>> img.modify_exif({'Exif.Image.mytag1': 'Hello'})
+    RuntimeError: Invalid tag name or ifdId `mytag1', ifdId 1
     ```
+    For XMP, Exiv2 supports writing non-standard XMP tags:
+    ```py
+    >>> img.modify_xmp({'Xmp.dc.mytag1': 'Hello'})
+    >>> img.read_xmp()['Xmp.dc.mytag1']
+    'Hello'
+    ```
+    For XMP, Exiv2 automatically registers standard namespaces and existing namespaces in the image. You can also actively register namespaces:
+    ```py
+    >>> img.modify_xmp({'Xmp.test.mytag1': 'Hello'})
+    RuntimeError: No namespace info available for XMP prefix `test'
+    >>> pyexiv2.registerNs('a namespace for test', 'Ns1')
+    >>> img.modify_xmp({'Xmp.Ns1.mytag1': 'Hello'})
+    >>> img.read_xmp()['Xmp.Ns1.mytag1']
+    'Hello'
+    ```
+
 - Some special tags cannot be modified by pyexiv2. For example:
     ```py
-    >>> img.modify_exif({'Exif.Photo.MakerNote': 'test'})
+    >>> img.modify_exif({'Exif.Photo.MakerNote': 'Hello'})
     >>> img.read_exif()['Exif.Photo.MakerNote']
     ''
     ```
@@ -188,7 +202,6 @@ def set_log_level(level=2)
     RuntimeError: XMP Toolkit error 102: Indexing applied to non-array
     Failed to encode XMP metadata.
     ```
-- The speed of modifying metadata is inversely proportional to the size of the image.
 
 ### clear
 
@@ -271,6 +284,11 @@ def set_log_level(level=2)
     {'lang="x-default"': 'test-中文-', 'lang="de-DE"': 'Hallo, Welt'}
     ```
 
+## BMFF
+
+- Access to BMFF files (CR3, HEIF, HEIC, and AVIF) is disabled by default, which can be enabled by calling `pyexiv2.enableBMFF()`.
+    > Attention: BMFF Support may be the subject of patent rights. pyexiv2 shall not be held responsible for identifying any such patent rights. pyexiv2 shall not be held responsible for the legal consequences of the use of this code.
+
 ## Log
 
 - Exiv2 has five levels of handling logs：
@@ -291,8 +309,3 @@ def set_log_level(level=2)
     >>> pyexiv2.set_log_level(4)
     >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'}) # No error reported
     ```
-
-## BMFF
-
-- Access to BMFF files (CR3, HEIF, HEIC, and AVIF) is disabled by default, which can be enabled by calling `pyexiv2.enableBMFF()`.
-    > Attention: BMFF Support may be the subject of patent rights. pyexiv2 shall not be held responsible for identifying any such patent rights. pyexiv2 shall not be held responsible for the legal consequences of the use of this code.

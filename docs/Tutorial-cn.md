@@ -147,9 +147,9 @@ def set_log_level(level=2)
     {'Xmp.dc.format': 'image/jpeg', 'Xmp.dc.rights': 'lang="x-default" TEST', 'Xmp.dc.subject': 'TEST', ...}
     >>> img.close()
     ```
+- 读取元数据的速度与元数据的数量成反比，不管图片的大小如何。
 - 调用 `Image.read_*()` 是安全的。这些方法永远不会影响图片文件（md5不变）。
 - 读取 XMP 元数据时，空白字符 `\v` 和 `\f` 会被替换为空格 ` ` 。
-- 元数据的读取速度与元数据的数量成反比，不管图片的大小如何。
 
 ### modify
 
@@ -167,17 +167,31 @@ def set_log_level(level=2)
     >>> img.close()
     ```
     - `img.modify_exif()` 和 `img.modify_iptc()` 的用法同理。
-- 如果你尝试修改一个非标准的标签，则可能引发一个异常。例如：
+- 修改元数据的速度与图片的大小成反比。
+- 修改非标准的标签可能引发异常。例如：
     ```py
-    >>> img.modify_exif({'Exif.Image.mytag001': 'test'})    # 失败
-    RuntimeError: Invalid tag name or ifdId `mytag001', ifdId 1
-    >>> img.modify_xmp({'Xmp.dc.mytag001': 'test'})         # 成功
-    >>> img.read_xmp()['Xmp.dc.mytag001']
-    'test'
+    >>> img.modify_exif({'Exif.Image.mytag1': 'Hello'})
+    RuntimeError: Invalid tag name or ifdId `mytag1', ifdId 1
     ```
+    对于 XMP ，Exiv2 支持写入非标准的标签：
+    ```py
+    >>> img.modify_xmp({'Xmp.dc.mytag1': 'Hello'})
+    >>> img.read_xmp()['Xmp.dc.mytag1']
+    'Hello'
+    ```
+    对于 XMP ，Exiv2 会自动注册标准的命名空间、图片中已有的命名空间。你也可以主动注册命名空间：
+    ```py
+    >>> img.modify_xmp({'Xmp.test.mytag1': 'Hello'})
+    RuntimeError: No namespace info available for XMP prefix `test'
+    >>> pyexiv2.registerNs('a namespace for test', 'Ns1')
+    >>> img.modify_xmp({'Xmp.Ns1.mytag1': 'Hello'})
+    >>> img.read_xmp()['Xmp.Ns1.mytag1']
+    'Hello'
+    ```
+
 - 某些特殊的标签不能被 pyexiv2 修改。例如：
     ```py
-    >>> img.modify_exif({'Exif.Photo.MakerNote': 'test'})
+    >>> img.modify_exif({'Exif.Photo.MakerNote': 'Hello'})
     >>> img.read_exif()['Exif.Photo.MakerNote']
     ''
     ```
@@ -188,7 +202,6 @@ def set_log_level(level=2)
     RuntimeError: XMP Toolkit error 102: Indexing applied to non-array
     Failed to encode XMP metadata.
     ```
-- 修改元数据的速度与图片的大小成反比。
 
 ### clear
 
@@ -271,6 +284,11 @@ def set_log_level(level=2)
     {'lang="x-default"': 'test-中文-', 'lang="de-DE"': 'Hallo, Welt'}
     ```
 
+## BMFF
+
+- 访问 BMFF 文件（CR3、HEIF、HEIC 和 AVIF）的功能默认是禁用的，可以通过调用 `pyexiv2.enableBMFF()` 来启用。
+    > 注意：BMFF 文件可能涉及到专利权。pyexiv2 不负责识别任何此类专利权。pyexiv2 不对使用此代码所产生的法律后果负责。
+
 ## 日志
 
 - Exiv2 有 5 种处理日志的级别：
@@ -291,8 +309,3 @@ def set_log_level(level=2)
     >>> pyexiv2.set_log_level(4)
     >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'}) # 此时没有错误日志
     ```
-
-## BMFF
-
-- 访问 BMFF 文件（CR3、HEIF、HEIC 和 AVIF）的功能默认是禁用的，可以通过调用 `pyexiv2.enableBMFF()` 来启用。
-    > 注意：BMFF 文件可能涉及到专利权。pyexiv2 不负责识别任何此类专利权。pyexiv2 不对使用此代码所产生的法律后果负责。
