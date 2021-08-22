@@ -4,6 +4,8 @@ name: Test
 
 on:
   push:
+    branches:
+      - dev
   workflow_dispatch:
 
 jobs:
