@@ -48,7 +48,12 @@ def _test_chinese_path():
 
 
 def test_get_mime_type():
-    assert ENV.img.get_mime_type() == 'image/jpeg'
+    assert ENV.img.get_mime_type() == data.MIME_TYPE
+    check_img_md5()
+
+
+def test_get_access_mode():
+    assert ENV.img.get_access_mode() == data.ACCESS_MODE
     check_img_md5()
 
 

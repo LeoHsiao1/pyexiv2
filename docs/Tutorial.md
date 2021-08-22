@@ -73,7 +73,9 @@ TOC:
 ```py
 class Image:
     def __init__(self, filename, encoding='utf-8')
-    def close   (self)
+    def close(self)
+    def get_mime_type(self)
+    def get_access_mode(self)
 
     def read_exif     (self, encoding='utf-8') -> dict
     def read_iptc     (self, encoding='utf-8') -> dict
@@ -97,7 +99,7 @@ class Image:
 
 
 class ImageData(Image):
-    def __init__ (self, data: bytes)
+    def __init__(self, data: bytes)
     def get_bytes(self) -> bytes
 
 

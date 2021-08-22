@@ -1,6 +1,10 @@
 import os
 
 
+MIME_TYPE   = 'image/jpeg'
+
+ACCESS_MODE = {'exif': 'read+write', 'iptc': 'read+write', 'xmp': 'read+write', 'comment': 'read+write'}
+
 EXIF = {'Exif.Image.ImageDescription'   : 'test-中文-',
         'Exif.Image.Make'               : 'test-中文-',
         'Exif.Image.Model'              : 'test-中文-',

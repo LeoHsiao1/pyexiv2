@@ -35,7 +35,18 @@ class Image:
                     setattr(self, attr, None)
 
     def get_mime_type(self) -> str:
+        """ Get the MIME type of the image, such as 'image/jpeg'. """
         return self.img.get_mime_type()
+
+    def get_access_mode(self) -> dict:
+        """ Get the access mode to various metadata. """
+        access_modes = {0: None,
+                        1: 'read',
+                        2: 'write',
+                        3: 'read+write'}
+        dic = self.img.get_access_mode()
+        dic = {k:access_modes.get(v) for k,v in dic.items()}
+        return dic
 
     def read_exif(self, encoding='utf-8') -> dict:
         data = self._parse(self.img.read_exif(), encoding)

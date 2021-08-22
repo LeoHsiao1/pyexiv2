@@ -157,26 +157,43 @@ public:
         return (*img)->mimeType();
     }
 
+    py::dict get_access_mode()
+    {
+        /* Get the access mode to various metadata.
+        Reference:
+        AccessMode Exiv2::Image::checkMode(MetadataId metadataId) const
+        enum MetadataId { mdNone=0, mdExif=1, mdIptc=2, mdComment=4, mdXmp=8, mdIccProfile=16 };
+        enum AccessMode { amNone=0, amRead=1, amWrite=2, amReadWrite=3 };
+        */
+        auto mode       = py::dict();
+        mode["exif"]    = int((*img)->checkMode(Exiv2::mdExif));
+        mode["iptc"]    = int((*img)->checkMode(Exiv2::mdIptc));
+        mode["xmp"]     = int((*img)->checkMode(Exiv2::mdXmp));
+        mode["comment"] = int((*img)->checkMode(Exiv2::mdComment));
+        // mode["icc"]     = int((*img)->checkMode(Exiv2::mdIccProfile));   // Exiv2 will not check ICC
+        return mode;
+    }
+
     py::object read_exif()
     {
-        Exiv2::ExifData &data = (*img)->exifData();
-        Exiv2::ExifData::iterator i = data.begin();
+        Exiv2::ExifData &data         = (*img)->exifData();
+        Exiv2::ExifData::iterator i   = data.begin();
         Exiv2::ExifData::iterator end = data.end();
         read_block;
     }
 
     py::object read_iptc()
     {
-        Exiv2::IptcData &data = (*img)->iptcData();
-        Exiv2::IptcData::iterator i = data.begin();
+        Exiv2::IptcData &data         = (*img)->iptcData();
+        Exiv2::IptcData::iterator i   = data.begin();
         Exiv2::IptcData::iterator end = data.end();
         read_block;
     }
 
     py::object read_xmp()
     {
-        Exiv2::XmpData &data = (*img)->xmpData();
-        Exiv2::XmpData::iterator i = data.begin();
+        Exiv2::XmpData &data         = (*img)->xmpData();
+        Exiv2::XmpData::iterator i   = data.begin();
         Exiv2::XmpData::iterator end = data.end();
         read_block;
     }
@@ -393,6 +410,7 @@ PYBIND11_MODULE(exiv2api, m)
         .def("close_image"       , &Image::close_image)
         .def("get_bytes"         , &Image::get_bytes)
         .def("get_mime_type"     , &Image::get_mime_type)
+        .def("get_access_mode"   , &Image::get_access_mode)
         .def("read_exif"         , &Image::read_exif)
         .def("read_iptc"         , &Image::read_iptc)
         .def("read_xmp"          , &Image::read_xmp)
