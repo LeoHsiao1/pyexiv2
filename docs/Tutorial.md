@@ -263,6 +263,11 @@ def set_log_level(level=2)
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1,tag2', 'tag3']
     ```
+- XMP tags of type LangAlt have values in multiple languages, they are converted to a dict. For example:
+    ```py
+    >>> img.read_xmp()['Xmp.dc.title']
+    {'lang="x-default"': 'test-中文-', 'lang="de-DE"': 'Hallo, Welt'}
+    ```
 
 ## Log
 

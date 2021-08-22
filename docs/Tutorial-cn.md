@@ -263,6 +263,11 @@ def set_log_level(level=2)
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1,tag2', 'tag3']
     ```
+- XMP 的 LangAlt 类型的标签有多种语言的值，它们会被转换成一个字典。例如：
+    ```py
+    >>> img.read_xmp()['Xmp.dc.title']
+    {'lang="x-default"': 'test-中文-', 'lang="de-DE"': 'Hallo, Welt'}
+    ```
 
 ## 日志
 

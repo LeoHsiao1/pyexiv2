@@ -1,5 +1,7 @@
-from .lib import exiv2api
+import re
+
 from . import reference
+from .lib import exiv2api
 
 
 class Image:
@@ -46,7 +48,7 @@ class Image:
     def read_iptc(self, encoding='utf-8') -> dict:
         data = self._parse(self.img.read_iptc(), encoding)
 
-        # For repeatable tags, even if they do not have multiple values, their values are converted to List type
+        # For repeatable tags, even if they do not have multiple values, their values are converted to list type.
         for tag in reference.IPTC_TAGS_REPEATABLE:
             value = data.get(tag)
             if isinstance(value, str):
@@ -89,19 +91,21 @@ class Image:
 
     def modify_icc(self, data: bytes):
         if not isinstance(data, bytes):
-            raise TypeError('The data should be of bytes type.')
+            raise TypeError('The ICC profile should be of bytes type.')
         return self.img.modify_icc(data, len(data))
 
     def _parse(self, table: list, encoding='utf-8') -> dict:
-        """ Parse the table returned by C++ API into a dict. """
+        """ Parse the metadata from a text table into a dict. """
         data = {}
         for line in table:
-            decoded_line = [i.decode(encoding) for i in line]
-            tag, value, typeName = decoded_line
+            tag, value, typeName = [field.decode(encoding) for field in line]
             if typeName in ['XmpBag', 'XmpSeq']:
                 value = value.split(', ')
+            elif typeName in ['LangAlt']:
+                if 'lang=' in value:
+                    fields = re.split(r', (lang="\S+") ', ', ' + value)[1:]
+                    value  = {language: content for language, content in zip(fields[0::2], fields[1::2])}
 
-            # Get the value of the tag
             # Convert the values to a list of strings if the tag has multiple values
             pre_value = data.get(tag)
             if pre_value == None:
@@ -114,7 +118,7 @@ class Image:
         return data
 
     def _dumps(self, data: dict) -> list:
-        """ Convert the metadata dict into a table. """
+        """ Convert the metadata from a dict into a text table. """
         table = []
         for tag, value in data.items():
             tag      = str(tag)
@@ -124,6 +128,9 @@ class Image:
             elif isinstance(value, (list, tuple)):
                 typeName = 'array'
                 value    = list(value)
+            elif isinstance(value, dict):
+                typeName = 'string'
+                value    = ', '.join(['{} {}'.format(k,v) for k,v in value.items()])
             else:
                 typeName = 'string'
                 value    = str(value)
