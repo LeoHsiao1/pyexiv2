@@ -31,7 +31,7 @@ jobs:
         echo  EXIV2_BUILDS_URL=https://www.exiv2.org/builds/${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT} >>  $GITHUB_ENV
         echo  EXIV2_DIR=`pwd`/${EXIV2_BUILD_NAME}                                                 >>  $GITHUB_ENV
         echo  LIB_DIR=`pwd`/pyexiv2/lib                                                           >>  $GITHUB_ENV
-        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION/./}-${PLATFORM_NAME}               >>  $GITHUB_ENV
+        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION}-${PLATFORM_NAME}                  >>  $GITHUB_ENV
 
     - uses: actions/checkout@v2
 
@@ -102,7 +102,7 @@ jobs:
         echo  EXIV2_BUILDS_URL=https://www.exiv2.org/builds/${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT} >>  $GITHUB_ENV
         echo  EXIV2_DIR=`pwd`/${EXIV2_BUILD_NAME}                                                 >>  $GITHUB_ENV
         echo  LIB_DIR=`pwd`/pyexiv2/lib                                                           >>  $GITHUB_ENV
-        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION/./}-${PLATFORM_NAME}               >>  $GITHUB_ENV
+        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION}-${PLATFORM_NAME}                  >>  $GITHUB_ENV
 
     - uses: actions/checkout@v2
 
@@ -175,7 +175,7 @@ jobs:
         echo  set EXIV2_BUILDS_URL=https://www.exiv2.org/builds/%EXIV2_BUILD_NAME%%EXIV2_BUILD_EXT%>> env.bat
         echo  set EXIV2_DIR=%CD%\%EXIV2_BUILD_NAME%>> env.bat
         echo  set LIB_DIR=%CD%\pyexiv2\lib>> env.bat
-        echo  set SUB_LIB_DIR=%CD%\pyexiv2\lib\py%PYTHON_VERSION:.=%-%PLATFORM_NAME%>> env.bat
+        echo  set SUB_LIB_DIR=%CD%\pyexiv2\lib\py%PYTHON_VERSION%-%PLATFORM_NAME%>> env.bat
 
     - name: Download Exiv2 build
       shell: cmd

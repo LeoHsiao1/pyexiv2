@@ -4,9 +4,9 @@
 
 ```sh
 .
-├── py3*-darwin     # the build results of exiv2api.cpp on Darwin
-├── py3*-linux      # the build results of exiv2api.cpp on Linux
-├── py3*-win        # the build results of exiv2api.cpp on Windows
+├── py3.*-darwin    # the build results of exiv2api.cpp on Darwin
+├── py3.*-linux     # the build results of exiv2api.cpp on Linux
+├── py3.*-win       # the build results of exiv2api.cpp on Windows
 ├── __init__.py
 ├── exiv2api.cpp    # Expose the API of exiv2 to Python
 ├── exiv2.dll       # Copied from the Exiv2 library for Windows
@@ -53,8 +53,8 @@
 4. Compile:
     ```sh
     cd $LIB_DIR
-    mkdir -p py3${py_version}-linux
-    g++ exiv2api.cpp -o py3${py_version}-linux/exiv2api.so \
+    mkdir -p py3.${py_version}-linux
+    g++ exiv2api.cpp -o py3.${py_version}-linux/exiv2api.so \
         -std=c++11 -O3 -Wall -shared -fPIC \
         `python3.$py_version -m pybind11 --includes` \
         -I $EXIV2_DIR/include \
@@ -89,7 +89,7 @@
 4. Compile:
     ```sh
     cd $LIB_DIR
-    g++ exiv2api.cpp -o py3${py_version}-darwin/exiv2api.so \
+    g++ exiv2api.cpp -o py3.${py_version}-darwin/exiv2api.so \
         -std=c++11 -O3 -Wall -shared -fPIC \
         `python3.$py_version -m pybind11 --includes` \
         -I $EXIV2_DIR/include \
@@ -127,6 +127,6 @@
 5. Compile:
     ```batch
     cd  %LIB_DIR%
-    cl /MD /LD exiv2api.cpp /EHsc -I %EXIV2_DIR%\include -I %PY_HOME%\include -I %PY_HOME%\Lib\site-packages\pybind11\include /link %EXIV2_DIR%\lib\exiv2.lib %PY_HOME%\libs\python3%py_version%.lib /OUT:py3%py_version%-win\exiv2api.pyd
+    cl /MD /LD exiv2api.cpp /EHsc -I %EXIV2_DIR%\include -I %PY_HOME%\include -I %PY_HOME%\Lib\site-packages\pybind11\include /link %EXIV2_DIR%\lib\exiv2.lib %PY_HOME%\libs\python3%py_version%.lib /OUT:py3.%py_version%-win\exiv2api.pyd
     del exiv2api.exp exiv2api.obj exiv2api.lib
     ```
