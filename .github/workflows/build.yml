@@ -161,7 +161,7 @@ jobs:
         exiv2_version: [0.27.4]
     runs-on: ${{matrix.os}}
     env:
-      PLATFORM_NAME: linux
+      PLATFORM_NAME: win
       EXIV2_VERSION: ${{matrix.exiv2_version}}
       EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-2019msvc64
       EXIV2_BUILD_EXT: .zip
