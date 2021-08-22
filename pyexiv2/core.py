@@ -211,6 +211,17 @@ class ImageData(Image):
         super().close()
 
 
+def registerNs(namespace: str, prefix:str):
+    """ Register a XMP namespace with prefix. Sample:
+    >>> pyexiv2.registerNs('a namespace for test', 'Ns1')
+    >>> img.modify_xmp({'Xmp.Ns1.mytag1': 'Hello'})
+    """
+    return exiv2api.registerNs(namespace, prefix)
+
+def enableBMFF(enable=True):
+    """ Enable or disable reading BMFF images. Return True on success. """
+    return exiv2api.enableBMFF(enable)
+
 def set_log_level(level=2):
     """
     Set the level of handling logs. There are five levels of handling logs:
@@ -224,11 +235,6 @@ def set_log_level(level=2):
         exiv2api.set_log_level(level)
     else:
         raise ValueError('Invalid log level.')
-
-
-def enableBMFF(enable=True):
-    """ Enable or disable reading BMFF images. Return True on success. """
-    return exiv2api.enableBMFF(enable)
 
 
 exiv2api.init()

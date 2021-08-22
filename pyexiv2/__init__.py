@@ -15,6 +15,7 @@ __all__ = [
   '__exiv2_version__',
   'Image',
   'ImageData',
+  'registerNs',
   'enableBMFF',
   'set_log_level',
 ]

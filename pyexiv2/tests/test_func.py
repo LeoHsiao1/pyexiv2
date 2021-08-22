@@ -184,12 +184,12 @@ def test_clear_icc():
     check_the_copy_of_img(diff_text, b'', 'read_icc')
 
 
-def test_log_level():
+def test_registerNs():
     with pytest.raises(RuntimeError):
-        ENV.img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
-    set_log_level(4)
-    ENV.img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
-    set_log_level(2)    # recover the log level
+        ENV.img.modify_xmp({'Xmp.test.mytag1': 'Hello'})
+    registerNs('a namespace for test', 'Ns1')
+    ENV.img.modify_xmp({'Xmp.Ns1.mytag1': 'Hello'})
+    assert ENV.img.read_xmp()['Xmp.Ns1.mytag1'] == 'Hello'
 
 
 def test_enableBMFF():
@@ -205,4 +205,11 @@ def test_enableBMFF():
     with pytest.raises(RuntimeError):
         with Image(ENV.heic_img) as img:
             pass
+
+def test_log_level():
+    with pytest.raises(RuntimeError):
+        ENV.img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
+    set_log_level(4)
+    ENV.img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
+    set_log_level(2)    # recover the log level
 

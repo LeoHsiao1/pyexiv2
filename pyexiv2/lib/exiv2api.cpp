@@ -385,6 +385,7 @@ public:
         (*img)->writeMetadata();
         check_error_log();
     }
+
 };
 
 
@@ -392,12 +393,13 @@ public:
 PYBIND11_MODULE(exiv2api, m)
 {
     m.doc() = "Expose the API of exiv2 to Python.";
-    m.def("set_log_level", &set_log_level);
     m.def("init"         , &init);
     m.def("version"      , &version);
+    m.def("registerNs"   , &Exiv2::XmpProperties::registerNs);
 #if EXIV2_TEST_VERSION(0,27,4)
     m.def("enableBMFF"   , &enableBMFF);
 #endif
+    m.def("set_log_level", &set_log_level);
     py::class_<Buffer>(m, "Buffer")
         .def(py::init<const char *, long>())
         .def_readonly("data"      , &Buffer::data)
