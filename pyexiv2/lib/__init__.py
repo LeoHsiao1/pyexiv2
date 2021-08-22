@@ -13,7 +13,6 @@ if py_version not in expected_py_version:
 
 # Recognize the system
 lib_dir     = os.path.dirname(__file__)
-py_version  = py_version.replace('.','')
 sys_name    = platform.system() or 'Unknown'
 if sys_name == 'Linux':
     ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.so'))
