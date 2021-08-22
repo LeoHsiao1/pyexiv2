@@ -103,6 +103,7 @@ class ImageData(Image):
     def get_bytes(self) -> bytes
 
 
+def registerNs(namespace: str, prefix: str)
 def enableBMFF(enable=True)
 def set_log_level(level=2)
 ```

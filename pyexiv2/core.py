@@ -211,7 +211,7 @@ class ImageData(Image):
         super().close()
 
 
-def registerNs(namespace: str, prefix:str):
+def registerNs(namespace: str, prefix: str):
     """ Register a XMP namespace with prefix. Sample:
     >>> pyexiv2.registerNs('a namespace for test', 'Ns1')
     >>> img.modify_xmp({'Xmp.Ns1.mytag1': 'Hello'})

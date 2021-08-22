@@ -6,7 +6,7 @@ Read/Write metadata(including EXIF, IPTC, XMP), comment and ICC Profile embedded
 from .core import *
 
 
-__version__ = '2.6.4'
+__version__ = '2.7.0'
 __exiv2_version__ = exiv2api.version()
 
 
