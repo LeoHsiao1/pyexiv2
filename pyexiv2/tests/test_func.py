@@ -47,6 +47,11 @@ def _test_chinese_path():
         os.remove(chinese_path)
 
 
+def test_get_mime_type():
+    assert ENV.img.get_mime_type() == 'image/jpeg'
+    check_img_md5()
+
+
 def test_read_exif():
     diff_dict(data.EXIF, ENV.img.read_exif())
     check_img_md5()

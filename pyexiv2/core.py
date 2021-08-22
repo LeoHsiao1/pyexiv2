@@ -34,6 +34,9 @@ class Image:
                 else:
                     setattr(self, attr, None)
 
+    def get_mime_type(self) -> str:
+        return self.img.get_mime_type()
+
     def read_exif(self, encoding='utf-8') -> dict:
         data = self._parse(self.img.read_exif(), encoding)
 
@@ -189,7 +192,7 @@ class ImageData(Image):
 
     def get_bytes(self) -> bytes:
         """ Get the bytes data of the image. """
-        return self.img.get_bytes_of_image()
+        return self.img.get_bytes()
 
     def close(self):
         """ Free the memory for storing image data. """

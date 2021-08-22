@@ -146,10 +146,15 @@ public:
         check_error_log();
     }
 
-    py::bytes get_bytes_of_image()
+    py::bytes get_bytes()
     {
         Exiv2::BasicIo &io = (*img)->io();
         return py::bytes((char *)io.mmap(), io.size());
+    }
+
+    std::string get_mime_type()
+    {
+        return (*img)->mimeType();
     }
 
     py::object read_exif()
@@ -386,7 +391,8 @@ PYBIND11_MODULE(exiv2api, m)
         .def(py::init<const char *>())
         .def(py::init<Buffer &>())
         .def("close_image"       , &Image::close_image)
-        .def("get_bytes_of_image", &Image::get_bytes_of_image)
+        .def("get_bytes"         , &Image::get_bytes)
+        .def("get_mime_type"     , &Image::get_mime_type)
         .def("read_exif"         , &Image::read_exif)
         .def("read_iptc"         , &Image::read_iptc)
         .def("read_xmp"          , &Image::read_xmp)
