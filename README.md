@@ -16,7 +16,7 @@ Read/Write metadata(including [EXIF](https://en.wikipedia.org/wiki/Exif), [IPTC]
 ## Defects
 
 - Can't read the image larger than 2G, or modify the image larger than 1G. ([related issue](https://github.com/Exiv2/exiv2/issues/1248))
-- Not thread safe, because it uses some global variables.
+- Not thread safe, because it uses some global variables in C++.
 
 ## Docs
 
