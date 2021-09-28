@@ -74,8 +74,8 @@ TOC:
 class Image:
     def __init__(self, filename, encoding='utf-8')
     def close(self)
-    def get_mime_type(self)
-    def get_access_mode(self)
+    def get_mime_type(self) -> str
+    def get_access_mode(self)  -> dict
 
     def read_exif     (self, encoding='utf-8') -> dict
     def read_iptc     (self, encoding='utf-8') -> dict
