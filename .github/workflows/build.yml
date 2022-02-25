@@ -38,7 +38,7 @@ jobs:
 
     - name: Download Exiv2 build
       run: |
-        curl -O   $EXIV2_BUILDS_URL
+        curl -LO  $EXIV2_BUILDS_URL
         tar  -zxf ${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT}
         cp   -f   ${EXIV2_DIR}/lib/libexiv2.so.${EXIV2_VERSION}   ${LIB_DIR}/libexiv2.so
 
@@ -110,7 +110,7 @@ jobs:
 
     - name: Download Exiv2 build
       run: |
-        curl -O   $EXIV2_BUILDS_URL
+        curl -LO  $EXIV2_BUILDS_URL
         tar  -zxf ${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT}
         cp   -f   $EXIV2_DIR/lib/libexiv2.${EXIV2_VERSION}.dylib  $LIB_DIR/libexiv2.dylib
 
@@ -184,7 +184,7 @@ jobs:
       shell: cmd
       run: |
         call env.bat
-        curl -O   %EXIV2_BUILDS_URL%
+        curl -LO  %EXIV2_BUILDS_URL%
         python -m zipfile -e %EXIV2_BUILD_NAME%%EXIV2_BUILD_EXT% .
 
         :: copy      %EXIV2_DIR%\bin\exiv2.dll   %LIB_DIR%
