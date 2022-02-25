@@ -20,6 +20,7 @@ jobs:
     runs-on: ${{matrix.os}}
     env:
       PLATFORM_NAME: linux
+      EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
       EXIV2_VERSION: ${{matrix.exiv2_version}}
       EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-Linux64
       EXIV2_BUILD_EXT: .tar.gz
@@ -28,10 +29,10 @@ jobs:
     - name: Set environment variables
       run: |
         set -u
-        echo  EXIV2_BUILDS_URL=https://www.exiv2.org/builds/${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT} >>  $GITHUB_ENV
-        echo  EXIV2_DIR=`pwd`/${EXIV2_BUILD_NAME}                                                 >>  $GITHUB_ENV
-        echo  LIB_DIR=`pwd`/pyexiv2/lib                                                           >>  $GITHUB_ENV
-        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION}-${PLATFORM_NAME}                  >>  $GITHUB_ENV
+        echo  EXIV2_BUILDS_URL=${EXIV2_URL}/${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT} >>  $GITHUB_ENV
+        echo  EXIV2_DIR=`pwd`/${EXIV2_BUILD_NAME}                                 >>  $GITHUB_ENV
+        echo  LIB_DIR=`pwd`/pyexiv2/lib                                           >>  $GITHUB_ENV
+        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION}-${PLATFORM_NAME}  >>  $GITHUB_ENV
 
     - uses: actions/checkout@v2
 
@@ -91,6 +92,7 @@ jobs:
     runs-on: ${{matrix.os}}
     env:
       PLATFORM_NAME: darwin
+      EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
       EXIV2_VERSION: ${{matrix.exiv2_version}}
       EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-Darwin
       EXIV2_BUILD_EXT: .tar.gz
@@ -99,10 +101,10 @@ jobs:
     - name: Set environment variables
       run: |
         set -u
-        echo  EXIV2_BUILDS_URL=https://www.exiv2.org/builds/${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT} >>  $GITHUB_ENV
-        echo  EXIV2_DIR=`pwd`/${EXIV2_BUILD_NAME}                                                 >>  $GITHUB_ENV
-        echo  LIB_DIR=`pwd`/pyexiv2/lib                                                           >>  $GITHUB_ENV
-        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION}-${PLATFORM_NAME}                  >>  $GITHUB_ENV
+        echo  EXIV2_BUILDS_URL=${EXIV2_URL}/${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT} >>  $GITHUB_ENV
+        echo  EXIV2_DIR=`pwd`/${EXIV2_BUILD_NAME}                                 >>  $GITHUB_ENV
+        echo  LIB_DIR=`pwd`/pyexiv2/lib                                           >>  $GITHUB_ENV
+        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION}-${PLATFORM_NAME}  >>  $GITHUB_ENV
 
     - uses: actions/checkout@v2
 
@@ -162,6 +164,7 @@ jobs:
     runs-on: ${{matrix.os}}
     env:
       PLATFORM_NAME: win
+      EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
       EXIV2_VERSION: ${{matrix.exiv2_version}}
       EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-2019msvc64
       EXIV2_BUILD_EXT: .zip
@@ -172,7 +175,7 @@ jobs:
     - name: Set environment variables
       shell: cmd
       run: |
-        echo  set EXIV2_BUILDS_URL=https://www.exiv2.org/builds/%EXIV2_BUILD_NAME%%EXIV2_BUILD_EXT%>> env.bat
+        echo  set EXIV2_BUILDS_URL=%EXIV2_URL%/%EXIV2_BUILD_NAME%%EXIV2_BUILD_EXT%>> env.bat
         echo  set EXIV2_DIR=%CD%\%EXIV2_BUILD_NAME%>> env.bat
         echo  set LIB_DIR=%CD%\pyexiv2\lib>> env.bat
         echo  set SUB_LIB_DIR=%CD%\pyexiv2\lib\py%PYTHON_VERSION%-%PLATFORM_NAME%>> env.bat
