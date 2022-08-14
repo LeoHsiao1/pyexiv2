@@ -126,6 +126,7 @@ def test_modify_iptc():
 def test_modify_xmp():
     changes = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',
                'Xmp.xmp.Rating': None,
+               'Xmp.iptc.Location': 'somewhere',
                'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']}
     ENV.img.modify_xmp(changes)
     expected_result = simulate_updating_metadata(data.XMP, changes)

@@ -27,7 +27,10 @@ TOC:
 ## Installation
 
 - pyexiv2 is a third party library for Python, based on C++ and Python.
-- You can execute `pip install pyexiv2` to install the compiled package of pyexiv2, which supports running on 64bit Linux, MacOS and Windows, with CPython(≥3.5) interpreter.
+- You can execute `pip install pyexiv2` to install pyexiv2. It provides some compiled installation packages with the following compatibility conditions:
+  - The operating system is Linux, MacOS, or Windows
+  - The CPU architecture is AMD64
+  - The Python interpreter is CPython(≥3.5)
 - If you want to run pyexiv2 on another platform, You can download the source code and compile it. See [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md).
 
 ### FAQ
