@@ -111,6 +111,11 @@ class Image:
             raise TypeError('The ICC profile should be of bytes type.')
         return self.img.modify_icc(data, len(data))
 
+    def modify_thumbnail(self, data: bytes):
+        if not isinstance(data, bytes):
+            raise TypeError('The thumbnail should be of bytes type.')
+        return self.img.modify_thumbnail(data, len(data))
+
     def _parse(self, table: list, encoding='utf-8') -> dict:
         """ Parse the metadata from a text table into a dict. """
         data = {}

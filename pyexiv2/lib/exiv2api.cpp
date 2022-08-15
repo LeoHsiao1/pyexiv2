@@ -359,6 +359,14 @@ public:
         check_error_log();
     }
 
+    void modify_thumbnail(const char *data, long size)
+    {
+        Exiv2::ExifThumb exifThumb((*img)->exifData());
+        exifThumb.setJpegThumbnail((Exiv2::byte *) data, size);
+        (*img)->writeMetadata();
+        check_error_log();
+    }
+
     void clear_exif()
     {
         (*img)->clearExifData();
@@ -442,6 +450,7 @@ PYBIND11_MODULE(exiv2api, m)
         .def("modify_raw_xmp"   , &Image::modify_raw_xmp)
         .def("modify_comment"   , &Image::modify_comment)
         .def("modify_icc"       , &Image::modify_icc)
+        .def("modify_thumbnail" , &Image::modify_thumbnail)
         .def("clear_exif"       , &Image::clear_exif)
         .def("clear_iptc"       , &Image::clear_iptc)
         .def("clear_xmp"        , &Image::clear_xmp)
