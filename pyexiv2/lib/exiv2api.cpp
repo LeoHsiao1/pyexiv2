@@ -217,6 +217,14 @@ public:
         return py::bytes((char*)(*img)->iccProfile()->pData_, (*img)->iccProfile()->size_);
     }
 
+    py::object read_thumbnail()
+    {
+        Exiv2::ExifData &exifData = (*img)->exifData();
+        Exiv2::ExifThumb exifThumb(exifData);
+        Exiv2::DataBuf buf = exifThumb.copy();
+        return py::bytes((char*)buf.pData_, buf.size_);
+    }
+
     void modify_exif(py::list table, py::str encoding)
     {
         // Create an empty container for storing data
@@ -345,8 +353,8 @@ public:
 
     void modify_icc(const char *data, long size)
     {
-        Exiv2::DataBuf data_buf((Exiv2::byte *) data, size);
-        (*img)->setIccProfile(data_buf);
+        Exiv2::DataBuf buf((Exiv2::byte *) data, size);
+        (*img)->setIccProfile(buf);
         (*img)->writeMetadata();
         check_error_log();
     }
@@ -419,6 +427,7 @@ PYBIND11_MODULE(exiv2api, m)
         .def("read_raw_xmp"      , &Image::read_raw_xmp)
         .def("read_comment"      , &Image::read_comment)
         .def("read_icc"          , &Image::read_icc)
+        .def("read_thumbnail"    , &Image::read_thumbnail)
         .def("modify_exif"       , &Image::modify_exif)
         .def("modify_iptc"       , &Image::modify_iptc)
         .def("modify_xmp"        , &Image::modify_xmp)

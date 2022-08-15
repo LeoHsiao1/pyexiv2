@@ -82,6 +82,9 @@ class Image:
     def read_icc(self) -> bytes:
         return self.img.read_icc()
 
+    def read_thumbnail(self) -> bytes:
+        return self.img.read_thumbnail()
+
     def modify_exif(self, data: dict, encoding='utf-8'):
         # Encode some tags
         for tag in reference.EXIF_TAGS_ENCODED_IN_UCS2:
