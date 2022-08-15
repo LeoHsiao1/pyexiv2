@@ -191,6 +191,9 @@ class Image:
     def clear_icc(self):
         self.img.clear_icc()
 
+    def clear_thumbnail(self):
+        self.img.clear_thumbnail()
+
 
 class ImageData(Image):
     """
