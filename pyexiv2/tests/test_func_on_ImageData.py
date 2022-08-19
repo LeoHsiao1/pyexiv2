@@ -21,7 +21,7 @@ def test_modify_exif():
         with ImageData(f.read()) as img:
             expected_result = simulate_updating_metadata(data.EXIF, changes)
             result = img.read_exif()
-            ignored_keys = ['Exif.Image.ExifTag']
+            ignored_keys = ['Exif.Image.ExifTag', 'Exif.Thumbnail.JPEGInterchangeFormat']
             for key in ignored_keys:
                 expected_result.pop(key)
                 result.pop(key)
