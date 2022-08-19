@@ -87,6 +87,11 @@ def test_read_icc():
     check_img_md5()
 
 
+def test_read_thumbnail():
+    diff_text(data.EXIF_THUMB, ENV.img.read_thumbnail())
+    check_img_md5()
+
+
 def test_modify_exif():
     changes = {'Exif.Image.ImageDescription': 'test-中文-',
                'Exif.Image.Artist': None}
@@ -95,7 +100,7 @@ def test_modify_exif():
     # Check the modified data
     expected_result = simulate_updating_metadata(data.EXIF, changes)
     result = ENV.img.read_exif()
-    ignored_keys = ['Exif.Image.ExifTag']
+    ignored_keys = ['Exif.Image.ExifTag', 'Exif.Thumbnail.JPEGInterchangeFormat']
     for key in ignored_keys:
         expected_result.pop(key)
         result.pop(key)
@@ -155,6 +160,12 @@ def test_modify_icc():
     check_the_copy_of_img(diff_text, data.GRAY_ICC, 'read_icc')
 
 
+def test_modify_thumbnail():
+    ENV.img.modify_thumbnail(data.EXIF_THUMB)
+    diff_text(data.EXIF_THUMB, ENV.img.read_thumbnail())
+    check_the_copy_of_img(diff_text, data.EXIF_THUMB, 'read_thumbnail')
+
+
 def test_clear_exif():
     ENV.img.clear_exif()
     diff_dict({}, ENV.img.read_exif())
@@ -183,6 +194,12 @@ def test_clear_icc():
     ENV.img.clear_icc()
     diff_text(b'', ENV.img.read_icc())
     check_the_copy_of_img(diff_text, b'', 'read_icc')
+
+
+def test_clear_thumbnail():
+    ENV.img.clear_thumbnail()
+    diff_text(b'', ENV.img.read_thumbnail())
+    check_the_copy_of_img(diff_text, b'', 'read_thumbnail')
 
 
 def test_registerNs():

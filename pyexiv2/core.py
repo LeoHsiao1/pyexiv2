@@ -82,6 +82,9 @@ class Image:
     def read_icc(self) -> bytes:
         return self.img.read_icc()
 
+    def read_thumbnail(self) -> bytes:
+        return self.img.read_thumbnail()
+
     def modify_exif(self, data: dict, encoding='utf-8'):
         # Encode some tags
         for tag in reference.EXIF_TAGS_ENCODED_IN_UCS2:
@@ -107,6 +110,11 @@ class Image:
         if not isinstance(data, bytes):
             raise TypeError('The ICC profile should be of bytes type.')
         return self.img.modify_icc(data, len(data))
+
+    def modify_thumbnail(self, data: bytes):
+        if not isinstance(data, bytes):
+            raise TypeError('The thumbnail should be of bytes type.')
+        return self.img.modify_thumbnail(data, len(data))
 
     def _parse(self, table: list, encoding='utf-8') -> dict:
         """ Parse the metadata from a text table into a dict. """
@@ -187,6 +195,9 @@ class Image:
 
     def clear_icc(self):
         self.img.clear_icc()
+
+    def clear_thumbnail(self):
+        self.img.clear_thumbnail()
 
 
 class ImageData(Image):

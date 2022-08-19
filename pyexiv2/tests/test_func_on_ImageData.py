@@ -1,5 +1,4 @@
 from .base import *
-from .test_func import test_read_exif, test_read_iptc, test_read_xmp, test_read_raw_xmp, test_read_comment, test_read_icc
 
 
 def setup_function():
@@ -22,7 +21,7 @@ def test_modify_exif():
         with ImageData(f.read()) as img:
             expected_result = simulate_updating_metadata(data.EXIF, changes)
             result = img.read_exif()
-            ignored_keys = ['Exif.Image.ExifTag']
+            ignored_keys = ['Exif.Image.ExifTag', 'Exif.Thumbnail.JPEGInterchangeFormat']
             for key in ignored_keys:
                 expected_result.pop(key)
                 result.pop(key)
@@ -67,6 +66,7 @@ def test_clear_all():
             img.clear_xmp()
             img.clear_comment()
             img.clear_icc()
+            img.clear_thumbnail()
             f.seek(0)
             f.write(img.get_bytes())
         f.seek(0)
@@ -76,4 +76,5 @@ def test_clear_all():
             assert img.read_xmp() == {}
             assert img.read_comment() == ''
             assert img.read_icc() == b''
+            assert img.read_thumbnail() == b''
 

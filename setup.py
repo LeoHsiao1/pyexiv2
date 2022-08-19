@@ -8,7 +8,7 @@ with open('README.md', encoding='utf-8') as f:
 
 setuptools.setup(
     name='pyexiv2',
-    version='2.7.1',    # need to set the variable in 'pyexiv2/__init__.py'
+    version='2.8.0',    # need to set the variable in 'pyexiv2/__init__.py'
     author='LeoHsiao',
     author_email='leohsiao@foxmail.com',
     description='Read/Write metadata(including EXIF, IPTC, XMP), comment and ICC Profile embedded in digital images.',
@@ -26,10 +26,5 @@ setuptools.setup(
         'Operating System :: POSIX :: Linux',
         'Operating System :: MacOS',
         'Operating System :: Microsoft :: Windows',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
     ],
 )
