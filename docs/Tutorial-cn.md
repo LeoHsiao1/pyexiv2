@@ -77,28 +77,31 @@
 class Image:
     def __init__(self, filename, encoding='utf-8')
     def close(self)
-    def get_mime_type(self) -> str
-    def get_access_mode(self)  -> dict
+    def get_mime_type   (self) -> str
+    def get_access_mode (self) -> dict
 
-    def read_exif     (self, encoding='utf-8') -> dict
-    def read_iptc     (self, encoding='utf-8') -> dict
-    def read_xmp      (self, encoding='utf-8') -> dict
-    def read_raw_xmp  (self, encoding='utf-8') -> str
-    def read_comment  (self, encoding='utf-8') -> str
-    def read_icc      (self, encoding='utf-8') -> bytes
+    def read_exif       (self, encoding='utf-8') -> dict
+    def read_iptc       (self, encoding='utf-8') -> dict
+    def read_xmp        (self, encoding='utf-8') -> dict
+    def read_raw_xmp    (self, encoding='utf-8') -> str
+    def read_comment    (self, encoding='utf-8') -> str
+    def read_icc        (self) -> bytes
+    def read_thumbnail  (self) -> bytes
 
-    def modify_exif   (self, data: dict, encoding='utf-8')
-    def modify_iptc   (self, data: dict, encoding='utf-8')
-    def modify_xmp    (self, data: dict, encoding='utf-8')
-    def modify_raw_xmp(self, data: str,  encoding='utf-8')
-    def modify_comment(self, data: str,  encoding='utf-8')
-    def modify_icc    (self, data: bytes)
+    def modify_exif     (self, data: dict, encoding='utf-8')
+    def modify_iptc     (self, data: dict, encoding='utf-8')
+    def modify_xmp      (self, data: dict, encoding='utf-8')
+    def modify_raw_xmp  (self, data: str,  encoding='utf-8')
+    def modify_comment  (self, data: str,  encoding='utf-8')
+    def modify_icc      (self, data: bytes)
+    def modify_thumbnail(self, data: bytes)
 
-    def clear_exif    (self)
-    def clear_iptc    (self)
-    def clear_xmp     (self)
-    def clear_comment (self)
-    def clear_icc     (self)
+    def clear_exif      (self)
+    def clear_iptc      (self)
+    def clear_xmp       (self)
+    def clear_comment   (self)
+    def clear_icc       (self)
+    def clear_thumbnail (self)
 
 
 class ImageData(Image):
@@ -241,6 +244,12 @@ def set_log_level(level=2)
 ### icc
 
 - `img.read_icc()`、`img.modify_icc()`、`img.clear_icc()` 用于访问图片里的 [ICC profile](https://en.wikipedia.org/wiki/ICC_profile) 。
+
+
+### thumbnail
+
+- EXIF 标准允许在 JPEG 图片中嵌入缩略图，通常存储在 APP1 标签（FFE1）中。
+- Exiv2 支持读写图像中的 EXIF 缩略图。但是只能插入 JPEG 缩略图（不能插入TIFF）。
 
 ## class ImageData
 
