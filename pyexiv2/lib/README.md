@@ -32,7 +32,7 @@
     - For example:
         ```sh
         cd /root/
-        curl -O https://www.exiv2.org/builds/exiv2-0.27.4-Linux64.tar.gz
+        curl -O https://github.com/Exiv2/exiv2/releases/download/v0.27.4/exiv2-0.27.4-Linux64.tar.gz
         tar -zxvf exiv2-0.27.4-Linux64.tar.gz
         ```
 
@@ -69,7 +69,7 @@
     - For example:
         ```sh
         cd /Users/leo/Documents/
-        curl -O https://www.exiv2.org/builds/exiv2-0.27.4-Darwin.tar.gz
+        curl -O https://github.com/Exiv2/exiv2/releases/download/v0.27.4/exiv2-0.27.4-Darwin.tar.gz
         tar -zxvf exiv2-0.27.4-Darwin.tar.gz
         ```
 
@@ -104,7 +104,7 @@
     - msvc64 : <https://www.exiv2.org/archive.html>
     - For example:
         ```sh
-        curl -O https://www.exiv2.org/releases/exiv2-0.27.4-2019msvc64.zip
+        curl -O https://github.com/Exiv2/exiv2/releases/download/v0.27.4/exiv2-0.27.4-2019msvc64.zip
         ```
 
 2. Install `Visual Studio 2019` (must use the same version of Visual Studio as the Exiv2 build) , and set the environment variables it needs.
