@@ -20,9 +20,7 @@ Read/Write metadata(including [EXIF](https://en.wikipedia.org/wiki/Exif), [IPTC]
 
 ## Docs
 
-- [Tutorial](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial.md)
-- [中文教程](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial-cn.md)
-
+- [Tutorial](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial.md) | [中文教程](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial-cn.md)
 - Similar projects:
   - [pyexiv2](https://launchpad.net/pyexiv2): It is a Python 2 binding to exiv2, hasn't been updated since 2011.
   - [py3exiv2](https://pypi.org/project/py3exiv2/): It is a Python 3 binding to exiv2, wrapped with Boost.Python.
