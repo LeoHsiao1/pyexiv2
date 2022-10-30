@@ -16,7 +16,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         python_version: [3.5, 3.6, 3.7, 3.8, 3.9, '3.10', '3.11']
-        exiv2_version: [0.27.4]
+        exiv2_version: [0.27.5]
     runs-on: ${{matrix.os}}
     env:
       PLATFORM_NAME: linux
@@ -88,7 +88,7 @@ jobs:
       matrix:
         os: [macos-11]
         python_version: [3.5, 3.6, 3.7, 3.8, 3.9, '3.10', '3.11']
-        exiv2_version: [0.27.4]
+        exiv2_version: [0.27.5]
     runs-on: ${{matrix.os}}
     env:
       PLATFORM_NAME: darwin
@@ -160,7 +160,7 @@ jobs:
       matrix:
         os: [windows-2019]
         python_version: [3.5, 3.6, 3.7, 3.8, 3.9, '3.10', '3.11']
-        exiv2_version: [0.27.4]
+        exiv2_version: [0.27.5]
     runs-on: ${{matrix.os}}
     env:
       PLATFORM_NAME: win
@@ -186,9 +186,7 @@ jobs:
         call env.bat
         curl -LO  %EXIV2_BUILDS_URL%
         python -m zipfile -e %EXIV2_BUILD_NAME%%EXIV2_BUILD_EXT% .
-
-        :: copy      %EXIV2_DIR%\bin\exiv2.dll   %LIB_DIR%
-        :: Do not use the official current release exiv2.dll as it does not set `EXIV2_ENABLE_BMFF=ON` at compile time.
+        copy      %EXIV2_DIR%\bin\exiv2.dll   %LIB_DIR%
 
     - name: Set up Python ${{matrix.python_version}}
       uses: actions/setup-python@v2
