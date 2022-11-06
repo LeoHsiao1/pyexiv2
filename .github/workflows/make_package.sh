@@ -12,7 +12,7 @@ echo WORK_DIR: $WORK_DIR
 
 if [ ! -f setup.py ]
 then
-    echo '[ERROR] WORK_DIR is valid.'
+    echo '[ERROR] WORK_DIR is invalid.'
     exit 1
 fi
 

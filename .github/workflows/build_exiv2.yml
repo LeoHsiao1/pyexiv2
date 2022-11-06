@@ -11,8 +11,8 @@ on:
         default: v0.27.5
 
 jobs:
-  job1:
-    name: Build on Linux
+  Linux:
+    name: 'Build Linux Release'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -24,10 +24,13 @@ jobs:
         run: |
           sudo apt-get install ninja-build
           sudo apt-get install gettext
-          pip3 install conan==1.36.0
+          sudo apt-get install doxygen
+          sudo apt-get install graphviz
+          pip3 install conan==1.39.0
 
       - name: Conan common config
         run: |
+          conan config install https://github.com/conan-io/conanclientcert.git
           conan profile new --detect default
           conan profile update settings.build_type=Release default
           conan profile update settings.compiler.libcxx=libstdc++11 default
@@ -42,7 +45,8 @@ jobs:
       - name: Build packaged release
         run: |
           cd build
-          cmake -GNinja -DEXIV2_TEAM_PACKAGING=ON -DBUILD_SHARED_LIBS=ON -DEXIV2_ENABLE_WEBREADY=OFF -DEXIV2_ENABLE_NLS=ON -DCMAKE_BUILD_TYPE=Release -DEXIV2_ENABLE_BMFF=ON -DEXIV2_TEAM_WARNINGS_AS_ERRORS=ON ..
+          cmake -GNinja -DEXIV2_TEAM_PACKAGING=ON -DBUILD_SHARED_LIBS=ON -DEXIV2_ENABLE_WEBREADY=OFF -DEXIV2_ENABLE_NLS=ON -DCMAKE_BUILD_TYPE=Release -DEXIV2_ENABLE_BMFF=ON -DEXIV2_TEAM_WARNINGS_AS_ERRORS=ON -DEXIV2_BUILD_DOC=ON ..
+          cmake --build . -t doc
           cmake --build . -t package
           tree -L 3
 
@@ -53,8 +57,8 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  job2:
-    name: Build on MacOS
+  macOS:
+    name: 'Build macOS Release'
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
@@ -67,21 +71,14 @@ jobs:
           brew install ninja
           brew install tree
           brew install gettext
-          pip3 install conan==1.36.0
-
-      - name: Run Conan
-        run: |
-          mkdir build && cd build
-          conan profile new --detect default
-          conan profile show default
-          conan install .. -o webready=False --build missing
-          # Hack: Delete cmake_find_package generated files to fix compilation on mac.
-          rm Find*
+          brew install doxygen
+          brew install graphviz
 
       - name: Build packaged release
         run: |
-          cd build
-          cmake -GNinja -DEXIV2_TEAM_PACKAGING=ON -DBUILD_SHARED_LIBS=ON -DEXIV2_ENABLE_WEBREADY=OFF -DEXIV2_ENABLE_NLS=ON -DCMAKE_BUILD_TYPE=Release -DEXIV2_ENABLE_BMFF=ON -DEXIV2_TEAM_WARNINGS_AS_ERRORS=ON -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
+          mkdir build && cd build
+          cmake -GNinja -DEXIV2_TEAM_PACKAGING=ON -DBUILD_SHARED_LIBS=ON -DEXIV2_ENABLE_WEBREADY=OFF -DEXIV2_ENABLE_NLS=ON -DCMAKE_BUILD_TYPE=Release -DEXIV2_ENABLE_BMFF=ON -DEXIV2_TEAM_WARNINGS_AS_ERRORS=ON -DEXIV2_BUILD_DOC=ON -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
+          cmake --build . -t doc
           cmake --build . -t package
           tree -L 3
 
@@ -92,8 +89,8 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  job3:
-    name: Build on Windows
+  Windows:
+    name: 'Build Windows Release'
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
@@ -120,9 +117,15 @@ jobs:
             path: ${{github.workspace}}/conanCache
             key: ${{runner.os}}-packaged-win-release-${{ hashFiles('conanfile.py') }}
 
+      - name: Install doxygen
+        run: |
+          choco install doxygen.install
+          choco install graphviz
+
       - name: Install Conan & Common config
         run: |
-          pip.exe install conan
+          pip.exe install "conan==1.39.0"
+          conan config install https://github.com/conan-io/conanclientcert.git
           conan profile new --detect default
           conan profile update settings.build_type=Release default
           conan config set storage.path=$Env:GITHUB_WORKSPACE/conanCache
@@ -141,7 +144,8 @@ jobs:
       - name: Build packaged release
         run: |
           cd build
-          cmake -GNinja -DEXIV2_TEAM_PACKAGING=ON -DBUILD_SHARED_LIBS=ON -DEXIV2_ENABLE_WEBREADY=OFF -DEXIV2_ENABLE_NLS=OFF -DCMAKE_BUILD_TYPE=Release -DEXIV2_ENABLE_BMFF=ON -DEXIV2_TEAM_WARNINGS_AS_ERRORS=ON ..
+          cmake -GNinja -DEXIV2_TEAM_PACKAGING=ON -DBUILD_SHARED_LIBS=ON -DEXIV2_ENABLE_WEBREADY=OFF -DEXIV2_ENABLE_NLS=OFF -DCMAKE_BUILD_TYPE=Release -DEXIV2_ENABLE_BMFF=ON -DEXIV2_TEAM_WARNINGS_AS_ERRORS=ON -DEXIV2_BUILD_DOC=ON ..
+          cmake --build . -t doc
           cmake --build . -t package
           tree -L 3
 
