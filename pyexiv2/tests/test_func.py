@@ -4,7 +4,7 @@ from .base import *
 def test_version():
     try:
         from .base import __exiv2_version__
-        assert __exiv2_version__ == '0.27.5'
+        assert __exiv2_version__ == '0.28.0'
     except:
         ENV.skip_test = True
         raise
