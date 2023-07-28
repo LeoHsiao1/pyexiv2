@@ -33,8 +33,8 @@
 
 2. Prepare environment variables according to your download path:
     ```sh
-    EXIV2_DIR=/mnt/c/Users/Leo/Downloads/exiv2-0.28.0-Linux64
-    LIB_DIR=`git rev-parse --show-toplevel`/pyexiv2/lib/
+    EXIV2_DIR=??/exiv2-0.28.0-Linux64
+    LIB_DIR=??/pyexiv2/lib/
     cp $EXIV2_DIR/lib/libexiv2.so.0.28.0  $EXIV2_DIR/lib/libexiv2.so
     cp $EXIV2_DIR/lib/libexiv2.so.0.28.0  $LIB_DIR/libexiv2.so
     ```
@@ -71,8 +71,8 @@
 
 2. Prepare environment variables according to your download path:
     ```sh
-    EXIV2_DIR=/Users/leo/Documents/exiv2-0.28.0-Darwin
-    LIB_DIR=`git rev-parse --show-toplevel`/pyexiv2/lib
+    EXIV2_DIR=??/exiv2-0.28.0-Darwin
+    LIB_DIR=??/pyexiv2/lib
     cp ${EXIV2_DIR}/lib/libexiv2.0.28.0.dylib ${LIB_DIR}/libexiv2.dylib
     ```
 
@@ -111,8 +111,8 @@
 3. Prepare environment variables according to your download path:
     ```batch
     "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
-    set  EXIV2_DIR=C:\Users\Leo\Downloads\exiv2-0.28.0-2019msvc64
-    set  LIB_DIR=%PYEXIV2_DIR%\pyexiv2\lib
+    set  EXIV2_DIR=??\exiv2-0.28.0-2019msvc64
+    set  LIB_DIR=??\pyexiv2\lib
     copy %EXIV2_DIR%\bin\exiv2.dll  %LIB_DIR%
     ```
 
