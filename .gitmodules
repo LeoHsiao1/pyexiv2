@@ -1,4 +1,4 @@
 [submodule ".github/exiv2"]
 	path = .github/exiv2
 	url = https://github.com/Exiv2/exiv2.git
-  branch = v0.27.5
+  branch = v0.27.7

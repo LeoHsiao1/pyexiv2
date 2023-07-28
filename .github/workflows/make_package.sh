@@ -69,15 +69,15 @@ make_wheels
 
 # Make wheel packages for MacOS platform
 plat_type=darwin
-plat_name=macosx_10_14_x86_64
+plat_name=macosx_12_0_x86_64
 EXIV2_LIB_FILE='libexiv2.dylib'
 make_wheels
 # Add plat_name for MacOS platform
-cd $DIST_DIR
-for f in `ls | grep ${plat_name}`
-do
-    mv  $f  ${f/.whl/.macosx_11_0_x86_64.whl}
-done
+# cd $DIST_DIR
+# for f in `ls | grep ${plat_name}`
+# do
+#     mv  $f  ${f/.whl/.macosx_13_0_x86_64.whl}
+# done
 
 # Make wheel packages for Windows platform
 plat_type=win
