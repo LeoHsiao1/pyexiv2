@@ -14,21 +14,39 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macos-11, windows-2019]
+        os: [macos-12, windows-2019]
         python_version: [3.5, 3.6, 3.7, 3.8, 3.9, '3.10', '3.11']
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
-
     - name: Set up Python ${{ matrix.python_version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python_version }}
-
     - name: Install dependencies
       run: |
         python -m pip install pytest psutil
+    - name: Test
+      run: |
+        pytest -v
 
+  job2:
+    name: Test on ubuntu
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04]
+        python_version: [3.7, 3.8, 3.9, '3.10', '3.11']
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python_version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python_version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install pytest psutil
     - name: Test
       run: |
         pytest -v
