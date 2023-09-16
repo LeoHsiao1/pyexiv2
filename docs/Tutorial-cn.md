@@ -44,8 +44,8 @@
       self._handle = _dlopen(self._name, mode)
   OSError: /lib64/libm.so.6: version `GLIBC_2.29' not found (required by /usr/local/lib/python3.6/site-packages/pyexiv2/lib/libexiv2.so)
   ```
-  - 这是因为 pyexiv2 在编译时使用了 GLIBC 2.29 ，它在 2019 年 1 月发布。你需要升级你的 GLIBC 库，或者升级 Linux 发行版。
-  - 你可以执行 `ldd --version` 查看 GLIBC 库的版本。
+  - 这是因为 pyexiv2 是使用较新版本的 GLIBC 库编译的。你需要升级你的 GLIBC 库，或者升级你的 Linux 发行版。
+  - 你可以在自己电脑上执行 `ldd --version` 查看 GLIBC 库的版本。
 
 - 在 MacOS 上使用 pyexiv2 时，你可能遇到以下异常：
   ```py
