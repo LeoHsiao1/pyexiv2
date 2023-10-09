@@ -49,7 +49,7 @@ rm -rf $DIST_DIR
 # mv $whl_name ${whl_name/-none-any/}
 
 make_wheels(){
-    for py_version in {5..11}
+    for py_version in {5..12}
     do
         reset_workdir
         rm -rf $TEST_DIR
