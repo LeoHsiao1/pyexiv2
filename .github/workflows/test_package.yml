@@ -24,7 +24,7 @@ jobs:
         python-version: ${{ matrix.python_version }}
     - name: Install dependencies
       run: |
-        python -m pip install pyexiv2==2.8.2
+        python -m pip install pyexiv2==2.8.3
         python -m pip install pytest psutil
     - name: Test
       run: |
@@ -50,7 +50,7 @@ jobs:
         python-version: ${{ matrix.python_version }}
     - name: Install dependencies
       run: |
-        python -m pip install pyexiv2==2.8.2
+        python -m pip install pyexiv2==2.8.3
         python -m pip install pytest psutil
     - name: Test
       run: |
