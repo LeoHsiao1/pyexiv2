@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04]
-        python_version: [3.7, 3.8, 3.9, '3.10', '3.11']
+        python_version: [3.7, 3.8, 3.9, '3.10', '3.11', '3.12']
         exiv2_version: [0.27.7]
     runs-on: ${{matrix.os}}
     env:
@@ -87,7 +87,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-12]
-        python_version: [3.5, 3.6, 3.7, 3.8, 3.9, '3.10', '3.11']
+        python_version: [3.5, 3.6, 3.7, 3.8, 3.9, '3.10', '3.11', '3.12']
         exiv2_version: [0.27.7]
     runs-on: ${{matrix.os}}
     env:
@@ -159,7 +159,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2019]
-        python_version: [3.5, 3.6, 3.7, 3.8, 3.9, '3.10', '3.11']
+        python_version: [3.5, 3.6, 3.7, 3.8, 3.9, '3.10', '3.11', '3.12']
         exiv2_version: [0.27.7]
     runs-on: ${{matrix.os}}
     env:
