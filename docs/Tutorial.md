@@ -270,9 +270,6 @@ def set_log_level(level=2)
             f.truncate()
             # Get the bytes data of the image and save it to the file
             f.write(img.get_bytes())
-        f.seek(0)
-        with pyexiv2.ImageData(f.read()) as img:
-            result = img.read_iptc()
     ```
 
 ## Data types
