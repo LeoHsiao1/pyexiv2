@@ -2,28 +2,6 @@
 
 Language: [English](./Tutorial.md) | [中文](./Tutorial-cn.md)
 
-TOC:
-<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=6 orderedList=false} -->
-
-<!-- code_chunk_output -->
-
-- [Installation](#installation)
-  - [FAQ](#faq)
-- [API list](#api-list)
-- [class Image](#class-image)
-  - [close](#close)
-  - [read](#read)
-  - [modify](#modify)
-  - [clear](#clear)
-  - [comment](#comment)
-  - [icc](#icc)
-- [class ImageData](#class-imagedata)
-- [Data types](#data-types)
-- [Log](#log)
-- [BMFF](#bmff)
-
-<!-- /code_chunk_output -->
-
 ## Installation
 
 - pyexiv2 is a third party library for Python, based on C++ and Python.
