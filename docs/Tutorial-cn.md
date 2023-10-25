@@ -2,28 +2,6 @@
 
 语言: [English](./Tutorial.md) | [中文](./Tutorial-cn.md)
 
-目录:
-<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=6 orderedList=false} -->
-
-<!-- code_chunk_output -->
-
-- [安装](#安装)
-  - [常见问题](#常见问题)
-- [API 列表](#api-列表)
-- [Class Image](#class-image)
-  - [close](#close)
-  - [read](#read)
-  - [modify](#modify)
-  - [clear](#clear)
-  - [comment](#comment)
-  - [icc](#icc)
-- [class ImageData](#class-imagedata)
-- [数据类型](#数据类型)
-- [日志](#日志)
-- [BMFF](#bmff)
-
-<!-- /code_chunk_output -->
-
 ## 安装
 
 - pyexiv2 是一个 Python 第三方库，基于 C++ 和 Python 开发。
