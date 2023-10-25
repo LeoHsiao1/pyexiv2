@@ -271,9 +271,6 @@ def set_log_level(level=2)
             f.truncate()
             # 获取图片的字节数据并保存到文件中
             f.write(img.get_bytes())
-        f.seek(0)
-        with pyexiv2.ImageData(f.read()) as img:
-            result = img.read_iptc()
     ```
 
 ## 数据类型
