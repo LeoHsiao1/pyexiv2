@@ -123,7 +123,12 @@ class Image:
             tag, value, typeName = [field.decode(encoding) for field in line]
             if typeName in ['XmpBag', 'XmpSeq']:
                 value = value.split(', ')
+            elif typeName in ['XmpText']:
+                # Handle nested array structures in XML. Refer to https://exiv2.org/manpage.html#set_xmp_struct
+                if value in ['type="Bag"', 'type="Seq"']:
+                    value = ['']
             elif typeName in ['LangAlt']:
+                # Refer to https://exiv2.org/manpage.html#langalt_values
                 if 'lang=' in value:
                     fields = re.split(r', (lang="\S+") ', ', ' + value)[1:]
                     value  = {language: content for language, content in zip(fields[0::2], fields[1::2])}

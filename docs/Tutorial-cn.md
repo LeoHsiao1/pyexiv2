@@ -202,13 +202,6 @@ def set_log_level(level=2)
     >>> img.read_exif()['Exif.Photo.MakerNote']
     ''
     ```
-    ```py
-    >>> img.read_xmp()['Xmp.xmpMM.History']
-    'type="Seq"'
-    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
-    RuntimeError: XMP Toolkit error 102: Indexing applied to non-array
-    Failed to encode XMP metadata.
-    ```
 
 ### clear
 
