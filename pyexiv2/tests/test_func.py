@@ -93,6 +93,7 @@ def test_read_thumbnail():
 
 
 def test_modify_exif():
+    # Test writing key and deleting key
     changes = {'Exif.Image.ImageDescription': 'test-中文-',
                'Exif.Image.Artist': None}
     ENV.img.modify_exif(changes)
@@ -100,6 +101,7 @@ def test_modify_exif():
     # Check the modified data
     expected_result = simulate_updating_metadata(data.EXIF, changes)
     result = ENV.img.read_exif()
+    # Somehow, the value of ['Exif.Image.ExifTag', 'Exif.Thumbnail.JPEGInterchangeFormat'] will change
     ignored_keys = ['Exif.Image.ExifTag', 'Exif.Thumbnail.JPEGInterchangeFormat']
     for key in ignored_keys:
         expected_result.pop(key)
@@ -130,9 +132,8 @@ def test_modify_iptc():
 
 def test_modify_xmp():
     changes = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',
-               'Xmp.xmp.Rating': None,
-               'Xmp.iptc.Location': 'somewhere',
-               'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']}
+                'Xmp.xmp.Rating': None,
+                'Xmp.dc.subject': ['tag1', 'tag2', 'tag3']}
     ENV.img.modify_xmp(changes)
     expected_result = simulate_updating_metadata(data.XMP, changes)
     diff_dict(expected_result, ENV.img.read_xmp())
@@ -145,6 +146,21 @@ def test_modify_raw_xmp():
     diff_text(data.RAW_XMP, ENV.img.read_raw_xmp())
     check_the_copy_of_img(diff_text, data.RAW_XMP, 'read_raw_xmp')
     test_read_xmp()
+
+
+def test_modify_exif_all():
+    ENV.img.modify_exif(data.EXIF)
+    diff_dict(data.EXIF, ENV.img.read_exif())
+
+
+def test_modify_iptc_all():
+    ENV.img.modify_iptc(data.IPTC)
+    diff_dict(data.IPTC, ENV.img.read_iptc())
+
+
+def test_modify_xmp_all():
+    ENV.img.modify_xmp(data.XMP)
+    diff_dict(data.XMP, ENV.img.read_xmp())
 
 
 def test_modify_comment():
