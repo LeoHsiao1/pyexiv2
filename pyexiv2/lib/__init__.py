@@ -8,7 +8,7 @@ if platform.architecture()[0] != '64bit':
     raise RuntimeError('pyexiv2 can only run on 64-bit python3 interpreter.')
 py_version = platform.python_version()              # the version is a string, like '3.9.7'
 py_version = '.'.join(py_version.split('.')[:2])    # ignore the patch version
-expected_py_version = ['3.5', '3.6', '3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
+expected_py_version = ['3.6', '3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
 if py_version not in expected_py_version:
     raise RuntimeError('pyexiv2 only supports these Python versions: {} . But your version is {} .'.format(expected_py_version, py_version))
 

@@ -8,7 +8,7 @@
 - 你可以执行 `pip install pyexiv2` 来安装 pyexiv2 。它包含一些已编译的库文件，带有以下兼容条件：
   - 操作系统为 Linux、MacOS 或 Windows
   - CPU 架构为 AMD64
-  - Python 解释器为 CPython(≥3.5)
+  - Python 解释器为 CPython(≥3.6)
 - 如果你想在其它平台上运行 pyexiv2 ，你可以下载源代码然后编译它。参考 [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md)。
 
 ### 常见问题
@@ -179,13 +179,6 @@ def set_log_level(level=2)
     >>> img.modify_exif({'Exif.Photo.MakerNote': 'Hello'})
     >>> img.read_exif()['Exif.Photo.MakerNote']
     ''
-    ```
-    ```py
-    >>> img.read_xmp()['Xmp.xmpMM.History']
-    'type="Seq"'
-    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
-    RuntimeError: XMP Toolkit error 102: Indexing applied to non-array
-    Failed to encode XMP metadata.
     ```
 
 ### clear

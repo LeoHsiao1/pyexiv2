@@ -8,7 +8,7 @@ Language: [English](./Tutorial.md) | [中文](./Tutorial-cn.md)
 - You can execute `pip install pyexiv2` to install pyexiv2. It contains some compiled library files with the following compatibility conditions:
   - The operating system is Linux, MacOS, or Windows
   - The CPU architecture is AMD64
-  - The Python interpreter is CPython(≥3.5)
+  - The Python interpreter is CPython(≥3.6)
 - If you want to run pyexiv2 on another platform, You can download the source code and compile it. See [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md).
 
 ### FAQ
@@ -179,13 +179,6 @@ def set_log_level(level=2)
     >>> img.modify_exif({'Exif.Photo.MakerNote': 'Hello'})
     >>> img.read_exif()['Exif.Photo.MakerNote']
     ''
-    ```
-    ```py
-    >>> img.read_xmp()['Xmp.xmpMM.History']
-    'type="Seq"'
-    >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
-    RuntimeError: XMP Toolkit error 102: Indexing applied to non-array
-    Failed to encode XMP metadata.
     ```
 
 ### clear
