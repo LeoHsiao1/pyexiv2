@@ -70,8 +70,8 @@ def test_transmit_various_characters():
 
 def _test_thread_safe():
     """
-    Test whether pyexiv can successfully run multiple threads. 
-    TODO: Could not catch the exception from the child thread.
+    Test whether pyexiv2 can successfully run multiple threads. 
+    TODO: pyexiv2 is not thread-safe because in exiv2api.cpp, check_error_log() reads and writes to a global variable.
     """
     import multiprocessing
     pool = multiprocessing.Pool(3)
@@ -80,17 +80,3 @@ def _test_thread_safe():
     pool.close()
     pool.join()
 
-
-def _test_recovery_exif():
-    """
-    Test whether pyexiv2 can delete metadata and recover it completely.
-    TODO: complete it
-    """
-    original_dict = ENV.img.read_exif()
-    ENV.img.clear_exif()
-    ENV.img.modify_exif(original_dict)
-    new_dict = ENV.img.read_exif()
-    for key in original_dict.keys():
-        for key in original_dict.keys():
-            assert original_dict[key] == new_dict.get(key), "{} didn't recover".format(key)
-    check_img_md5()
