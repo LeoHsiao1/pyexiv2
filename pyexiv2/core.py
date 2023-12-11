@@ -1,7 +1,6 @@
-import re
-
-from . import reference
 from .lib import exiv2api
+from .convert import *
+from .convert import _parse, _dumps
 
 
 class Image:
@@ -49,29 +48,24 @@ class Image:
         return dic
 
     def read_exif(self, encoding='utf-8') -> dict:
-        data = self._parse(self.img.read_exif(), encoding)
-
-        # Decode some tags
-        for tag in reference.EXIF_TAGS_ENCODED_IN_UCS2:
+        data = _parse(self.img.read_exif(), encoding)
+        for tag in EXIF_TAGS_ENCODED_IN_UCS2:
             value = data.get(tag)
             if value:
-                data[tag] = self._decode_ucs2(value)
-
+                data[tag] = decode_ucs2(value)
         return data
 
     def read_iptc(self, encoding='utf-8') -> dict:
-        data = self._parse(self.img.read_iptc(), encoding)
-
-        # For repeatable tags, even if they do not have multiple values, their values are converted to list type.
-        for tag in reference.IPTC_TAGS_REPEATABLE:
+        data = _parse(self.img.read_iptc(), encoding)
+        # For repeatable tags, the value is converted to list type even if there are no multiple values.
+        for tag in IPTC_TAGS_REPEATABLE:
             value = data.get(tag)
             if isinstance(value, str):
                 data[tag] = [value]
-
         return data
 
     def read_xmp(self, encoding='utf-8') -> dict:
-        return self._parse(self.img.read_xmp(), encoding)
+        return _parse(self.img.read_xmp(), encoding)
 
     def read_raw_xmp(self, encoding='utf-8') -> str:
         return self.img.read_raw_xmp().decode(encoding)
@@ -86,19 +80,18 @@ class Image:
         return self.img.read_thumbnail()
 
     def modify_exif(self, data: dict, encoding='utf-8'):
-        data = data.copy()
-        for tag in reference.EXIF_TAGS_ENCODED_IN_UCS2:
+        data = data.copy()  # Avoid modifying the original data
+        for tag in EXIF_TAGS_ENCODED_IN_UCS2:
             value = data.get(tag)
             if value:
-                data[tag] = self._encode_ucs2(value)
-
-        self.img.modify_exif(self._dumps(data), encoding)
+                data[tag] = encode_ucs2(value)
+        self.img.modify_exif(_dumps(data), encoding)
 
     def modify_iptc(self, data: dict, encoding='utf-8'):
-        self.img.modify_iptc(self._dumps(data), encoding)
+        self.img.modify_iptc(_dumps(data), encoding)
 
     def modify_xmp(self, data: dict, encoding='utf-8'):
-        self.img.modify_xmp(self._dumps(data), encoding)
+        self.img.modify_xmp(_dumps(data), encoding)
 
     def modify_raw_xmp(self, data: str, encoding='utf-8'):
         self.img.modify_raw_xmp(data, encoding)
@@ -115,76 +108,6 @@ class Image:
         if not isinstance(data, bytes):
             raise TypeError('The thumbnail should be of bytes type.')
         return self.img.modify_thumbnail(data, len(data))
-
-    def _parse(self, table: list, encoding='utf-8') -> dict:
-        """ Parse the metadata from a text table into a dict. """
-        data = {}
-        for line in table:
-            tag, value, typeName = [field.decode(encoding) for field in line]
-            if typeName in ['XmpBag', 'XmpSeq']:
-                value = value.split(', ')
-            elif typeName in ['XmpText']:
-                # Handle nested array structures in XML. Refer to https://exiv2.org/manpage.html#set_xmp_struct
-                if value in ['type="Bag"', 'type="Seq"']:
-                    value = ['']
-            elif typeName in ['LangAlt']:
-                # Refer to https://exiv2.org/manpage.html#langalt_values
-                if 'lang=' in value:
-                    fields = re.split(r', (lang="\S+") ', ', ' + value)[1:]
-                    value  = {language: content for language, content in zip(fields[0::2], fields[1::2])}
-
-            # Convert the values to a list of strings if the tag has multiple values
-            pre_value = data.get(tag)
-            if pre_value == None:
-                data[tag] = value
-            elif isinstance(pre_value, str):
-                data[tag] = [pre_value, value]
-            elif isinstance(pre_value, list):
-                data[tag].append(value)
-
-        return data
-
-    def _dumps(self, data: dict) -> list:
-        """ Convert the metadata from a dict into a text table. """
-        table = []
-        for tag, value in data.items():
-            tag      = str(tag)
-            if value == None:
-                typeName = '_delete'
-                value    = ''
-            elif isinstance(value, (list, tuple)):
-                typeName = 'array'
-                value    = list(value)
-            elif isinstance(value, dict):
-                typeName = 'string'
-                value    = ', '.join(['{} {}'.format(k,v) for k,v in value.items()])
-            else:
-                typeName = 'string'
-                value    = str(value)
-            line = [tag, value, typeName]
-            table.append(line)
-        return table
-
-    def _decode_ucs2(self, text):
-        """
-        Convert text from UCS2 encoding to UTF8 encoding.
-        For example:
-        >>> img._decode_ucs2('116 0 101 0 115 0 116 0')
-        'test'
-        """
-        hex_str = ''.join(['{:02x}'.format(int(i)) for i in text.split()])
-        return bytes.fromhex(hex_str).decode('utf-16le')
-
-    def _encode_ucs2(self, text):
-        """
-        Convert text from UTF8 encoding to UCS2 encoding.
-        For example:
-        >>> img._encode_ucs2('test')
-        '116 0 101 0 115 0 116 0'
-        """
-        hex_str = text.encode('utf-16le').hex()
-        int_list = [int(''.join(i), base=16) for i in zip(*[iter(hex_str)] * 2)]
-        return ' '.join([str(i) for i in int_list])
 
     def clear_exif(self):
         self.img.clear_exif()
@@ -234,9 +157,11 @@ def registerNs(namespace: str, prefix: str):
     """
     return exiv2api.registerNs(namespace, prefix)
 
+
 def enableBMFF(enable=True):
     """ Enable or disable reading BMFF images. Return True on success. """
     return exiv2api.enableBMFF(enable)
+
 
 def set_log_level(level=2):
     """
