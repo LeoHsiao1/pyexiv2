@@ -308,7 +308,6 @@ public:
             Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
             if (key_pos != xmpData.end())
                 xmpData.erase(key_pos);
-
             if      (typeName == "_delete")
                 continue;
             else if (typeName == "string")
@@ -481,6 +480,46 @@ py::object convert_iptc_to_xmp(py::list table, py::str encoding)
     read_block;
 }
 
+py::object convert_xmp_to_exif(py::list table, py::str encoding)
+{
+    Exiv2::XmpData xmpData;
+    Exiv2::ExifData exifData;
+
+    // Write metadata, which works like modify_xmp()
+    for (auto _line : table){
+        py::list line;
+        for (auto field : _line)
+            line.append(field);
+        std::string key = py::bytes(line[0].attr("encode")(encoding));
+        std::string typeName = py::bytes(line[2].attr("encode")(encoding));
+        Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
+        if (key_pos != xmpData.end())
+            xmpData.erase(key_pos);
+        if      (typeName == "_delete")
+            continue;
+        else if (typeName == "string")
+        {
+            std::string value = py::bytes(line[1].attr("encode")(encoding));
+            xmpData[key] = value;
+        }
+        else if (typeName == "array")
+        {
+            Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::xmpSeq);
+            for (auto item: line[1]){
+                std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
+                value->read(item_str);
+            }
+            xmpData.add(Exiv2::XmpKey(key), value.get());
+        }
+    }
+
+    // Convert and read metadata, which works like read_exif()
+    Exiv2::copyXmpToExif(xmpData, exifData);
+    Exiv2::ExifData::iterator i   = exifData.begin();
+    Exiv2::ExifData::iterator end = exifData.end();
+    read_block;
+}
+
 // Declare the API that needs to be mapped, to convert this CPP file into a Python module.
 PYBIND11_MODULE(exiv2api, m)
 {
@@ -525,6 +564,7 @@ PYBIND11_MODULE(exiv2api, m)
         .def("clear_comment"    , &Image::clear_comment)
         .def("clear_icc"        , &Image::clear_icc)
         .def("clear_thumbnail"  , &Image::clear_thumbnail);
-    m.def("convert_exif_to_xmp", &convert_exif_to_xmp);
-    m.def("convert_iptc_to_xmp", &convert_iptc_to_xmp);
+    m.def("convert_exif_to_xmp" , &convert_exif_to_xmp);
+    m.def("convert_iptc_to_xmp" , &convert_iptc_to_xmp);
+    m.def("convert_xmp_to_exif" , &convert_xmp_to_exif);
 }

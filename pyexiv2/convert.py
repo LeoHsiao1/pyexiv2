@@ -3,7 +3,7 @@ import re
 from .lib import exiv2api
 
 
-# These tags are used by Windows and encoded in UCS2.
+# These tags are used by Windows and encoded in UCS2-LE.
 # pyexiv2 will automatically convert encoding formats when reading and writing them.
 EXIF_TAGS_ENCODED_IN_UCS2 = [
     'Exif.Image.XPTitle',
@@ -122,5 +122,11 @@ def convert_exif_to_xmp(data: dict, encoding='utf-8') -> dict:
 def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict:
     """ Input IPTC metadata, convert to XMP metadata and return. It works like executing modify_iptc() then read_xmp(). """
     converted_data = exiv2api.convert_iptc_to_xmp(_dumps(data), encoding)
+    return _parse(converted_data, encoding)
+
+
+def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict:
+    """ Input XMP metadata, convert to EXIF metadata and return. It works like executing modify_xmp() then read_exif(). """
+    converted_data = exiv2api.convert_xmp_to_exif(_dumps(data), encoding)
     return _parse(converted_data, encoding)
 
