@@ -112,6 +112,14 @@ class ImageData(Image):
 def registerNs(namespace: str, prefix: str)
 def enableBMFF(enable=True)
 def set_log_level(level=2)
+
+def convert_exif_to_xmp(data: dict, encoding='utf-8') -> dict
+def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict
+def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
+def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
+
+__version__ = '...'
+__exiv2_version__ = '...'
 ```
 
 ## Class Image
@@ -238,7 +246,6 @@ def set_log_level(level=2)
 
 - `img.read_icc()`、`img.modify_icc()`、`img.clear_icc()` 用于访问图片里的 [ICC profile](https://en.wikipedia.org/wiki/ICC_profile) 。
 
-
 ### thumbnail
 
 - EXIF 标准允许在 JPEG 图片中嵌入缩略图，通常存储在 APP1 标签（FFE1）中。
@@ -315,3 +322,13 @@ def set_log_level(level=2)
     >>> pyexiv2.set_log_level(4)
     >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'}) # 此时没有错误日志
     ```
+
+## convert
+
+- Exiv2 支持将某些 EXIF 或 IPTC 标签，转换成 XMP 标签，也支持反向转换。参考：<https://github.com/Exiv2/exiv2/blob/v0.27.7/src/convert.cpp#L313>
+- 示例：
+    ```py
+    >>> pyexiv2.convert_exif_to_xmp({'Exif.Image.Artist': 'test-中文-', 'Exif.Image.Rating': '4'})
+    {'Xmp.dc.creator': ['test-中文-'], 'Xmp.xmp.Rating': '4'}
+    ```
+
