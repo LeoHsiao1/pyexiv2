@@ -25,4 +25,5 @@ __all__ = [
   'convert_exif_to_xmp',
   'convert_iptc_to_xmp',
   'convert_xmp_to_exif',
+  'convert_xmp_to_iptc',
 ]
