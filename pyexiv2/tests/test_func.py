@@ -1,6 +1,7 @@
 from .base import *
 
 
+# First, test the most basic functionality: can it call exiv2
 def test_version():
     try:
         from .base import __exiv2_version__
@@ -8,6 +9,7 @@ def test_version():
     except:
         ENV.skip_test = True
         raise
+
 
 def test_open_img_by_path():
     try:
@@ -240,10 +242,10 @@ def test_enableBMFF():
         with Image(ENV.heic_img) as img:
             pass
 
+
 def test_log_level():
     with pytest.raises(RuntimeError):
         ENV.img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
     set_log_level(4)
     ENV.img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'})
     set_log_level(2)    # recover the log level
-
