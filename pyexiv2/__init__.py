@@ -23,4 +23,5 @@ __all__ = [
 
   # convert.py
   'convert_exif_to_xmp',
+  'convert_iptc_to_xmp',
 ]

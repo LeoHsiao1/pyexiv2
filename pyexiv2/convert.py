@@ -118,3 +118,9 @@ def convert_exif_to_xmp(data: dict, encoding='utf-8') -> dict:
     converted_data = exiv2api.convert_exif_to_xmp(_dumps(data), encoding)
     return _parse(converted_data, encoding)
 
+
+def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict:
+    """ Input IPTC metadata, convert to XMP metadata and return. It works like executing modify_iptc() then read_xmp(). """
+    converted_data = exiv2api.convert_iptc_to_xmp(_dumps(data), encoding)
+    return _parse(converted_data, encoding)
+

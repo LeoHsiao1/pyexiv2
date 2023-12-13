@@ -439,6 +439,48 @@ py::object convert_exif_to_xmp(py::list table, py::str encoding)
     read_block;
 }
 
+py::object convert_iptc_to_xmp(py::list table, py::str encoding)
+{
+    Exiv2::IptcData iptcData;
+    Exiv2::XmpData xmpData;
+
+    // Write metadata, which works like modify_iptc()
+    for (auto _line : table){
+        py::list line;
+        for (auto field : _line)
+            line.append(field);
+        std::string key      = py::bytes(line[0].attr("encode")(encoding));
+        std::string typeName = py::bytes(line[2].attr("encode")(encoding));
+        Exiv2::IptcData::iterator key_pos = iptcData.findKey(Exiv2::IptcKey(key));
+        while (key_pos != iptcData.end()){
+            iptcData.erase(key_pos);
+            key_pos = iptcData.findKey(Exiv2::IptcKey(key));
+        }
+        if      (typeName == "_delete")
+            continue;
+        else if (typeName == "string")
+        {
+            std::string value = py::bytes(line[1].attr("encode")(encoding));
+            iptcData[key] = value;
+        }
+        else if (typeName == "array")
+        {
+            Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::string);
+            for (auto item: line[1]){
+                std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
+                value->read(item_str);
+                iptcData.add(Exiv2::IptcKey(key), value.get());
+            }
+        }
+    }
+
+    // Convert and read metadata, which works like read_xmp()
+    Exiv2::copyIptcToXmp(iptcData, xmpData);
+    Exiv2::XmpData::iterator i   = xmpData.begin();
+    Exiv2::XmpData::iterator end = xmpData.end();
+    read_block;
+}
+
 // Declare the API that needs to be mapped, to convert this CPP file into a Python module.
 PYBIND11_MODULE(exiv2api, m)
 {
@@ -484,4 +526,5 @@ PYBIND11_MODULE(exiv2api, m)
         .def("clear_icc"        , &Image::clear_icc)
         .def("clear_thumbnail"  , &Image::clear_thumbnail);
     m.def("convert_exif_to_xmp", &convert_exif_to_xmp);
+    m.def("convert_iptc_to_xmp", &convert_iptc_to_xmp);
 }
