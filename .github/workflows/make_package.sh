@@ -28,7 +28,7 @@ reset_workdir(){
 }
 
 # Install dependencies
-python3 -m pip install setuptools wheel twine 
+python3 -m pip install setuptools wheel twine
 
 # Clear dist directory
 rm -rf $DIST_DIR
@@ -92,4 +92,4 @@ make_wheels
 reset_workdir
 
 # upload to pypi.org
-twine upload $DIST_DIR/*
+twine upload -u __token__ $DIST_DIR/*
