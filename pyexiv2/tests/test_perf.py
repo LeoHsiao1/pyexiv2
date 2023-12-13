@@ -5,7 +5,7 @@ from . import test_func, test_func_on_convert
 def test_memory_leak_when_reading():
     process = psutil.Process(os.getpid())
     # memory_init = process.memory_info().rss
-    for i in range(100):
+    for i in range(1000):
         if i == 1:
             memory_1 = process.memory_info().rss
         test_func.test_read_exif()
@@ -19,8 +19,8 @@ def test_memory_leak_when_reading():
         test_func_on_convert.test_convert_xmp_to_exif()
         test_func_on_convert.test_convert_xmp_to_iptc()
     memory_end = process.memory_info().rss
-    delta = (memory_end - memory_1) / 1024
-    assert delta < 100, 'Memory grew by {}KB, a memory leak may have occurred.'.format(delta)
+    delta = (memory_end - memory_1) / 1024 / 1024
+    assert delta < 1, 'Memory grew by {}MB, a memory leak may have occurred.'.format(delta)
     # If img.close() hasn't been called, the memory can increase by more than 10MB.
     check_img_md5()
 
@@ -28,7 +28,7 @@ def test_memory_leak_when_reading():
 def test_memory_leak_when_writing():
     process = psutil.Process(os.getpid())
     # memory_init = process.memory_info().rss
-    for i in range(100):
+    for i in range(1000):
         if i == 1:
             memory_1 = process.memory_info().rss
         test_func.test_modify_exif()
@@ -37,8 +37,8 @@ def test_memory_leak_when_writing():
         test_func.test_modify_comment()
         test_func.test_modify_icc()
     memory_end = process.memory_info().rss
-    delta = (memory_end - memory_1) / 1024
-    assert delta < 100, 'Memory grew by {}KB, a memory leak may have occurred.'.format(delta)
+    delta = (memory_end - memory_1) / 1024 / 1024
+    assert delta < 1, 'Memory grew by {}MB, a memory leak may have occurred.'.format(delta)
 
 
 def test_stack_overflow():
