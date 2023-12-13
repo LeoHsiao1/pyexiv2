@@ -32,7 +32,7 @@ void logHandler(int level, const char *msg)
 }
 
 /* The error log should be checked at the end of each operation.
-   If there is a C++ error, it is converted to a Python exception. */
+   If a C++ error occurs, convert it to a Python exception. */
 void check_error_log()
 {
     std::string str = error_log.str();
@@ -227,7 +227,6 @@ public:
 
     void modify_exif(py::list table, py::str encoding)
     {
-        // Create an empty container for storing data
         Exiv2::ExifData &exifData = (*img)->exifData();
 
         // Iterate the input table. each line contains a key and a value
@@ -255,8 +254,9 @@ public:
             else if (typeName == "string")
                 exifData[key] = value;
         }
-        (*img)->setExifData(exifData);
-        (*img)->writeMetadata();        // Save the metadata from memory to disk
+
+        (*img)->setExifData(exifData);  // Save metadata to images in memory
+        (*img)->writeMetadata();        // Save metadata from memory to disk
         check_error_log();
     }
 
@@ -269,13 +269,11 @@ public:
                 line.append(field);
             std::string key      = py::bytes(line[0].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
-
             Exiv2::IptcData::iterator key_pos = iptcData.findKey(Exiv2::IptcKey(key));
             while (key_pos != iptcData.end()){  // Use the while loop because the iptc key may repeat
                 iptcData.erase(key_pos);
                 key_pos = iptcData.findKey(Exiv2::IptcKey(key));
             }
-
             if      (typeName == "_delete")
                 continue;
             else if (typeName == "string")
@@ -307,11 +305,9 @@ public:
                 line.append(field);
             std::string key = py::bytes(line[0].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
-
             Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
             if (key_pos != xmpData.end())
                 xmpData.erase(key_pos);
-
             if      (typeName == "_delete")
                 continue;
             else if (typeName == "string")
@@ -412,6 +408,157 @@ public:
 
 };
 
+py::object convert_exif_to_xmp(py::list table, py::str encoding)
+{
+    Exiv2::ExifData exifData;
+    Exiv2::XmpData xmpData;
+
+    // Write metadata, which works like modify_exif()
+    for (auto _line : table){
+        py::list line;
+        for (auto field : _line)
+            line.append(field);
+        std::string key      = py::bytes(line[0].attr("encode")(encoding));
+        std::string value    = py::bytes(line[1].attr("encode")(encoding));
+        std::string typeName = py::bytes(line[2].attr("encode")(encoding));
+        Exiv2::ExifData::iterator key_pos = exifData.findKey(Exiv2::ExifKey(key));
+        if (key_pos != exifData.end())
+            exifData.erase(key_pos);
+
+        if      (typeName == "_delete")
+            continue;
+        else if (typeName == "string")
+            exifData[key] = value;
+    }
+
+    // Convert and read metadata, which works like read_xmp()
+    Exiv2::copyExifToXmp(exifData, xmpData);
+    Exiv2::XmpData::iterator i   = xmpData.begin();
+    Exiv2::XmpData::iterator end = xmpData.end();
+    read_block;
+}
+
+py::object convert_iptc_to_xmp(py::list table, py::str encoding)
+{
+    Exiv2::IptcData iptcData;
+    Exiv2::XmpData xmpData;
+
+    // Write metadata, which works like modify_iptc()
+    for (auto _line : table){
+        py::list line;
+        for (auto field : _line)
+            line.append(field);
+        std::string key      = py::bytes(line[0].attr("encode")(encoding));
+        std::string typeName = py::bytes(line[2].attr("encode")(encoding));
+        Exiv2::IptcData::iterator key_pos = iptcData.findKey(Exiv2::IptcKey(key));
+        while (key_pos != iptcData.end()){
+            iptcData.erase(key_pos);
+            key_pos = iptcData.findKey(Exiv2::IptcKey(key));
+        }
+        if      (typeName == "_delete")
+            continue;
+        else if (typeName == "string")
+        {
+            std::string value = py::bytes(line[1].attr("encode")(encoding));
+            iptcData[key] = value;
+        }
+        else if (typeName == "array")
+        {
+            Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::string);
+            for (auto item: line[1]){
+                std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
+                value->read(item_str);
+                iptcData.add(Exiv2::IptcKey(key), value.get());
+            }
+        }
+    }
+
+    // Convert and read metadata, which works like read_xmp()
+    Exiv2::copyIptcToXmp(iptcData, xmpData);
+    Exiv2::XmpData::iterator i   = xmpData.begin();
+    Exiv2::XmpData::iterator end = xmpData.end();
+    read_block;
+}
+
+py::object convert_xmp_to_exif(py::list table, py::str encoding)
+{
+    Exiv2::XmpData xmpData;
+    Exiv2::ExifData exifData;
+
+    // Write metadata, which works like modify_xmp()
+    for (auto _line : table){
+        py::list line;
+        for (auto field : _line)
+            line.append(field);
+        std::string key = py::bytes(line[0].attr("encode")(encoding));
+        std::string typeName = py::bytes(line[2].attr("encode")(encoding));
+        Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
+        if (key_pos != xmpData.end())
+            xmpData.erase(key_pos);
+        if      (typeName == "_delete")
+            continue;
+        else if (typeName == "string")
+        {
+            std::string value = py::bytes(line[1].attr("encode")(encoding));
+            xmpData[key] = value;
+        }
+        else if (typeName == "array")
+        {
+            Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::xmpSeq);
+            for (auto item: line[1]){
+                std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
+                value->read(item_str);
+            }
+            xmpData.add(Exiv2::XmpKey(key), value.get());
+        }
+    }
+
+    // Convert and read metadata, which works like read_exif()
+    Exiv2::copyXmpToExif(xmpData, exifData);
+    Exiv2::ExifData::iterator i   = exifData.begin();
+    Exiv2::ExifData::iterator end = exifData.end();
+    read_block;
+}
+
+py::object convert_xmp_to_iptc(py::list table, py::str encoding)
+{
+    Exiv2::XmpData xmpData;
+    Exiv2::IptcData iptcData;
+
+    // Write metadata, which works like modify_xmp()
+    for (auto _line : table){
+        py::list line;
+        for (auto field : _line)
+            line.append(field);
+        std::string key = py::bytes(line[0].attr("encode")(encoding));
+        std::string typeName = py::bytes(line[2].attr("encode")(encoding));
+        Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
+        if (key_pos != xmpData.end())
+            xmpData.erase(key_pos);
+        if      (typeName == "_delete")
+            continue;
+        else if (typeName == "string")
+        {
+            std::string value = py::bytes(line[1].attr("encode")(encoding));
+            xmpData[key] = value;
+        }
+        else if (typeName == "array")
+        {
+            Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::xmpSeq);
+            for (auto item: line[1]){
+                std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
+                value->read(item_str);
+            }
+            xmpData.add(Exiv2::XmpKey(key), value.get());
+        }
+    }
+
+    // Convert and read metadata, which works like read_iptc()
+    Exiv2::copyXmpToIptc(xmpData, iptcData);
+    Exiv2::IptcData::iterator i   = iptcData.begin();
+    Exiv2::IptcData::iterator end = iptcData.end();
+    read_block;
+}
 
 // Declare the API that needs to be mapped, to convert this CPP file into a Python module.
 PYBIND11_MODULE(exiv2api, m)
@@ -457,4 +604,8 @@ PYBIND11_MODULE(exiv2api, m)
         .def("clear_comment"    , &Image::clear_comment)
         .def("clear_icc"        , &Image::clear_icc)
         .def("clear_thumbnail"  , &Image::clear_thumbnail);
+    m.def("convert_exif_to_xmp" , &convert_exif_to_xmp);
+    m.def("convert_iptc_to_xmp" , &convert_iptc_to_xmp);
+    m.def("convert_xmp_to_exif" , &convert_xmp_to_exif);
+    m.def("convert_xmp_to_iptc" , &convert_xmp_to_iptc);
 }

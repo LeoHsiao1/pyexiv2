@@ -90,6 +90,14 @@ class ImageData(Image):
 def registerNs(namespace: str, prefix: str)
 def enableBMFF(enable=True)
 def set_log_level(level=2)
+
+def convert_exif_to_xmp(data: dict, encoding='utf-8') -> dict
+def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict
+def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
+def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
+
+__version__ = '...'
+__exiv2_version__ = '...'
 ```
 
 ## class Image
@@ -190,7 +198,7 @@ def set_log_level(level=2)
 
 - `img.read_comment()`、`img.modify_comment()`、`img.clear_comment()` are used to access JPEG COM (Comment) segment in the image, which does not belong to EXIF, IPTC or XMP metadata.
   - [related issue](https://github.com/Exiv2/exiv2/issues/1445)
-- Sample:
+- For example:
     ```py
     >>> img.modify_comment('Hello World!   \n你好！\n')
     >>> img.read_comment()
@@ -288,4 +296,13 @@ def set_log_level(level=2)
 
     >>> pyexiv2.set_log_level(4)
     >>> img.modify_xmp({'Xmp.xmpMM.History': 'type="Seq"'}) # No error reported
+    ```
+
+## convert
+
+- Exiv2 supports converting some EXIF or IPTC tags to XMP tags, and also supports reverse conversion. Reference: <https://github.com/Exiv2/exiv2/blob/v0.27.7/src/convert.cpp#L313>
+- For example:
+    ```py
+    >>> pyexiv2.convert_exif_to_xmp({'Exif.Image.Artist': 'test-中文-', 'Exif.Image.Rating': '4'})
+    {'Xmp.dc.creator': ['test-中文-'], 'Xmp.xmp.Rating': '4'}
     ```

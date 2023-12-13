@@ -1,36 +1,44 @@
 from .base import *
-from . import test_func
+from . import test_func, test_func_on_convert
 
 
 def test_memory_leak_when_reading():
-    p = psutil.Process(os.getpid())
-    m0 = p.memory_info().rss
-    for _ in range(1000):
+    process = psutil.Process(os.getpid())
+    # memory_init = process.memory_info().rss
+    for i in range(100):
+        if i == 1:
+            memory_1 = process.memory_info().rss
         test_func.test_read_exif()
         test_func.test_read_iptc()
         test_func.test_read_xmp()
         test_func.test_read_raw_xmp()
         test_func.test_read_comment()
         test_func.test_read_icc()
-    m1 = p.memory_info().rss
-    delta = (m1 - m0) / 1024 / 1024
-    assert delta < 1, 'Memory grew by {}MB, possibly due to the memory leak.'.format(delta)
-    # If img.close() hasn't been called, the memory can increase by more than 100MB.
+        test_func_on_convert.test_convert_exif_to_xmp()
+        test_func_on_convert.test_convert_iptc_to_xmp()
+        test_func_on_convert.test_convert_xmp_to_exif()
+        test_func_on_convert.test_convert_xmp_to_iptc()
+    memory_end = process.memory_info().rss
+    delta = (memory_end - memory_1) / 1024
+    assert delta < 100, 'Memory grew by {}KB, a memory leak may have occurred.'.format(delta)
+    # If img.close() hasn't been called, the memory can increase by more than 10MB.
     check_img_md5()
 
 
 def test_memory_leak_when_writing():
-    p = psutil.Process(os.getpid())
-    m0 = p.memory_info().rss
-    for _ in range(1000):
+    process = psutil.Process(os.getpid())
+    # memory_init = process.memory_info().rss
+    for i in range(100):
+        if i == 1:
+            memory_1 = process.memory_info().rss
         test_func.test_modify_exif()
         test_func.test_modify_iptc()
         test_func.test_modify_xmp()
         test_func.test_modify_comment()
         test_func.test_modify_icc()
-    m1 = p.memory_info().rss
-    delta = (m1 - m0) / 1024 / 1024
-    assert delta < 1, 'Memory grew by {}MB, possibly due to the memory leak.'.format(delta)
+    memory_end = process.memory_info().rss
+    delta = (memory_end - memory_1) / 1024
+    assert delta < 100, 'Memory grew by {}KB, a memory leak may have occurred.'.format(delta)
 
 
 def test_stack_overflow():
@@ -70,8 +78,8 @@ def test_transmit_various_characters():
 
 def _test_thread_safe():
     """
-    Test whether pyexiv can successfully run multiple threads. 
-    TODO: Could not catch the exception from the child thread.
+    Test whether pyexiv2 can successfully run multiple threads.
+    TODO: pyexiv2 is not thread-safe because in exiv2api.cpp, check_error_log() reads and writes to a global variable.
     """
     import multiprocessing
     pool = multiprocessing.Pool(3)
@@ -79,18 +87,3 @@ def _test_thread_safe():
         pool.apply_async(test_memory_leak_when_reading, ())
     pool.close()
     pool.join()
-
-
-def _test_recovery_exif():
-    """
-    Test whether pyexiv2 can delete metadata and recover it completely.
-    TODO: complete it
-    """
-    original_dict = ENV.img.read_exif()
-    ENV.img.clear_exif()
-    ENV.img.modify_exif(original_dict)
-    new_dict = ENV.img.read_exif()
-    for key in original_dict.keys():
-        for key in original_dict.keys():
-            assert original_dict[key] == new_dict.get(key), "{} didn't recover".format(key)
-    check_img_md5()
