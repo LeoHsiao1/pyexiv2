@@ -117,6 +117,7 @@ __exiv2_version__ = '...'
     img = pyexiv2.Image(path, encoding='ISO-8859-1')
     ```
   - 另一个例子：中国地区的 Windows 电脑通常用 GBK 编码文件路径，因此它们不能被 utf-8 解码。
+  - 另一个方案：如果你不想指定每个图片文件名的 encoding ，你可以用 Python 的 `open()` 函数打开图片文件，然后用 [pyexiv2.ImageData](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial.md#class-imagedata) 解析图片。
 
 ### close
 
