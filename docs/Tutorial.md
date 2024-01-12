@@ -117,6 +117,7 @@ __exiv2_version__ = '...'
     img = Image(path, encoding='ISO-8859-1')
     ```
   - Another example: Windows computers in China usually encoded file paths by GBK, so they cannot be decoded by utf-8.
+  - Another option: If you don't want to specify the encoding of each image filename, you can open the image file with Python's `open()` function and then parse the image with [pyexiv2.ImageData](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial.md#class-imagedata) .
 
 ### close
 
