@@ -122,7 +122,7 @@ public:
 
 class Image{
 public:
-    Exiv2::Image::AutoPtr *img = new Exiv2::Image::AutoPtr;
+    Exiv2::Image::UniquePtr *img = new Exiv2::Image::UniquePtr;
 
     Image(const char *filename){
         *img = Exiv2::ImageFactory::open(filename);
@@ -283,7 +283,7 @@ public:
             }
             else if (typeName == "array")
             {
-                Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::string);
+                Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::string);
                 for (auto item: line[1]){
                     std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
                     value->read(item_str);
@@ -317,7 +317,7 @@ public:
             }
             else if (typeName == "array")
             {
-                Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::xmpSeq);
+                Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpSeq);
                 for (auto item: line[1]){
                     std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
                     value->read(item_str);
@@ -464,7 +464,7 @@ py::object convert_iptc_to_xmp(py::list table, py::str encoding)
         }
         else if (typeName == "array")
         {
-            Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::string);
+            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::string);
             for (auto item: line[1]){
                 std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
                 value->read(item_str);
@@ -504,7 +504,7 @@ py::object convert_xmp_to_exif(py::list table, py::str encoding)
         }
         else if (typeName == "array")
         {
-            Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::xmpSeq);
+            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpSeq);
             for (auto item: line[1]){
                 std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
                 value->read(item_str);
@@ -544,7 +544,7 @@ py::object convert_xmp_to_iptc(py::list table, py::str encoding)
         }
         else if (typeName == "array")
         {
-            Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::xmpSeq);
+            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpSeq);
             for (auto item: line[1]){
                 std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
                 value->read(item_str);
