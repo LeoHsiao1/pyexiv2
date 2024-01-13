@@ -127,7 +127,7 @@ public:
     Image(const char *filename){
         *img = Exiv2::ImageFactory::open(filename);
         if (img->get() == 0)
-            throw Exiv2::Error(Exiv2::kerErrorMessage, "Can not open this image.");
+            throw Exiv2::Error(Exiv2::ErrorCode::kerErrorMessage, "Can not open this image.");
         (*img)->readMetadata();     // Calling readMetadata() reads all types of metadata supported by the image
         check_error_log();
     }
@@ -135,7 +135,7 @@ public:
     Image(Buffer buffer){
         *img = Exiv2::ImageFactory::open((Exiv2::byte *)buffer.data, buffer.size);
         if (img->get() == 0)
-            throw Exiv2::Error(Exiv2::kerErrorMessage, "Can not open this image.");
+            throw Exiv2::Error(Exiv2::ErrorCode::kerErrorMessage, "Can not open this image.");
         (*img)->readMetadata();
         check_error_log();
     }
