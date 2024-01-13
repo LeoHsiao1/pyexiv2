@@ -214,15 +214,15 @@ public:
 
     py::object read_icc()
     {
-        Exiv2::DataBuf *buf = (*img)->iccProfile();
-        return py::bytes((char*)buf->pData_, buf->size_);
+        Exiv2::DataBuf buf = (*img)->iccProfile();
+        return py::bytes((char*)buf.c_str(), buf.size());
     }
 
     py::object read_thumbnail()
     {
         Exiv2::ExifThumb exifThumb((*img)->exifData());
         Exiv2::DataBuf buf = exifThumb.copy();
-        return py::bytes((char*)buf.pData_, buf.size_);
+        return py::bytes((char*)buf.c_str(), buf.size());
     }
 
     void modify_exif(py::list table, py::str encoding)
@@ -350,7 +350,7 @@ public:
     void modify_icc(const char *data, long size)
     {
         Exiv2::DataBuf buf((Exiv2::byte *) data, size);
-        (*img)->setIccProfile(buf);
+        (*img)->setIccProfile(std::move(buf));
         (*img)->writeMetadata();
         check_error_log();
     }
