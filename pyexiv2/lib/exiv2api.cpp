@@ -335,7 +335,7 @@ public:
         std::string data_str = py::bytes(data.attr("encode")(encoding));
         (*img)->setXmpPacket(data_str);
         (*img)->writeMetadata();
-        (*img)->writeXmpFromPacket();   // Refresh the parsed XMP data in memory
+        (void)(*img)->writeXmpFromPacket();   // Refresh the parsed XMP data in memory
         check_error_log();
     }
 
