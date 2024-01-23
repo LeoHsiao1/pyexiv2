@@ -300,7 +300,7 @@ __exiv2_version__ = '...'
 
 ## convert
 
-- Exiv2 支持将某些 EXIF 或 IPTC 标签，转换成 XMP 标签，也支持反向转换。参考：<https://github.com/Exiv2/exiv2/blob/v0.27.7/src/convert.cpp#L313>
+- Exiv2 支持将某些 EXIF 或 IPTC 标签，转换成 XMP 标签，也支持反向转换。参考：<https://github.com/Exiv2/exiv2/blob/v0.28.1/src/convert.cpp#L313>
 - 示例：
     ```py
     >>> pyexiv2.convert_exif_to_xmp({'Exif.Image.Artist': 'test-中文-', 'Exif.Image.Rating': '4'})
