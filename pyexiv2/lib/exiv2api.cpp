@@ -239,20 +239,35 @@ public:
 
             // Extract the fields in line
             std::string key      = py::bytes(line[0].attr("encode")(encoding));
-            std::string value    = py::bytes(line[1].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
 
             // Locate the key
             Exiv2::ExifData::iterator key_pos = exifData.findKey(Exiv2::ExifKey(key));
-
-            // Delete the existing key to set a new value, otherwise the key may contain multiple values.
-            if (key_pos != exifData.end())
+            // Use the while loop because the key may repeat
+            while (key_pos != exifData.end()){
+                // Delete the existing key to set a new value
                 exifData.erase(key_pos);
+                key_pos = exifData.findKey(Exiv2::ExifKey(key));
+            }
 
+            // Set the value
             if      (typeName == "_delete")
                 continue;
             else if (typeName == "string")
+            {
+                std::string value = py::bytes(line[1].attr("encode")(encoding));
                 exifData[key] = value;
+            }
+            // The Exif specification allows for duplicate tags with the same key, although this is rare
+            else if (typeName == "array")
+            {
+                Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::asciiString);
+                for (auto item: line[1]){
+                    std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
+                    value->read(item_str);
+                    exifData.add(Exiv2::ExifKey(key), value.get());
+                }
+            }
         }
 
         (*img)->setExifData(exifData);  // Save metadata to images in memory
@@ -270,7 +285,7 @@ public:
             std::string key      = py::bytes(line[0].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
             Exiv2::IptcData::iterator key_pos = iptcData.findKey(Exiv2::IptcKey(key));
-            while (key_pos != iptcData.end()){  // Use the while loop because the iptc key may repeat
+            while (key_pos != iptcData.end()){
                 iptcData.erase(key_pos);
                 key_pos = iptcData.findKey(Exiv2::IptcKey(key));
             }
@@ -306,8 +321,10 @@ public:
             std::string key = py::bytes(line[0].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
             Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
-            if (key_pos != xmpData.end())
+            while (key_pos != xmpData.end()){
                 xmpData.erase(key_pos);
+                key_pos = xmpData.findKey(Exiv2::XmpKey(key));
+            }
             if      (typeName == "_delete")
                 continue;
             else if (typeName == "string")

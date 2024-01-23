@@ -80,7 +80,7 @@ class Image:
         return self.img.read_thumbnail()
 
     def modify_exif(self, data: dict, encoding='utf-8'):
-        data = data.copy()  # Avoid modifying the original data
+        data = data.copy()  # Avoid modifying the original data when calling encode_ucs2()
         for tag in EXIF_TAGS_ENCODED_IN_UCS2:
             value = data.get(tag)
             if value:
