@@ -127,6 +127,16 @@ class Image:
     def clear_thumbnail(self):
         self.img.clear_thumbnail()
 
+    def copy_to_another_image(self, filename, encoding='utf-8', clean_before_copy=True,
+                              exif=True, iptc=True, xmp=True,
+                              comment=True, icc=True, thumbnail=True):
+        """ Copy metadata from one image to another image.
+        By default, it will clean the existing metadata in another image before copying.
+        """
+        self.img.copy_to_another_image(filename.encode(encoding), clean_before_copy,
+                                       exif, iptc, xmp,
+                                       comment, icc, thumbnail)
+
 
 class ImageData(Image):
     """
