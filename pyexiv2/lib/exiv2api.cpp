@@ -261,7 +261,7 @@ public:
             // The Exif specification allows for duplicate tags with the same key, although this is rare
             else if (typeName == "array")
             {
-                Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::asciiString);
+                Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::asciiString);
                 for (auto item: line[1]){
                     std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
                     value->read(item_str);
