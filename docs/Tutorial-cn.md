@@ -38,6 +38,12 @@
   ```
   - 这是因为 libintl.8.dylib 不存在。你需要执行 `brew install gettext` 。
 
+- 在 MacOS 上使用 pyexiv2 时，你可能遇到以下异常：
+  ```py
+  Library not loaded: '/usr/local/opt/inih/lib/libinih.0.dylib'
+  ```
+  - 这是因为 libinih.0.dylib 不存在。你需要执行 `brew install inih` 。
+
 - 在 Windows 上使用 pyexiv2 时，你可能遇到以下异常：
   ```py
   >>> import pyexiv2
@@ -81,6 +87,10 @@ class Image:
     def clear_icc       (self)
     def clear_thumbnail (self)
 
+    def copy_to_another_image(self, another_image,
+                              exif=True, iptc=True, xmp=True,
+                              comment=True, icc=True, thumbnail=True)
+
 
 class ImageData(Image):
     def __init__(self, data: bytes)
@@ -96,11 +106,11 @@ def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
 
-__version__ = '...'
-__exiv2_version__ = '...'
+__version__ = '2.12.0'
+__exiv2_version__ = '0.28.1'
 ```
 
-## Class Image
+## class Image
 
 - 类 `Image` 用于根据文件路径打开图片。例如：
     ```py
@@ -119,7 +129,7 @@ __exiv2_version__ = '...'
   - 另一个例子：中国地区的 Windows 电脑通常用 GBK 编码文件路径，因此它们不能被 utf-8 解码。
   - 另一个方案：如果你不想指定每个图片文件名的 encoding ，你可以用 Python 的 `open()` 函数打开图片文件，然后用 [pyexiv2.ImageData](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial.md#class-imagedata) 解析图片。
 
-### close
+### close()
 
 - 当你处理完图片之后，请记得调用 `img.close()` ，以释放用于存储图片数据的内存。
   - 不调用该方法会导致内存泄漏，但不会锁定文件描述符。
@@ -129,7 +139,7 @@ __exiv2_version__ = '...'
         data = img.read_exif()
     ```
 
-### read
+### read_xx()
 
 - 读取元数据的示例:
     ```py
@@ -145,7 +155,7 @@ __exiv2_version__ = '...'
 - 调用 `Image.read_*()` 是安全的。这些方法永远不会影响图片文件（md5不变）。
 - 读取 XMP 元数据时，空白字符 `\v` 和 `\f` 会被替换为空格 ` ` 。
 
-### modify
+### modify_xx()
 
 - 修改元数据的示例:
     ```py
@@ -190,7 +200,7 @@ __exiv2_version__ = '...'
     ''
     ```
 
-### clear
+### clear_xx()
 
 - 调用 `img.clear_exif()` 将删除图片的所有 EXIF 元数据。一旦清除元数据，pyexiv2 可能无法完全恢复它。
 - `img.clear_iptc()` 和 `img.clear_xmp()` 的用法同理。
@@ -229,6 +239,30 @@ __exiv2_version__ = '...'
 
 - EXIF 标准允许在 JPEG 图片中嵌入缩略图，通常存储在 APP1 标签（FFE1）中。
 - Exiv2 支持读写图像中的 EXIF 缩略图。但是只能插入 JPEG 缩略图（不能插入TIFF）。
+
+### copy_xx()
+
+- 以下代码用于从一个图片拷贝元数据到另一个图片：
+  ```py
+  with pyexiv2.Image(r'.\pyexiv2\tests\1.jpg') as img1:
+      with pyexiv2.Image(r'.\pyexiv2\tests\2.jpg') as img2:
+          img2.modify_exif(img1.read_exif())
+          img2.modify_iptc(img1.read_iptc())
+          img2.modify_xmp(img1.read_xmp())
+  ```
+  但更推荐以下代码：
+  ```py
+  with pyexiv2.Image(r'.\pyexiv2\tests\1.jpg') as img1:
+      with pyexiv2.Image(r'.\pyexiv2\tests\2.jpg') as img2:
+          # 如果不想保留第二张图像中已有的元数据，可以提前清除第二张图像
+          # img2.clear_exif()
+          # img2.clear_iptc()
+          # img2.clear_xmp()
+          img1.copy_to_another_image(img2, exif=True, iptc=True, xmp=True, comment=False, icc=False, thumbnail=False)
+  ```
+  理由如下：
+  - 它的效率更高，因为不需要多次执行 modify_xx() 。
+  - 一张图片的元数据可能是错误的格式，无法被 pyexiv2 解析，但仍然可以复制到另一张图片上。
 
 ## class ImageData
 
@@ -301,7 +335,7 @@ __exiv2_version__ = '...'
 
 ## convert
 
-- Exiv2 支持将某些 EXIF 或 IPTC 标签，转换成 XMP 标签，也支持反向转换。参考：<https://github.com/Exiv2/exiv2/blob/v0.27.7/src/convert.cpp#L313>
+- Exiv2 支持将某些 EXIF 或 IPTC 标签，转换成 XMP 标签，也支持反向转换。参考：<https://github.com/Exiv2/exiv2/blob/v0.28.1/src/convert.cpp#L313>
 - 示例：
     ```py
     >>> pyexiv2.convert_exif_to_xmp({'Exif.Image.Artist': 'test-中文-', 'Exif.Image.Rating': '4'})

@@ -38,6 +38,12 @@ Language: [English](./Tutorial.md) | [中文](./Tutorial-cn.md)
   ```
   - This is because libintl.8.dylib is missing. You need to execute `brew install gettext` .
 
+- When using pyexiv2 on MacOS, you may encounter the following exception:
+  ```py
+  Library not loaded: '/usr/local/opt/inih/lib/libinih.0.dylib'
+  ```
+  - This is because libinih.0.dylib is missing. You need to execute `brew install inih` .
+1
 - When using pyexiv2 on Windows, you may encounter the following exception:
   ```py
   >>> import pyexiv2
@@ -81,6 +87,10 @@ class Image:
     def clear_icc       (self)
     def clear_thumbnail (self)
 
+    def copy_to_another_image(self, another_image,
+                              exif=True, iptc=True, xmp=True,
+                              comment=True, icc=True, thumbnail=True)
+
 
 class ImageData(Image):
     def __init__(self, data: bytes)
@@ -96,8 +106,8 @@ def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
 
-__version__ = '...'
-__exiv2_version__ = '...'
+__version__ = '2.12.0'
+__exiv2_version__ = '0.28.1'
 ```
 
 ## class Image
@@ -119,7 +129,7 @@ __exiv2_version__ = '...'
   - Another example: Windows computers in China usually encoded file paths by GBK, so they cannot be decoded by utf-8.
   - Another option: If you don't want to specify the encoding of each image filename, you can open the image file with Python's `open()` function and then parse the image with [pyexiv2.ImageData](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial.md#class-imagedata) .
 
-### close
+### close()
 
 - When you're done with the image, remember to call `img.close()` to free the memory for storing image data.
     - Not calling this method causes a memory leak, but it doesn't lock the file descriptor.
@@ -129,7 +139,7 @@ __exiv2_version__ = '...'
         data = img.read_exif()
     ```
 
-### read
+### read_xx()
 
 - An example of reading metadata:
     ```py
@@ -145,7 +155,7 @@ __exiv2_version__ = '...'
 - It is safe to call `Image.read_*()`. These methods never affect image files (md5 unchanged).
 - When reading XMP metadata, the whitespace characters `\v` and `\f` are replaced with the space ` `.
 
-### modify
+### modify_xx()
 
 - An example of modifing metadata:
     ```py
@@ -190,7 +200,7 @@ __exiv2_version__ = '...'
     ''
     ```
 
-### clear
+### clear_xx()
 
 - Calling `img.clear_exif()` will delete all EXIF metadata of the image. Once cleared, pyexiv2 may not be able to recover it completely.
 - Use `img.clear_iptc()` and `img.clear_xmp()` in the similar way.
@@ -229,6 +239,30 @@ __exiv2_version__ = '...'
 
 - The EXIF standard allows embedding thumbnails in a JPEG image, which is typically stored in the APP1 tag (FFE1).
 - Exiv2 supports reading and writing EXIF thumbnails in images. But only JPEG thumbnails can be inserted (not TIFF thumbnails).
+
+### copy_xx()
+
+- The following code is used to copy metadata from one image to another image:
+  ```py
+  with pyexiv2.Image(r'.\pyexiv2\tests\1.jpg') as img1:
+      with pyexiv2.Image(r'.\pyexiv2\tests\2.jpg') as img2:
+          img2.modify_exif(img1.read_exif())
+          img2.modify_iptc(img1.read_iptc())
+          img2.modify_xmp(img1.read_xmp())
+  ```
+  However, the following code is more recommended:
+  ```py
+  with pyexiv2.Image(r'.\pyexiv2\tests\1.jpg') as img1:
+      with pyexiv2.Image(r'.\pyexiv2\tests\2.jpg') as img2:
+          # If you don't want to keep the metadata already in the second image, you can clear the second image in advance.
+          # img2.clear_exif()
+          # img2.clear_iptc()
+          # img2.clear_xmp()
+          img1.copy_to_another_image(img2, exif=True, iptc=True, xmp=True, comment=False, icc=False, thumbnail=False)
+  ```
+  The reasons are as follows:
+  - It's more efficient because it doesn't require multiple executions of modify_xx() .
+  - The metadata of an image may be in the wrong format and cannot be parsed by pyexiv2, but it can still be copied to another image.
 
 ## class ImageData
 
@@ -301,7 +335,7 @@ __exiv2_version__ = '...'
 
 ## convert
 
-- Exiv2 supports converting some EXIF or IPTC tags to XMP tags, and also supports reverse conversion. Reference: <https://github.com/Exiv2/exiv2/blob/v0.27.7/src/convert.cpp#L313>
+- Exiv2 supports converting some EXIF or IPTC tags to XMP tags, and also supports reverse conversion. Reference: <https://github.com/Exiv2/exiv2/blob/v0.28.1/src/convert.cpp#L313>
 - For example:
     ```py
     >>> pyexiv2.convert_exif_to_xmp({'Exif.Image.Artist': 'test-中文-', 'Exif.Image.Rating': '4'})

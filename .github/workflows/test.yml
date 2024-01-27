@@ -9,13 +9,14 @@ on:
   workflow_dispatch:
 
 jobs:
+
   job1:
-    name: Test
+    name: Test on ubuntu
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-12, macos-13, windows-2019]
-        python_version: [3.6, 3.7, 3.8, 3.9, '3.10', '3.11', '3.12']
+        os: [ubuntu-22.04]
+        python_version: [3.7, 3.8, 3.9, '3.10', '3.11', '3.12']
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
@@ -31,12 +32,34 @@ jobs:
         pytest -v
 
   job2:
-    name: Test on ubuntu
+    name: Test
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04]
-        python_version: [3.7, 3.8, 3.9, '3.10', '3.11', '3.12']
+        os: [macos-12, macos-13]
+        python_version: [3.6, 3.7, 3.8, 3.9, '3.10', '3.11', '3.12']
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python_version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python_version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install pytest psutil
+    - name: Test
+      run: |
+        brew install inih
+        pytest -v
+
+  job3:
+    name: Test
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019]
+        python_version: [3.6, 3.7, 3.8, 3.9, '3.10', '3.11', '3.12']
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2

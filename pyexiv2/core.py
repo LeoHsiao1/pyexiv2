@@ -9,7 +9,7 @@ class Image:
     Please call the public methods of this class.
     """
 
-    def __init__(self, filename, encoding='utf-8'):
+    def __init__(self, filename: str, encoding='utf-8'):
         """ Open an image and load its metadata. """
         self.img = exiv2api.Image(filename.encode(encoding))
 
@@ -80,7 +80,7 @@ class Image:
         return self.img.read_thumbnail()
 
     def modify_exif(self, data: dict, encoding='utf-8'):
-        data = data.copy()  # Avoid modifying the original data
+        data = data.copy()  # Avoid modifying the original data when calling encode_ucs2()
         for tag in EXIF_TAGS_ENCODED_IN_UCS2:
             value = data.get(tag)
             if value:
@@ -126,6 +126,17 @@ class Image:
 
     def clear_thumbnail(self):
         self.img.clear_thumbnail()
+
+    def copy_to_another_image(self, another_image,
+                              exif=True, iptc=True, xmp=True,
+                              comment=True, icc=True, thumbnail=True):
+        """ Copy metadata from one image to another image.
+        """
+        if not isinstance(another_image, (Image, ImageData)):
+            raise TypeError('The type of another_image should be pyexiv2.Image or pyexiv2.ImageData.')
+        self.img.copy_to_another_image(another_image.img,
+                                       exif, iptc, xmp,
+                                       comment, icc, thumbnail)
 
 
 class ImageData(Image):

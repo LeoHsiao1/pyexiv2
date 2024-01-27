@@ -36,6 +36,7 @@ def test_memory_leak_when_writing():
         test_func.test_modify_xmp()
         test_func.test_modify_comment()
         test_func.test_modify_icc()
+        test_func.test_copy_to_another_image()
     memory_end = process.memory_info().rss
     delta = (memory_end - memory_1) / 1024 / 1024
     assert delta < 1, 'Memory grew by {}MB, a memory leak may have occurred.'.format(delta)
@@ -79,7 +80,7 @@ def test_transmit_various_characters():
 def _test_thread_safe():
     """
     Test whether pyexiv2 can successfully run multiple threads.
-    TODO: pyexiv2 is not thread-safe because in exiv2api.cpp, check_error_log() reads and writes to a global variable.
+    TODO: pyexiv2 is not thread-safe because in exiv2api.cpp, check_error_log() reads and writes a global variable.
     """
     import multiprocessing
     pool = multiprocessing.Pool(3)

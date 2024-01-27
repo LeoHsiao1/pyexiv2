@@ -122,39 +122,39 @@ public:
 
 class Image{
 public:
-    Exiv2::Image::AutoPtr *img = new Exiv2::Image::AutoPtr;
+    Exiv2::Image::UniquePtr img;
 
     Image(const char *filename){
-        *img = Exiv2::ImageFactory::open(filename);
-        if (img->get() == 0)
-            throw Exiv2::Error(Exiv2::kerErrorMessage, "Can not open this image.");
-        (*img)->readMetadata();     // Calling readMetadata() reads all types of metadata supported by the image
+        img = Exiv2::ImageFactory::open(filename);
+        if (img.get() == 0)
+            throw Exiv2::Error(Exiv2::ErrorCode::kerErrorMessage, "Can not open this image.");
+        img->readMetadata();     // Calling readMetadata() reads all types of metadata supported by the image
         check_error_log();
     }
 
     Image(Buffer buffer){
-        *img = Exiv2::ImageFactory::open((Exiv2::byte *)buffer.data, buffer.size);
-        if (img->get() == 0)
-            throw Exiv2::Error(Exiv2::kerErrorMessage, "Can not open this image.");
-        (*img)->readMetadata();
+        img = Exiv2::ImageFactory::open((Exiv2::byte *)buffer.data, buffer.size);
+        if (img.get() == 0)
+            throw Exiv2::Error(Exiv2::ErrorCode::kerErrorMessage, "Can not open this image.");
+        img->readMetadata();
         check_error_log();
     }
 
     void close_image()
     {
-        delete img;
+        img.reset();
         check_error_log();
     }
 
     py::bytes get_bytes()
     {
-        Exiv2::BasicIo &io = (*img)->io();
+        Exiv2::BasicIo &io = img->io();
         return py::bytes((char *)io.mmap(), io.size());
     }
 
     std::string get_mime_type()
     {
-        return (*img)->mimeType();
+        return img->mimeType();
     }
 
     py::dict get_access_mode()
@@ -166,17 +166,17 @@ public:
         enum AccessMode { amNone=0, amRead=1, amWrite=2, amReadWrite=3 };
         */
         auto mode       = py::dict();
-        mode["exif"]    = int((*img)->checkMode(Exiv2::mdExif));
-        mode["iptc"]    = int((*img)->checkMode(Exiv2::mdIptc));
-        mode["xmp"]     = int((*img)->checkMode(Exiv2::mdXmp));
-        mode["comment"] = int((*img)->checkMode(Exiv2::mdComment));
-        // mode["icc"]     = int((*img)->checkMode(Exiv2::mdIccProfile));   // Exiv2 will not check ICC
+        mode["exif"]    = int(img->checkMode(Exiv2::mdExif));
+        mode["iptc"]    = int(img->checkMode(Exiv2::mdIptc));
+        mode["xmp"]     = int(img->checkMode(Exiv2::mdXmp));
+        mode["comment"] = int(img->checkMode(Exiv2::mdComment));
+        // mode["icc"]     = int(img->checkMode(Exiv2::mdIccProfile));   // Exiv2 will not check ICC
         return mode;
     }
 
     py::object read_exif()
     {
-        Exiv2::ExifData &data         = (*img)->exifData();
+        Exiv2::ExifData &data         = img->exifData();
         Exiv2::ExifData::iterator i   = data.begin();
         Exiv2::ExifData::iterator end = data.end();
         read_block;
@@ -184,7 +184,7 @@ public:
 
     py::object read_iptc()
     {
-        Exiv2::IptcData &data         = (*img)->iptcData();
+        Exiv2::IptcData &data         = img->iptcData();
         Exiv2::IptcData::iterator i   = data.begin();
         Exiv2::IptcData::iterator end = data.end();
         read_block;
@@ -192,7 +192,7 @@ public:
 
     py::object read_xmp()
     {
-        Exiv2::XmpData &data         = (*img)->xmpData();
+        Exiv2::XmpData &data         = img->xmpData();
         Exiv2::XmpData::iterator i   = data.begin();
         Exiv2::XmpData::iterator end = data.end();
         read_block;
@@ -204,30 +204,30 @@ public:
         When readMetadata() is called, Exiv2 reads the raw XMP text,
         stores it in a string called XmpPacket, then parses it into an XmpData instance.
         */
-        return py::bytes((*img)->xmpPacket());
+        return py::bytes(img->xmpPacket());
     }
 
     py::object read_comment()
     {
-        return py::bytes((*img)->comment());
+        return py::bytes(img->comment());
     }
 
     py::object read_icc()
     {
-        Exiv2::DataBuf *buf = (*img)->iccProfile();
-        return py::bytes((char*)buf->pData_, buf->size_);
+        Exiv2::DataBuf buf = img->iccProfile();
+        return py::bytes((char*)buf.c_str(), buf.size());
     }
 
     py::object read_thumbnail()
     {
-        Exiv2::ExifThumb exifThumb((*img)->exifData());
+        Exiv2::ExifThumb exifThumb(img->exifData());
         Exiv2::DataBuf buf = exifThumb.copy();
-        return py::bytes((char*)buf.pData_, buf.size_);
+        return py::bytes((char*)buf.c_str(), buf.size());
     }
 
     void modify_exif(py::list table, py::str encoding)
     {
-        Exiv2::ExifData &exifData = (*img)->exifData();
+        Exiv2::ExifData &exifData = img->exifData();
 
         // Iterate the input table. each line contains a key and a value
         for (auto _line : table){
@@ -239,30 +239,45 @@ public:
 
             // Extract the fields in line
             std::string key      = py::bytes(line[0].attr("encode")(encoding));
-            std::string value    = py::bytes(line[1].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
 
             // Locate the key
             Exiv2::ExifData::iterator key_pos = exifData.findKey(Exiv2::ExifKey(key));
-
-            // Delete the existing key to set a new value, otherwise the key may contain multiple values.
-            if (key_pos != exifData.end())
+            // Use the while loop because the key may repeat
+            while (key_pos != exifData.end()){
+                // Delete the existing key to set a new value
                 exifData.erase(key_pos);
+                key_pos = exifData.findKey(Exiv2::ExifKey(key));
+            }
 
+            // Set the value
             if      (typeName == "_delete")
                 continue;
             else if (typeName == "string")
+            {
+                std::string value = py::bytes(line[1].attr("encode")(encoding));
                 exifData[key] = value;
+            }
+            // The Exif specification allows for duplicate tags with the same key, although this is rare
+            else if (typeName == "array")
+            {
+                Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::asciiString);
+                for (auto item: line[1]){
+                    std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
+                    value->read(item_str);
+                    exifData.add(Exiv2::ExifKey(key), value.get());
+                }
+            }
         }
 
-        (*img)->setExifData(exifData);  // Save metadata to images in memory
-        (*img)->writeMetadata();        // Save metadata from memory to disk
+        img->setExifData(exifData);  // Save metadata to images in memory
+        img->writeMetadata();        // Save metadata from memory to disk
         check_error_log();
     }
 
     void modify_iptc(py::list table, py::str encoding)
     {
-        Exiv2::IptcData &iptcData = (*img)->iptcData();
+        Exiv2::IptcData &iptcData = img->iptcData();
         for (auto _line : table){
             py::list line;
             for (auto field : _line)
@@ -270,7 +285,7 @@ public:
             std::string key      = py::bytes(line[0].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
             Exiv2::IptcData::iterator key_pos = iptcData.findKey(Exiv2::IptcKey(key));
-            while (key_pos != iptcData.end()){  // Use the while loop because the iptc key may repeat
+            while (key_pos != iptcData.end()){
                 iptcData.erase(key_pos);
                 key_pos = iptcData.findKey(Exiv2::IptcKey(key));
             }
@@ -283,7 +298,7 @@ public:
             }
             else if (typeName == "array")
             {
-                Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::string);
+                Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::string);
                 for (auto item: line[1]){
                     std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
                     value->read(item_str);
@@ -291,14 +306,14 @@ public:
                 }
             }
         }
-        (*img)->setIptcData(iptcData);
-        (*img)->writeMetadata();
+        img->setIptcData(iptcData);
+        img->writeMetadata();
         check_error_log();
     }
 
     void modify_xmp(py::list table, py::str encoding)
     {
-        Exiv2::XmpData &xmpData = (*img)->xmpData();
+        Exiv2::XmpData &xmpData = img->xmpData();
         for (auto _line : table){
             py::list line;
             for (auto field : _line)
@@ -306,8 +321,10 @@ public:
             std::string key = py::bytes(line[0].attr("encode")(encoding));
             std::string typeName = py::bytes(line[2].attr("encode")(encoding));
             Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
-            if (key_pos != xmpData.end())
+            while (key_pos != xmpData.end()){
                 xmpData.erase(key_pos);
+                key_pos = xmpData.findKey(Exiv2::XmpKey(key));
+            }
             if      (typeName == "_delete")
                 continue;
             else if (typeName == "string")
@@ -317,7 +334,7 @@ public:
             }
             else if (typeName == "array")
             {
-                Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::xmpSeq);
+                Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpSeq);
                 for (auto item: line[1]){
                     std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
                     value->read(item_str);
@@ -325,84 +342,114 @@ public:
                 xmpData.add(Exiv2::XmpKey(key), value.get());
             }
         }
-        (*img)->setXmpData(xmpData);
-        (*img)->writeMetadata();
+        img->setXmpData(xmpData);
+        img->writeMetadata();
         check_error_log();
     }
 
     void modify_raw_xmp(py::str data, py::str encoding)
     {
         std::string data_str = py::bytes(data.attr("encode")(encoding));
-        (*img)->setXmpPacket(data_str);
-        (*img)->writeMetadata();
-        (*img)->writeXmpFromPacket();   // Refresh the parsed XMP data in memory
+        img->setXmpPacket(data_str);
+        img->writeMetadata();
+        (void)img->writeXmpFromPacket();   // Refresh the parsed XMP data in memory
         check_error_log();
     }
 
     void modify_comment(py::str data, py::str encoding)
     {
         std::string data_str = py::bytes(data.attr("encode")(encoding));
-        (*img)->setComment(data_str);
-        (*img)->writeMetadata();
+        img->setComment(data_str);
+        img->writeMetadata();
         check_error_log();
     }
 
     void modify_icc(const char *data, long size)
     {
         Exiv2::DataBuf buf((Exiv2::byte *) data, size);
-        (*img)->setIccProfile(buf);
-        (*img)->writeMetadata();
+        img->setIccProfile(std::move(buf));
+        img->writeMetadata();
         check_error_log();
     }
 
     void modify_thumbnail(const char *data, long size)
     {
-        Exiv2::ExifThumb exifThumb((*img)->exifData());
+        Exiv2::ExifThumb exifThumb(img->exifData());
         exifThumb.setJpegThumbnail((Exiv2::byte *) data, size);
-        (*img)->writeMetadata();
+        img->writeMetadata();
         check_error_log();
     }
 
     void clear_exif()
     {
-        (*img)->clearExifData();
-        (*img)->writeMetadata();
+        img->clearExifData();
+        img->writeMetadata();
         check_error_log();
     }
 
     void clear_iptc()
     {
-        (*img)->clearIptcData();
-        (*img)->writeMetadata();
+        img->clearIptcData();
+        img->writeMetadata();
         check_error_log();
     }
 
     void clear_xmp()
     {
-        (*img)->clearXmpData();
-        (*img)->writeMetadata();
+        img->clearXmpData();
+        img->writeMetadata();
         check_error_log();
     }
 
     void clear_comment()
     {
-        (*img)->clearComment();
-        (*img)->writeMetadata();
+        img->clearComment();
+        img->writeMetadata();
         check_error_log();
     }
 
     void clear_icc()
     {
-        (*img)->clearIccProfile();
-        (*img)->writeMetadata();
+        img->clearIccProfile();
+        img->writeMetadata();
         check_error_log();
     }
 
     void clear_thumbnail()
     {
-        Exiv2::ExifThumb exifThumb((*img)->exifData());
+        Exiv2::ExifThumb exifThumb(img->exifData());
         exifThumb.erase();
-        (*img)->writeMetadata();
+        img->writeMetadata();
+        check_error_log();
+    }
+
+    void copy_to_another_image(Image& another_image,
+                                bool exif, bool iptc, bool xmp,
+                                bool comment, bool icc, bool thumbnail)
+    {
+        if (comment) {
+            another_image.img->setComment(img->comment());
+        }
+        if (icc) {
+            Exiv2::DataBuf buf = img->iccProfile();
+            another_image.img->setIccProfile(std::move(buf));
+        }
+        // Exif.Image.JPEGInterchangeFormat may be changed when modifying thumbnail, so copy thumbnail before copying exif.
+        if (thumbnail) {
+            Exiv2::ExifThumb exifThumb(another_image.img->exifData());
+            Exiv2::DataBuf buf = exifThumb.copy();
+            exifThumb.setJpegThumbnail(buf.c_data(), buf.size());
+        }
+        if (exif) {
+            another_image.img->setExifData(img->exifData());
+        }
+        if (iptc) {
+            another_image.img->setIptcData(img->iptcData());
+        }
+        if (xmp) {
+            another_image.img->setXmpPacket(img->xmpPacket());
+        }
+        another_image.img->writeMetadata();
         check_error_log();
     }
 
@@ -464,7 +511,7 @@ py::object convert_iptc_to_xmp(py::list table, py::str encoding)
         }
         else if (typeName == "array")
         {
-            Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::string);
+            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::string);
             for (auto item: line[1]){
                 std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
                 value->read(item_str);
@@ -504,7 +551,7 @@ py::object convert_xmp_to_exif(py::list table, py::str encoding)
         }
         else if (typeName == "array")
         {
-            Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::xmpSeq);
+            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpSeq);
             for (auto item: line[1]){
                 std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
                 value->read(item_str);
@@ -544,7 +591,7 @@ py::object convert_xmp_to_iptc(py::list table, py::str encoding)
         }
         else if (typeName == "array")
         {
-            Exiv2::Value::AutoPtr value = Exiv2::Value::create(Exiv2::xmpSeq);
+            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpSeq);
             for (auto item: line[1]){
                 std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
                 value->read(item_str);
@@ -572,40 +619,41 @@ PYBIND11_MODULE(exiv2api, m)
 #endif
     m.def("set_log_level", &set_log_level);
     py::class_<Buffer>(m, "Buffer")
-        .def(py::init<const char *, long>())
-        .def_readonly("data"      , &Buffer::data)
-        .def_readonly("size"      , &Buffer::size)
-        .def("destroy"            , &Buffer::destroy)
-        .def("dump"               , &Buffer::dump);
+        .def(py::init<const char *  , long>())
+        .def_readonly("data"        , &Buffer::data)
+        .def_readonly("size"        , &Buffer::size)
+        .def("destroy"              , &Buffer::destroy)
+        .def("dump"                 , &Buffer::dump);
     py::class_<Image>(m, "Image")
         .def(py::init<const char *>())
         .def(py::init<Buffer &>())
-        .def("close_image"      , &Image::close_image)
-        .def("get_bytes"        , &Image::get_bytes)
-        .def("get_mime_type"    , &Image::get_mime_type)
-        .def("get_access_mode"  , &Image::get_access_mode)
-        .def("read_exif"        , &Image::read_exif)
-        .def("read_iptc"        , &Image::read_iptc)
-        .def("read_xmp"         , &Image::read_xmp)
-        .def("read_raw_xmp"     , &Image::read_raw_xmp)
-        .def("read_comment"     , &Image::read_comment)
-        .def("read_icc"         , &Image::read_icc)
-        .def("read_thumbnail"   , &Image::read_thumbnail)
-        .def("modify_exif"      , &Image::modify_exif)
-        .def("modify_iptc"      , &Image::modify_iptc)
-        .def("modify_xmp"       , &Image::modify_xmp)
-        .def("modify_raw_xmp"   , &Image::modify_raw_xmp)
-        .def("modify_comment"   , &Image::modify_comment)
-        .def("modify_icc"       , &Image::modify_icc)
-        .def("modify_thumbnail" , &Image::modify_thumbnail)
-        .def("clear_exif"       , &Image::clear_exif)
-        .def("clear_iptc"       , &Image::clear_iptc)
-        .def("clear_xmp"        , &Image::clear_xmp)
-        .def("clear_comment"    , &Image::clear_comment)
-        .def("clear_icc"        , &Image::clear_icc)
-        .def("clear_thumbnail"  , &Image::clear_thumbnail);
-    m.def("convert_exif_to_xmp" , &convert_exif_to_xmp);
-    m.def("convert_iptc_to_xmp" , &convert_iptc_to_xmp);
-    m.def("convert_xmp_to_exif" , &convert_xmp_to_exif);
-    m.def("convert_xmp_to_iptc" , &convert_xmp_to_iptc);
+        .def("close_image"          , &Image::close_image)
+        .def("get_bytes"            , &Image::get_bytes)
+        .def("get_mime_type"        , &Image::get_mime_type)
+        .def("get_access_mode"      , &Image::get_access_mode)
+        .def("read_exif"            , &Image::read_exif)
+        .def("read_iptc"            , &Image::read_iptc)
+        .def("read_xmp"             , &Image::read_xmp)
+        .def("read_raw_xmp"         , &Image::read_raw_xmp)
+        .def("read_comment"         , &Image::read_comment)
+        .def("read_icc"             , &Image::read_icc)
+        .def("read_thumbnail"       , &Image::read_thumbnail)
+        .def("modify_exif"          , &Image::modify_exif)
+        .def("modify_iptc"          , &Image::modify_iptc)
+        .def("modify_xmp"           , &Image::modify_xmp)
+        .def("modify_raw_xmp"       , &Image::modify_raw_xmp)
+        .def("modify_comment"       , &Image::modify_comment)
+        .def("modify_icc"           , &Image::modify_icc)
+        .def("modify_thumbnail"     , &Image::modify_thumbnail)
+        .def("clear_exif"           , &Image::clear_exif)
+        .def("clear_iptc"           , &Image::clear_iptc)
+        .def("clear_xmp"            , &Image::clear_xmp)
+        .def("clear_comment"        , &Image::clear_comment)
+        .def("clear_icc"            , &Image::clear_icc)
+        .def("clear_thumbnail"      , &Image::clear_thumbnail)
+        .def("copy_to_another_image", &Image::copy_to_another_image);
+    m.def("convert_exif_to_xmp"     , &convert_exif_to_xmp);
+    m.def("convert_iptc_to_xmp"     , &convert_iptc_to_xmp);
+    m.def("convert_xmp_to_exif"     , &convert_xmp_to_exif);
+    m.def("convert_xmp_to_iptc"     , &convert_xmp_to_iptc);
 }

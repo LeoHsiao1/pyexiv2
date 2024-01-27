@@ -27,16 +27,16 @@
 
 1. Download [the release of Exiv2](https://www.exiv2.org/archive.html) :
     ```sh
-    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.27.7/exiv2-0.27.7-Linux64.tar.gz
-    tar -zxvf exiv2-0.27.7-Linux64.tar.gz
+    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.1/exiv2-0.28.1-Linux64.tar.gz
+    tar -zxvf exiv2-0.28.1-Linux64.tar.gz
     ```
 
 2. Prepare environment variables according to your download path:
     ```sh
-    EXIV2_DIR=??/exiv2-0.27.7-Linux64
+    EXIV2_DIR=??/exiv2-0.28.1-Linux64
     LIB_DIR=??/pyexiv2/lib/
-    cp $EXIV2_DIR/lib/libexiv2.so.0.27.7  $EXIV2_DIR/lib/libexiv2.so
-    cp $EXIV2_DIR/lib/libexiv2.so.0.27.7  $LIB_DIR/libexiv2.so
+    cp $EXIV2_DIR/lib/libexiv2.so.0.28.1  $EXIV2_DIR/lib/libexiv2.so
+    cp $EXIV2_DIR/lib/libexiv2.so.0.28.1  $LIB_DIR/libexiv2.so
     ```
 
 3. Prepare the python interpreter:
@@ -65,15 +65,15 @@
 
 1. Download [the release of Exiv2](https://www.exiv2.org/archive.html) :
     ```sh
-    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.27.7/exiv2-0.27.7-Darwin.tar.gz
-    tar -zxvf exiv2-0.27.7-Darwin.tar.gz
+    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.1/exiv2-0.28.1-Darwin.tar.gz
+    tar -zxvf exiv2-0.28.1-Darwin.tar.gz
     ```
 
 2. Prepare environment variables according to your download path:
     ```sh
-    EXIV2_DIR=??/exiv2-0.27.7-Darwin
+    EXIV2_DIR=??/exiv2-0.28.1-Darwin
     LIB_DIR=??/pyexiv2/lib
-    cp ${EXIV2_DIR}/lib/libexiv2.0.27.7.dylib ${LIB_DIR}/libexiv2.dylib
+    cp ${EXIV2_DIR}/lib/libexiv2.0.28.1.dylib ${LIB_DIR}/libexiv2.dylib
     ```
 
 3. Prepare the python interpreter:
@@ -102,8 +102,8 @@
 
 1. Download [the release of Exiv2](https://www.exiv2.org/archive.html) :
     ```sh
-    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.27.7/exiv2-0.27.7-2019msvc64.zip
-    python -m zipfile -e exiv2-0.27.7-2019msvc64.zip .
+    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.1/exiv2-0.28.1-2019msvc64.zip
+    python -m zipfile -e exiv2-0.28.1-2019msvc64.zip .
     ```
 
 2. Install `Visual Studio 2019` (must use the same version of Visual Studio as the Exiv2 build) , and set the environment variables it needs.
@@ -111,7 +111,7 @@
 3. Prepare environment variables according to your download path:
     ```batch
     "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
-    set  EXIV2_DIR=??\exiv2-0.27.7-2019msvc64
+    set  EXIV2_DIR=??\exiv2-0.28.1-2019msvc64
     set  LIB_DIR=??\pyexiv2\lib
     copy %EXIV2_DIR%\bin\exiv2.dll  %LIB_DIR%
     ```
