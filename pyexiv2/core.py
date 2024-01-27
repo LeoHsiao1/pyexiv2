@@ -127,30 +127,16 @@ class Image:
     def clear_thumbnail(self):
         self.img.clear_thumbnail()
 
-    def copy_to_another_image(self, filename: str, encoding='utf-8', clean_before_copy=True,
+    def copy_to_another_image(self, another_image,
                               exif=True, iptc=True, xmp=True,
                               comment=True, icc=True, thumbnail=True):
         """ Copy metadata from one image to another image.
-        By default, it will clean the existing metadata in another image before copying.
         """
-        self.img.copy_to_another_image(filename.encode(encoding), clean_before_copy,
+        if not isinstance(another_image, (Image, ImageData)):
+            raise TypeError('The type of another_image should be pyexiv2.Image or pyexiv2.ImageData.')
+        self.img.copy_to_another_image(another_image.img,
                                        exif, iptc, xmp,
                                        comment, icc, thumbnail)
-
-    def copy_to_another_imageData(self, data: bytes, clean_before_copy=True,
-                                  exif=True, iptc=True, xmp=True,
-                                  comment=True, icc=True, thumbnail=True):
-        """ Copy metadata from one image to another image.
-        Opens another image from bytes data.
-        """
-        length = len(data)
-        if length >= 2**31:
-            raise ValueError('Only images smaller than 2GB can be opened. The size of your image is {} bytes.'.format(length))
-        another_image_buffer = exiv2api.Buffer(data, length)
-        self.img.copy_to_another_imageData(another_image_buffer, clean_before_copy,
-                                           exif, iptc, xmp,
-                                           comment, icc, thumbnail)
-        another_image_buffer.destroy()
 
 
 class ImageData(Image):
