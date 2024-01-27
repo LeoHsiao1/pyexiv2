@@ -38,6 +38,12 @@
   ```
   - 这是因为 libintl.8.dylib 不存在。你需要执行 `brew install gettext` 。
 
+- 在 MacOS 上使用 pyexiv2 时，你可能遇到以下异常：
+  ```py
+  Library not loaded: '/usr/local/opt/inih/lib/libinih.0.dylib'
+  ```
+  - 这是因为 libinih.0.dylib 不存在。你需要执行 `brew install inih` 。
+
 - 在 Windows 上使用 pyexiv2 时，你可能遇到以下异常：
   ```py
   >>> import pyexiv2

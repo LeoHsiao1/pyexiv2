@@ -38,6 +38,12 @@ Language: [English](./Tutorial.md) | [中文](./Tutorial-cn.md)
   ```
   - This is because libintl.8.dylib is missing. You need to execute `brew install gettext` .
 
+- When using pyexiv2 on MacOS, you may encounter the following exception:
+  ```py
+  Library not loaded: '/usr/local/opt/inih/lib/libinih.0.dylib'
+  ```
+  - This is because libinih.0.dylib is missing. You need to execute `brew install inih` .
+1
 - When using pyexiv2 on Windows, you may encounter the following exception:
   ```py
   >>> import pyexiv2
