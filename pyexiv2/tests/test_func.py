@@ -220,6 +220,27 @@ def test_clear_thumbnail():
     check_the_copy_of_img(diff_text, b'', 'read_thumbnail')
 
 
+def test_copy_to_another_image():
+    try:
+        shutil.copy(ENV.test_img, ENV.test_img_copy)
+        with Image(ENV.test_img_copy) as img_copy:
+            img_copy.clear_exif()
+            img_copy.clear_iptc()
+            img_copy.clear_xmp()
+            img_copy.clear_comment()
+            img_copy.clear_icc()
+            img_copy.clear_thumbnail()
+            ENV.img.copy_to_another_image(img_copy)
+            diff_dict(ENV.img.read_exif()       , img_copy.read_exif())
+            diff_dict(ENV.img.read_iptc()       , img_copy.read_iptc())
+            diff_dict(ENV.img.read_xmp()        , img_copy.read_xmp())
+            diff_text(ENV.img.read_comment()    , img_copy.read_comment())
+            diff_text(ENV.img.read_icc()        , img_copy.read_icc())
+            diff_text(ENV.img.read_thumbnail()  , img_copy.read_thumbnail())
+    finally:
+        os.remove(ENV.test_img_copy)
+
+
 def test_registerNs():
     with pytest.raises(RuntimeError):
         ENV.img.modify_xmp({'Xmp.test.mytag1': 'Hello'})

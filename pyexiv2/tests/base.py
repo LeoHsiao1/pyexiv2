@@ -51,7 +51,7 @@ def diff_text(text1: (str, bytes), text2: (str, bytes)):
 def diff_dict(dict1, dict2):
     assert len(dict1) == len(dict2), "The two dict are of different length: {}, {}".format(len(dict1), len(dict2))
     for k in dict1.keys():
-        assert dict1[k] == dict2[k], "['{}'] is different.".format(k)
+        assert dict1[k] == dict2[k], "The two dict is different at ['{}'] :\n{}\n{}".format(k, dict1[k], dict2[k])
 
 
 def check_img_md5():
