@@ -9,7 +9,7 @@ class Image:
     Please call the public methods of this class.
     """
 
-    def __init__(self, filename, encoding='utf-8'):
+    def __init__(self, filename: str, encoding='utf-8'):
         """ Open an image and load its metadata. """
         self.img = exiv2api.Image(filename.encode(encoding))
 
@@ -127,7 +127,7 @@ class Image:
     def clear_thumbnail(self):
         self.img.clear_thumbnail()
 
-    def copy_to_another_image(self, filename, encoding='utf-8', clean_before_copy=True,
+    def copy_to_another_image(self, filename: str, encoding='utf-8', clean_before_copy=True,
                               exif=True, iptc=True, xmp=True,
                               comment=True, icc=True, thumbnail=True):
         """ Copy metadata from one image to another image.
@@ -136,6 +136,21 @@ class Image:
         self.img.copy_to_another_image(filename.encode(encoding), clean_before_copy,
                                        exif, iptc, xmp,
                                        comment, icc, thumbnail)
+
+    def copy_to_another_imageData(self, data: bytes, clean_before_copy=True,
+                                  exif=True, iptc=True, xmp=True,
+                                  comment=True, icc=True, thumbnail=True):
+        """ Copy metadata from one image to another image.
+        Opens another image from bytes data.
+        """
+        length = len(data)
+        if length >= 2**31:
+            raise ValueError('Only images smaller than 2GB can be opened. The size of your image is {} bytes.'.format(length))
+        another_image_buffer = exiv2api.Buffer(data, length)
+        self.img.copy_to_another_imageData(another_image_buffer, clean_before_copy,
+                                           exif, iptc, xmp,
+                                           comment, icc, thumbnail)
+        another_image_buffer.destroy()
 
 
 class ImageData(Image):

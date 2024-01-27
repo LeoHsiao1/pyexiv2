@@ -423,16 +423,14 @@ public:
         check_error_log();
     }
 
-    void copy_to_another_image(const char *filename, bool clean_before_copy,
+    void _copy_to_another_image(Exiv2::Image::UniquePtr another_image, bool clean_before_copy,
                                bool exif, bool iptc, bool xmp,
                                bool comment, bool icc, bool thumbnail)
     {
-        // Open another image
-        auto another_image = Exiv2::ImageFactory::open(filename);
         if (another_image.get() == 0)
             throw Exiv2::Error(Exiv2::ErrorCode::kerErrorMessage, "Can not open this image.");
 
-        // Whether to preserve the existing metadata in another image
+        // Whether to read the existing metadata in another image
         if (!clean_before_copy) {
             another_image->readMetadata();
         }
@@ -465,12 +463,25 @@ public:
         check_error_log();
     }
 
-    // void copy_to_another_image(Buffer buffer, bool clean_before_copy)
-    // {
-    //     *img = Exiv2::ImageFactory::open((Exiv2::byte *)buffer.data, buffer.size);
-    //     if (img->get() == 0)
-    //         throw Exiv2::Error(Exiv2::ErrorCode::kerErrorMessage, "Can not open this image.");
-    // }
+    void copy_to_another_image(const char *filename, bool clean_before_copy,
+                               bool exif, bool iptc, bool xmp,
+                               bool comment, bool icc, bool thumbnail)
+    {
+        Exiv2::Image::UniquePtr another_image = Exiv2::ImageFactory::open(filename);
+        this->_copy_to_another_image(std::move(another_image), clean_before_copy,
+                               exif, iptc, xmp,
+                               comment, icc, thumbnail);
+    }
+
+    void copy_to_another_imageData(Buffer buffer, bool clean_before_copy,
+                                   bool exif, bool iptc, bool xmp,
+                                   bool comment, bool icc, bool thumbnail)
+    {
+        Exiv2::Image::UniquePtr another_image = Exiv2::ImageFactory::open((Exiv2::byte *)buffer.data, buffer.size);
+        this->_copy_to_another_image(std::move(another_image), clean_before_copy,
+                                     exif, iptc, xmp,
+                                     comment, icc, thumbnail);
+    }
 };
 
 py::object convert_exif_to_xmp(py::list table, py::str encoding)
@@ -637,41 +648,42 @@ PYBIND11_MODULE(exiv2api, m)
 #endif
     m.def("set_log_level", &set_log_level);
     py::class_<Buffer>(m, "Buffer")
-        .def(py::init<const char *, long>())
-        .def_readonly("data"      , &Buffer::data)
-        .def_readonly("size"      , &Buffer::size)
-        .def("destroy"            , &Buffer::destroy)
-        .def("dump"               , &Buffer::dump);
+        .def(py::init<const char *  , long>())
+        .def_readonly("data"        , &Buffer::data)
+        .def_readonly("size"        , &Buffer::size)
+        .def("destroy"              , &Buffer::destroy)
+        .def("dump"                 , &Buffer::dump);
     py::class_<Image>(m, "Image")
         .def(py::init<const char *>())
         .def(py::init<Buffer &>())
-        .def("close_image"           , &Image::close_image)
-        .def("get_bytes"             , &Image::get_bytes)
-        .def("get_mime_type"         , &Image::get_mime_type)
-        .def("get_access_mode"       , &Image::get_access_mode)
-        .def("read_exif"             , &Image::read_exif)
-        .def("read_iptc"             , &Image::read_iptc)
-        .def("read_xmp"              , &Image::read_xmp)
-        .def("read_raw_xmp"          , &Image::read_raw_xmp)
-        .def("read_comment"          , &Image::read_comment)
-        .def("read_icc"              , &Image::read_icc)
-        .def("read_thumbnail"        , &Image::read_thumbnail)
-        .def("modify_exif"           , &Image::modify_exif)
-        .def("modify_iptc"           , &Image::modify_iptc)
-        .def("modify_xmp"            , &Image::modify_xmp)
-        .def("modify_raw_xmp"        , &Image::modify_raw_xmp)
-        .def("modify_comment"        , &Image::modify_comment)
-        .def("modify_icc"            , &Image::modify_icc)
-        .def("modify_thumbnail"      , &Image::modify_thumbnail)
-        .def("clear_exif"            , &Image::clear_exif)
-        .def("clear_iptc"            , &Image::clear_iptc)
-        .def("clear_xmp"             , &Image::clear_xmp)
-        .def("clear_comment"         , &Image::clear_comment)
-        .def("clear_icc"             , &Image::clear_icc)
-        .def("clear_thumbnail"       , &Image::clear_thumbnail)
-        .def("copy_to_another_image" , &Image::copy_to_another_image);
-    m.def("convert_exif_to_xmp" , &convert_exif_to_xmp);
-    m.def("convert_iptc_to_xmp" , &convert_iptc_to_xmp);
-    m.def("convert_xmp_to_exif" , &convert_xmp_to_exif);
-    m.def("convert_xmp_to_iptc" , &convert_xmp_to_iptc);
+        .def("close_image"          , &Image::close_image)
+        .def("get_bytes"            , &Image::get_bytes)
+        .def("get_mime_type"        , &Image::get_mime_type)
+        .def("get_access_mode"      , &Image::get_access_mode)
+        .def("read_exif"            , &Image::read_exif)
+        .def("read_iptc"            , &Image::read_iptc)
+        .def("read_xmp"             , &Image::read_xmp)
+        .def("read_raw_xmp"         , &Image::read_raw_xmp)
+        .def("read_comment"         , &Image::read_comment)
+        .def("read_icc"             , &Image::read_icc)
+        .def("read_thumbnail"       , &Image::read_thumbnail)
+        .def("modify_exif"          , &Image::modify_exif)
+        .def("modify_iptc"          , &Image::modify_iptc)
+        .def("modify_xmp"           , &Image::modify_xmp)
+        .def("modify_raw_xmp"       , &Image::modify_raw_xmp)
+        .def("modify_comment"       , &Image::modify_comment)
+        .def("modify_icc"           , &Image::modify_icc)
+        .def("modify_thumbnail"     , &Image::modify_thumbnail)
+        .def("clear_exif"           , &Image::clear_exif)
+        .def("clear_iptc"           , &Image::clear_iptc)
+        .def("clear_xmp"            , &Image::clear_xmp)
+        .def("clear_comment"        , &Image::clear_comment)
+        .def("clear_icc"            , &Image::clear_icc)
+        .def("clear_thumbnail"      , &Image::clear_thumbnail)
+        .def("copy_to_another_image"     , &Image::copy_to_another_image)
+        .def("copy_to_another_imageData" , &Image::copy_to_another_imageData);
+    m.def("convert_exif_to_xmp"     , &convert_exif_to_xmp);
+    m.def("convert_iptc_to_xmp"     , &convert_iptc_to_xmp);
+    m.def("convert_xmp_to_exif"     , &convert_xmp_to_exif);
+    m.def("convert_xmp_to_iptc"     , &convert_xmp_to_iptc);
 }
