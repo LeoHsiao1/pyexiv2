@@ -150,6 +150,7 @@ jobs:
 
     - name: Test
       run: |
+        brew install inih
         python -m pytest -v
 
 
