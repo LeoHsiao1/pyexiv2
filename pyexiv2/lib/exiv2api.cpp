@@ -427,6 +427,19 @@ public:
                                 bool exif, bool iptc, bool xmp,
                                 bool comment, bool icc, bool thumbnail)
     {
+        if (comment) {
+            another_image.img->setComment(img->comment());
+        }
+        if (icc) {
+            Exiv2::DataBuf buf = img->iccProfile();
+            another_image.img->setIccProfile(std::move(buf));
+        }
+        // Exif.Image.JPEGInterchangeFormat may be changed when modifying thumbnail, so copy thumbnail before copying exif.
+        if (thumbnail) {
+            Exiv2::ExifThumb exifThumb(another_image.img->exifData());
+            Exiv2::DataBuf buf = exifThumb.copy();
+            exifThumb.setJpegThumbnail(buf.c_data(), buf.size());
+        }
         if (exif) {
             another_image.img->setExifData(img->exifData());
         }
@@ -435,18 +448,6 @@ public:
         }
         if (xmp) {
             another_image.img->setXmpPacket(img->xmpPacket());
-        }
-        if (comment) {
-            another_image.img->setComment(img->comment());
-        }
-        if (icc) {
-            Exiv2::DataBuf buf = img->iccProfile();
-            another_image.img->setIccProfile(std::move(buf));
-        }
-        if (thumbnail) {
-            Exiv2::ExifThumb exifThumb(another_image.img->exifData());
-            Exiv2::DataBuf buf = exifThumb.copy();
-            exifThumb.setJpegThumbnail(buf.c_data(), buf.size());
         }
         another_image.img->writeMetadata();
         check_error_log();
