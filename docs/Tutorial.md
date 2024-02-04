@@ -20,7 +20,7 @@ Language: [English](./Tutorial.md) | [中文](./Tutorial-cn.md)
       ...
       ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.so'))
       self._handle = _dlopen(self._name, mode)
-  OSError: /lib64/libm.so.6: version `GLIBC_2.29' not found (required by /usr/local/lib/python3.8/site-packages/pyexiv2/lib/libexiv2.so)
+  OSError: /lib64/libm.so.6: version `GLIBC_2.32' not found (required by /usr/local/lib/python3.8/site-packages/pyexiv2/lib/libexiv2.so)
   ```
   - This is because pyexiv2 is compiled with a newer version of GLIBC library. You need to upgrade your GLIBC library, or upgrade your Linux distribution.
   - You can execute `ldd --version` to see the version of the GLIBC library on your computer.
