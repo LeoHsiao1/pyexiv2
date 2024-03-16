@@ -29,7 +29,9 @@ There are some test cases in folder [pyexiv2/tests](https://github.com/LeoHsiao1
 - Similar projects:
   - [exiv2](https://exiv2.org/) is a C++ library for reading and writing various image metadata, including command-line tools.
   - [pyexiv2](https://launchpad.net/pyexiv2) is a Python2 binding to exiv2, hasn't been updated since 2011.
-  - [py3exiv2](https://pypi.org/project/py3exiv2/) is a Python3 binding to exiv2, wrapped with Boost.Python.
+  - [py3exiv2](https://pypi.org/project/py3exiv2/) is a Python3 binding to exiv2, wrapped with [Boost.Python](https://boostorg.github.io/python/doc/html/index.html).
+  - [python-exiv2](https://github.com/jim-easterbrook/python-exiv2) is a Python3 binding to exiv2, wrapped with [SWIG](https://swig.org/). The intention is to give direct access to all of the top-level classes in exiv2.
   - [exiftool](https://exiftool.org/) is a perl library for reading and writing various image metadata, including command-line tools.
+
 - Books:
   - [Robin Mills. "Image Metadata and Exiv2 Architecture". 2021](https://exiv2.org/book/index.html)
