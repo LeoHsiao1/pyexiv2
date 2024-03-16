@@ -1,5 +1,5 @@
 """
-Read/Write metadata(including EXIF, IPTC, XMP), comment and ICC Profile embedded in digital images.
+Read and write image metadata, including EXIF, IPTC, XMP, ICC Profile.
 """
 
 

@@ -11,7 +11,7 @@ setuptools.setup(
     version='2.12.0',    # need to set the variable in 'pyexiv2/__init__.py'
     author='LeoHsiao',
     author_email='leohsiao@foxmail.com',
-    description='Read/Write metadata(including EXIF, IPTC, XMP), comment and ICC Profile embedded in digital images.',
+    description='Read and write image metadata, including EXIF, IPTC, XMP, ICC Profile.',
     long_description=readme_md,
     long_description_content_type='text/markdown',
     license='GPLv3',
