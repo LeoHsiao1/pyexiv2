@@ -17,9 +17,9 @@ jobs:
         python_version: [3.7, 3.8, 3.9, '3.10', '3.11', '3.12']
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python_version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python_version }}
     - name: Install dependencies
@@ -43,9 +43,9 @@ jobs:
         python_version: [3.7, 3.8, 3.9, '3.10', '3.11', '3.12']
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python_version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python_version }}
     - name: Install dependencies
@@ -70,9 +70,9 @@ jobs:
         python_version: [3.7, 3.8, 3.9, '3.10', '3.11', '3.12']
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python_version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python_version }}
     - name: Install dependencies

@@ -34,7 +34,7 @@ jobs:
         echo  LIB_DIR=`pwd`/pyexiv2/lib                                           >>  $GITHUB_ENV
         echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION}-${PLATFORM_NAME}  >>  $GITHUB_ENV
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Download Exiv2 build
       run: |
@@ -43,7 +43,7 @@ jobs:
         cp   -f   ${EXIV2_DIR}/lib/libexiv2.so.${EXIV2_VERSION}   ${LIB_DIR}/libexiv2.so
 
     - name: Set up Python ${{matrix.python_version}}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{matrix.python_version}}
 
@@ -69,7 +69,7 @@ jobs:
         cp $SUB_LIB_DIR/exiv2api.so .
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
@@ -106,7 +106,7 @@ jobs:
         echo  LIB_DIR=`pwd`/pyexiv2/lib                                           >>  $GITHUB_ENV
         echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION}-${PLATFORM_NAME}  >>  $GITHUB_ENV
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Download Exiv2 build
       run: |
@@ -115,7 +115,7 @@ jobs:
         cp   -f   $EXIV2_DIR/lib/libexiv2.${EXIV2_VERSION}.dylib  $LIB_DIR/libexiv2.dylib
 
     - name: Set up Python ${{matrix.python_version}}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{matrix.python_version}}
 
@@ -141,7 +141,7 @@ jobs:
         cp $SUB_LIB_DIR/exiv2api.so .
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
@@ -171,7 +171,7 @@ jobs:
       EXIV2_BUILD_EXT: .zip
       PYTHON_VERSION: ${{matrix.python_version}}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Set environment variables
       shell: cmd
@@ -190,7 +190,7 @@ jobs:
         copy      %EXIV2_DIR%\bin\exiv2.dll   %LIB_DIR%
 
     - name: Set up Python ${{matrix.python_version}}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{matrix.python_version}}
 
@@ -226,7 +226,7 @@ jobs:
         copy %SUB_LIB_DIR%\exiv2api.pyd .
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
