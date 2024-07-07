@@ -182,6 +182,25 @@ public:
         read_block;
     }
 
+    py::object read_exif_detail()
+    {
+        Exiv2::ExifData &data = img->exifData();
+        py::dict data_detail  = py::dict();
+        for (const auto &datum : data)
+        {
+            py::dict datum_detail    = py::dict();
+            datum_detail["idx"]      = py::int_(datum.idx());
+            datum_detail["ifdName"]  = py::str(datum.ifdName());
+            datum_detail["tagDesc"]  = py::str(datum.tagDesc());
+            datum_detail["tagLabel"] = py::str(datum.tagLabel());
+            datum_detail["typeName"] = py::str(datum.typeName());
+            datum_detail["value"]    = py::bytes(datum.value().toString());
+            data_detail[py::bytes(datum.key())] = datum_detail;
+        }
+        check_error_log();
+        return data_detail;
+    }
+
     py::object read_iptc()
     {
         Exiv2::IptcData &data         = img->iptcData();
@@ -190,12 +209,46 @@ public:
         read_block;
     }
 
+    py::object read_iptc_detail()
+    {
+        Exiv2::IptcData &data = img->iptcData();
+        py::dict data_detail  = py::dict();
+        for (const auto &datum : data)
+        {
+            py::dict datum_detail    = py::dict();
+            datum_detail["tagDesc"]  = py::str(datum.tagDesc());
+            datum_detail["tagLabel"] = py::str(datum.tagLabel());
+            datum_detail["typeName"] = py::str(datum.typeName());
+            datum_detail["value"]    = py::bytes(datum.value().toString());
+            data_detail[py::bytes(datum.key())] = datum_detail;
+        }
+        check_error_log();
+        return data_detail;
+    }
+
     py::object read_xmp()
     {
         Exiv2::XmpData &data         = img->xmpData();
         Exiv2::XmpData::iterator i   = data.begin();
         Exiv2::XmpData::iterator end = data.end();
         read_block;
+    }
+
+    py::object read_xmp_detail()
+    {
+        Exiv2::XmpData &data = img->xmpData();
+        py::dict data_detail  = py::dict();
+        for (const auto &datum : data)
+        {
+            py::dict datum_detail    = py::dict();
+            datum_detail["tagDesc"]  = py::str(datum.tagDesc());
+            datum_detail["tagLabel"] = py::str(datum.tagLabel());
+            datum_detail["typeName"] = py::str(datum.typeName());
+            datum_detail["value"]    = py::bytes(datum.value().toString());
+            data_detail[py::bytes(datum.key())] = datum_detail;
+        }
+        check_error_log();
+        return data_detail;
     }
 
     py::object read_raw_xmp()
@@ -632,8 +685,11 @@ PYBIND11_MODULE(exiv2api, m)
         .def("get_mime_type"        , &Image::get_mime_type)
         .def("get_access_mode"      , &Image::get_access_mode)
         .def("read_exif"            , &Image::read_exif)
+        .def("read_exif_detail"     , &Image::read_exif_detail)
         .def("read_iptc"            , &Image::read_iptc)
+        .def("read_iptc_detail"     , &Image::read_iptc_detail)
         .def("read_xmp"             , &Image::read_xmp)
+        .def("read_xmp_detail"      , &Image::read_xmp_detail)
         .def("read_raw_xmp"         , &Image::read_raw_xmp)
         .def("read_comment"         , &Image::read_comment)
         .def("read_icc"             , &Image::read_icc)
