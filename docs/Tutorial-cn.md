@@ -65,8 +65,11 @@ class Image:
     def get_access_mode (self) -> dict
 
     def read_exif       (self, encoding='utf-8') -> dict
+    def read_exif_detail(self, encoding='utf-8') -> dict
     def read_iptc       (self, encoding='utf-8') -> dict
+    def read_iptc_detail(self, encoding='utf-8') -> dict
     def read_xmp        (self, encoding='utf-8') -> dict
+    def read_xmp_detail (self, encoding='utf-8') -> dict
     def read_raw_xmp    (self, encoding='utf-8') -> str
     def read_comment    (self, encoding='utf-8') -> str
     def read_icc        (self) -> bytes
@@ -150,7 +153,7 @@ __exiv2_version__ = '0.28.3'
     {'Xmp.dc.format': 'image/jpeg', 'Xmp.dc.rights': 'lang="x-default" TEST', 'Xmp.dc.subject': 'TEST', ...}
     >>> img.close()
     ```
-
+- 上例只读取元数据的 `tag` 和 `value` 。你可以调用 `img.read_xx_detail()` 获取更多信息，包括 `typeName`、`tagDesc`、`tagLabel` 。
 - 读取元数据的速度与元数据的数量成反比，不管图片的大小如何。
 - 调用 `img.read_*()` 是安全的。这些方法永远不会影响图片文件（md5不变）。
 - 读取 XMP 元数据时，空白字符 `\v` 和 `\f` 会被替换为空格 ` ` 。

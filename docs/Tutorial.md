@@ -65,8 +65,11 @@ class Image:
     def get_access_mode (self) -> dict
 
     def read_exif       (self, encoding='utf-8') -> dict
+    def read_exif_detail(self, encoding='utf-8') -> dict
     def read_iptc       (self, encoding='utf-8') -> dict
+    def read_iptc_detail(self, encoding='utf-8') -> dict
     def read_xmp        (self, encoding='utf-8') -> dict
+    def read_xmp_detail (self, encoding='utf-8') -> dict
     def read_raw_xmp    (self, encoding='utf-8') -> str
     def read_comment    (self, encoding='utf-8') -> str
     def read_icc        (self) -> bytes
@@ -150,6 +153,7 @@ __exiv2_version__ = '0.28.3'
     {'Xmp.dc.format': 'image/jpeg', 'Xmp.dc.rights': 'lang="x-default" TEST', 'Xmp.dc.subject': 'TEST', ...}
     >>> img.close()
     ```
+- The above example only reads the `tag` and `value` of the metadata. You can call `img.read_xx_detail()` to get more information, including `typeName`, `tagDesc`, `tagLabel`.
 - The speed of reading metadata is inversely proportional to the amount of metadata, regardless of the size of the image.
 - It is safe to call `img.read_*()`. These methods never affect image files (md5 unchanged).
 - When reading XMP metadata, the whitespace characters `\v` and `\f` are replaced with the space ` `.
