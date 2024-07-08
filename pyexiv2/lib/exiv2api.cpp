@@ -67,14 +67,6 @@ py::str version()
     return Exiv2::version();
 }
 
-// Ensure the current exiv2 version is equal to or greater than 0.27.4, which adds function Exiv2::enableBMFF().
-#if EXIV2_TEST_VERSION(0,27,4)
-bool enableBMFF(bool enable)
-{
-    return Exiv2::enableBMFF(enable);
-}
-#endif
-
 // The result here should be stored by py::list, not py::dict. Because a tag can be repeated.
 #define read_block                                              \
     {                                                           \
@@ -652,9 +644,6 @@ PYBIND11_MODULE(exiv2api, m)
     m.def("init"         , &init);
     m.def("version"      , &version);
     m.def("registerNs"   , &Exiv2::XmpProperties::registerNs);
-#if EXIV2_TEST_VERSION(0,27,4)
-    m.def("enableBMFF"   , &enableBMFF);
-#endif
     m.def("set_log_level", &set_log_level);
     py::class_<Buffer>(m, "Buffer")
         .def(py::init<const char *  , long>())

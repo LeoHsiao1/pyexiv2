@@ -98,7 +98,6 @@ class ImageData(Image):
 
 
 def registerNs(namespace: str, prefix: str)
-def enableBMFF(enable=True)
 def set_log_level(level=2)
 
 def convert_exif_to_xmp(data: dict, encoding='utf-8') -> dict
@@ -151,8 +150,9 @@ __exiv2_version__ = '0.28.1'
     {'Xmp.dc.format': 'image/jpeg', 'Xmp.dc.rights': 'lang="x-default" TEST', 'Xmp.dc.subject': 'TEST', ...}
     >>> img.close()
     ```
+
 - 读取元数据的速度与元数据的数量成反比，不管图片的大小如何。
-- 调用 `Image.read_*()` 是安全的。这些方法永远不会影响图片文件（md5不变）。
+- 调用 `img.read_*()` 是安全的。这些方法永远不会影响图片文件（md5不变）。
 - 读取 XMP 元数据时，空白字符 `\v` 和 `\f` 会被替换为空格 ` ` 。
 
 ### modify_xx()
@@ -306,11 +306,6 @@ __exiv2_version__ = '0.28.1'
     >>> img.read_xmp()['Xmp.dc.title']
     {'lang="x-default"': 'test-中文-', 'lang="de-DE"': 'Hallo, Welt'}
     ```
-
-## BMFF
-
-- 访问 BMFF 文件（CR3、HEIF、HEIC 和 AVIF）的功能默认是禁用的，可以通过调用 `pyexiv2.enableBMFF()` 来启用。
-    > 注意：BMFF 文件可能涉及到专利权。pyexiv2 不负责识别任何此类专利权。pyexiv2 不对使用此代码所产生的法律后果负责。
 
 ## 日志
 

@@ -98,7 +98,6 @@ class ImageData(Image):
 
 
 def registerNs(namespace: str, prefix: str)
-def enableBMFF(enable=True)
 def set_log_level(level=2)
 
 def convert_exif_to_xmp(data: dict, encoding='utf-8') -> dict
@@ -152,7 +151,7 @@ __exiv2_version__ = '0.28.1'
     >>> img.close()
     ```
 - The speed of reading metadata is inversely proportional to the amount of metadata, regardless of the size of the image.
-- It is safe to call `Image.read_*()`. These methods never affect image files (md5 unchanged).
+- It is safe to call `img.read_*()`. These methods never affect image files (md5 unchanged).
 - When reading XMP metadata, the whitespace characters `\v` and `\f` are replaced with the space ` `.
 
 ### modify_xx()
@@ -306,11 +305,6 @@ __exiv2_version__ = '0.28.1'
     >>> img.read_xmp()['Xmp.dc.title']
     {'lang="x-default"': 'test-中文-', 'lang="de-DE"': 'Hallo, Welt'}
     ```
-
-## BMFF
-
-- Access to BMFF files (CR3, HEIF, HEIC, and AVIF) is disabled by default, which can be enabled by calling `pyexiv2.enableBMFF()`.
-    > Attention: BMFF Support may be the subject of patent rights. pyexiv2 shall not be held responsible for identifying any such patent rights. pyexiv2 shall not be held responsible for the legal consequences of the use of this code.
 
 ## Log
 

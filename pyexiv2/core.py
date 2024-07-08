@@ -191,7 +191,8 @@ def registerNs(namespace: str, prefix: str):
 
 def enableBMFF(enable=True):
     """ Enable or disable reading BMFF images. Return True on success. """
-    return exiv2api.enableBMFF(enable)
+    print('[warning] enableBMFF() is deprecated since pyexiv2 v2.14.0 . Now it is always enabled.')
+    return True
 
 
 def set_log_level(level=2):
