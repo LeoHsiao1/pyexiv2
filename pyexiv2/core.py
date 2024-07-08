@@ -1,6 +1,6 @@
 from .lib import exiv2api
 from .convert import *
-from .convert import _parse, _dumps
+from .convert import _parse, _parse_detail, _dumps
 
 
 class Image:
@@ -11,7 +11,7 @@ class Image:
 
     def __init__(self, filename: str, encoding='utf-8'):
         """ Open an image and load its metadata. """
-        self.img = exiv2api.Image(filename.encode(encoding))
+        self._exiv2api_image = exiv2api.Image(filename.encode(encoding))
 
     def __enter__(self):
         return self
@@ -21,7 +21,7 @@ class Image:
 
     def close(self):
         """ Free the memory for storing image data. """
-        self.img.close_image()
+        self._exiv2api_image.close_image()
 
         # Disable all methods and properties
         def closed_warning(*args, **kwargs):
@@ -35,7 +35,7 @@ class Image:
 
     def get_mime_type(self) -> str:
         """ Get the MIME type of the image, such as 'image/jpeg'. """
-        return self.img.get_mime_type()
+        return self._exiv2api_image.get_mime_type()
 
     def get_access_mode(self) -> dict:
         """ Get the access mode to various metadata. """
@@ -43,20 +43,28 @@ class Image:
                         1: 'read',
                         2: 'write',
                         3: 'read+write'}
-        dic = self.img.get_access_mode()
+        dic = self._exiv2api_image.get_access_mode()
         dic = {k:access_modes.get(v) for k,v in dic.items()}
         return dic
 
     def read_exif(self, encoding='utf-8') -> dict:
-        data = _parse(self.img.read_exif(), encoding)
+        data = _parse(self._exiv2api_image.read_exif(), encoding)
         for tag in EXIF_TAGS_ENCODED_IN_UCS2:
             value = data.get(tag)
             if value:
                 data[tag] = decode_ucs2(value)
         return data
 
+    def read_exif_detail(self, encoding='utf-8') -> dict:
+        data = _parse_detail(self._exiv2api_image.read_exif_detail(), encoding)
+        for tag in EXIF_TAGS_ENCODED_IN_UCS2:
+            tag_detail = data.get(tag)
+            if tag_detail:
+                tag_detail['value'] = decode_ucs2(tag_detail['value'])
+        return data
+
     def read_iptc(self, encoding='utf-8') -> dict:
-        data = _parse(self.img.read_iptc(), encoding)
+        data = _parse(self._exiv2api_image.read_iptc(), encoding)
         # For repeatable tags, the value is converted to list type even if there are no multiple values.
         for tag in IPTC_TAGS_REPEATABLE:
             value = data.get(tag)
@@ -64,20 +72,32 @@ class Image:
                 data[tag] = [value]
         return data
 
+    def read_iptc_detail(self, encoding='utf-8') -> dict:
+        data = _parse_detail(self._exiv2api_image.read_iptc_detail(), encoding)
+        # For repeatable tags, the value is converted to list type even if there are no multiple values.
+        for tag in IPTC_TAGS_REPEATABLE:
+            tag_detail = data.get(tag)
+            if tag_detail and isinstance(tag_detail['value'], str):
+                tag_detail['value'] = [tag_detail['value']]
+        return data
+
     def read_xmp(self, encoding='utf-8') -> dict:
-        return _parse(self.img.read_xmp(), encoding)
+        return _parse(self._exiv2api_image.read_xmp(), encoding)
+
+    def read_xmp_detail(self, encoding='utf-8') -> dict:
+        return _parse_detail(self._exiv2api_image.read_xmp_detail(), encoding)
 
     def read_raw_xmp(self, encoding='utf-8') -> str:
-        return self.img.read_raw_xmp().decode(encoding)
+        return self._exiv2api_image.read_raw_xmp().decode(encoding)
 
     def read_comment(self, encoding='utf-8') -> str:
-        return self.img.read_comment().decode(encoding)
+        return self._exiv2api_image.read_comment().decode(encoding)
 
     def read_icc(self) -> bytes:
-        return self.img.read_icc()
+        return self._exiv2api_image.read_icc()
 
     def read_thumbnail(self) -> bytes:
-        return self.img.read_thumbnail()
+        return self._exiv2api_image.read_thumbnail()
 
     def modify_exif(self, data: dict, encoding='utf-8'):
         data = data.copy()  # Avoid modifying the original data when calling encode_ucs2()
@@ -85,47 +105,47 @@ class Image:
             value = data.get(tag)
             if value:
                 data[tag] = encode_ucs2(value)
-        self.img.modify_exif(_dumps(data), encoding)
+        self._exiv2api_image.modify_exif(_dumps(data), encoding)
 
     def modify_iptc(self, data: dict, encoding='utf-8'):
-        self.img.modify_iptc(_dumps(data), encoding)
+        self._exiv2api_image.modify_iptc(_dumps(data), encoding)
 
     def modify_xmp(self, data: dict, encoding='utf-8'):
-        self.img.modify_xmp(_dumps(data), encoding)
+        self._exiv2api_image.modify_xmp(_dumps(data), encoding)
 
     def modify_raw_xmp(self, data: str, encoding='utf-8'):
-        self.img.modify_raw_xmp(data, encoding)
+        self._exiv2api_image.modify_raw_xmp(data, encoding)
 
     def modify_comment(self, data: str, encoding='utf-8'):
-        self.img.modify_comment(data, encoding)
+        self._exiv2api_image.modify_comment(data, encoding)
 
     def modify_icc(self, data: bytes):
         if not isinstance(data, bytes):
             raise TypeError('The ICC profile should be of bytes type.')
-        return self.img.modify_icc(data, len(data))
+        return self._exiv2api_image.modify_icc(data, len(data))
 
     def modify_thumbnail(self, data: bytes):
         if not isinstance(data, bytes):
             raise TypeError('The thumbnail should be of bytes type.')
-        return self.img.modify_thumbnail(data, len(data))
+        return self._exiv2api_image.modify_thumbnail(data, len(data))
 
     def clear_exif(self):
-        self.img.clear_exif()
+        self._exiv2api_image.clear_exif()
 
     def clear_iptc(self):
-        self.img.clear_iptc()
+        self._exiv2api_image.clear_iptc()
 
     def clear_xmp(self):
-        self.img.clear_xmp()
+        self._exiv2api_image.clear_xmp()
 
     def clear_comment(self):
-        self.img.clear_comment()
+        self._exiv2api_image.clear_comment()
 
     def clear_icc(self):
-        self.img.clear_icc()
+        self._exiv2api_image.clear_icc()
 
     def clear_thumbnail(self):
-        self.img.clear_thumbnail()
+        self._exiv2api_image.clear_thumbnail()
 
     def copy_to_another_image(self, another_image,
                               exif=True, iptc=True, xmp=True,
@@ -134,7 +154,7 @@ class Image:
         """
         if not isinstance(another_image, (Image, ImageData)):
             raise TypeError('The type of another_image should be pyexiv2.Image or pyexiv2.ImageData.')
-        self.img.copy_to_another_image(another_image.img,
+        self._exiv2api_image.copy_to_another_image(another_image._exiv2api_image,
                                        exif, iptc, xmp,
                                        comment, icc, thumbnail)
 
@@ -149,11 +169,11 @@ class ImageData(Image):
         if length >= 2**31:
             raise ValueError('Only images smaller than 2GB can be opened. The size of your image is {} bytes.'.format(length))
         self.buffer = exiv2api.Buffer(data, length)
-        self.img = exiv2api.Image(self.buffer)
+        self._exiv2api_image = exiv2api.Image(self.buffer)
 
     def get_bytes(self) -> bytes:
         """ Get the bytes data of the image. """
-        return self.img.get_bytes()
+        return self._exiv2api_image.get_bytes()
 
     def close(self):
         """ Free the memory for storing image data. """
@@ -171,7 +191,8 @@ def registerNs(namespace: str, prefix: str):
 
 def enableBMFF(enable=True):
     """ Enable or disable reading BMFF images. Return True on success. """
-    return exiv2api.enableBMFF(enable)
+    print('[warning] enableBMFF() is deprecated since pyexiv2 v2.14.0 . Now it is always enabled.')
+    return True
 
 
 def set_log_level(level=2):

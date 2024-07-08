@@ -5,7 +5,7 @@ from .base import *
 def test_version():
     try:
         from .base import __exiv2_version__
-        assert __exiv2_version__ == '0.28.1'
+        assert __exiv2_version__ == '0.28.3'
     except:
         ENV.skip_test = True
         raise
@@ -64,13 +64,28 @@ def test_read_exif():
     check_img_md5()
 
 
+def test_read_exif_detail():
+    diff_dict(data.EXIF_DETAIL, ENV.img.read_exif_detail())
+    check_img_md5()
+
+
 def test_read_iptc():
     diff_dict(data.IPTC, ENV.img.read_iptc())
     check_img_md5()
 
 
+def test_read_iptc_detail():
+    diff_dict(data.IPTC_DETAIL, ENV.img.read_iptc_detail())
+    check_img_md5()
+
+
 def test_read_xmp():
     diff_dict(data.XMP, ENV.img.read_xmp())
+    check_img_md5()
+
+
+def test_read_xmp_detail():
+    diff_dict(data.XMP_DETAIL, ENV.img.read_xmp_detail())
     check_img_md5()
 
 
@@ -250,18 +265,8 @@ def test_registerNs():
 
 
 def test_enableBMFF():
-    with pytest.raises(RuntimeError):
-        with Image(ENV.heic_img) as img:
-            pass
-
-    assert enableBMFF() == True
     with Image(ENV.heic_img) as img:
         assert img.read_exif()
-
-    assert enableBMFF(False) == True
-    with pytest.raises(RuntimeError):
-        with Image(ENV.heic_img) as img:
-            pass
 
 
 def test_log_level():

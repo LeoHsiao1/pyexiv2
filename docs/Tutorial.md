@@ -65,8 +65,11 @@ class Image:
     def get_access_mode (self) -> dict
 
     def read_exif       (self, encoding='utf-8') -> dict
+    def read_exif_detail(self, encoding='utf-8') -> dict
     def read_iptc       (self, encoding='utf-8') -> dict
+    def read_iptc_detail(self, encoding='utf-8') -> dict
     def read_xmp        (self, encoding='utf-8') -> dict
+    def read_xmp_detail (self, encoding='utf-8') -> dict
     def read_raw_xmp    (self, encoding='utf-8') -> str
     def read_comment    (self, encoding='utf-8') -> str
     def read_icc        (self) -> bytes
@@ -98,7 +101,6 @@ class ImageData(Image):
 
 
 def registerNs(namespace: str, prefix: str)
-def enableBMFF(enable=True)
 def set_log_level(level=2)
 
 def convert_exif_to_xmp(data: dict, encoding='utf-8') -> dict
@@ -106,8 +108,8 @@ def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
 
-__version__ = '2.12.0'
-__exiv2_version__ = '0.28.1'
+__version__ = '2.14.0'
+__exiv2_version__ = '0.28.3'
 ```
 
 ## class Image
@@ -151,8 +153,9 @@ __exiv2_version__ = '0.28.1'
     {'Xmp.dc.format': 'image/jpeg', 'Xmp.dc.rights': 'lang="x-default" TEST', 'Xmp.dc.subject': 'TEST', ...}
     >>> img.close()
     ```
+- The above example only reads the `tag` and `value` of the metadata. You can call `img.read_xx_detail()` to get more information, including `typeName`, `tagDesc`, `tagLabel`.
 - The speed of reading metadata is inversely proportional to the amount of metadata, regardless of the size of the image.
-- It is safe to call `Image.read_*()`. These methods never affect image files (md5 unchanged).
+- It is safe to call `img.read_*()`. These methods never affect image files (md5 unchanged).
 - When reading XMP metadata, the whitespace characters `\v` and `\f` are replaced with the space ` `.
 
 ### modify_xx()
@@ -307,11 +310,6 @@ __exiv2_version__ = '0.28.1'
     {'lang="x-default"': 'test-中文-', 'lang="de-DE"': 'Hallo, Welt'}
     ```
 
-## BMFF
-
-- Access to BMFF files (CR3, HEIF, HEIC, and AVIF) is disabled by default, which can be enabled by calling `pyexiv2.enableBMFF()`.
-    > Attention: BMFF Support may be the subject of patent rights. pyexiv2 shall not be held responsible for identifying any such patent rights. pyexiv2 shall not be held responsible for the legal consequences of the use of this code.
-
 ## Log
 
 - Exiv2 has five levels of handling logs：
@@ -335,7 +333,7 @@ __exiv2_version__ = '0.28.1'
 
 ## convert
 
-- Exiv2 supports converting some EXIF or IPTC tags to XMP tags, and also supports reverse conversion. Reference: <https://github.com/Exiv2/exiv2/blob/v0.28.1/src/convert.cpp#L313>
+- Exiv2 supports converting some EXIF or IPTC tags to XMP tags, and also supports reverse conversion. Reference: <https://github.com/Exiv2/exiv2/blob/v0.28.3/src/convert.cpp#L313>
 - For example:
     ```py
     >>> pyexiv2.convert_exif_to_xmp({'Exif.Image.Artist': 'test-中文-', 'Exif.Image.Rating': '4'})

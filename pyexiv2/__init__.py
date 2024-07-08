@@ -6,7 +6,7 @@ Read and write image metadata, including EXIF, IPTC, XMP, ICC Profile.
 from .core import *
 
 
-__version__ = '2.12.0'
+__version__ = '2.14.0'
 __exiv2_version__ = exiv2api.version()
 
 
@@ -27,3 +27,9 @@ __all__ = [
   'convert_xmp_to_exif',
   'convert_xmp_to_iptc',
 ]
+
+
+def ImageMetadata(*args, **kwargs):
+    raise NameError('ImageMetadata() is the API of py3exiv2, see https://pypi.org/project/py3exiv2 . ' +
+              'However, the library you imported is pyexiv2, see https://pypi.org/project/pyexiv2 .')
+

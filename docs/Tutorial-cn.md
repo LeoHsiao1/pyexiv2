@@ -65,8 +65,11 @@ class Image:
     def get_access_mode (self) -> dict
 
     def read_exif       (self, encoding='utf-8') -> dict
+    def read_exif_detail(self, encoding='utf-8') -> dict
     def read_iptc       (self, encoding='utf-8') -> dict
+    def read_iptc_detail(self, encoding='utf-8') -> dict
     def read_xmp        (self, encoding='utf-8') -> dict
+    def read_xmp_detail (self, encoding='utf-8') -> dict
     def read_raw_xmp    (self, encoding='utf-8') -> str
     def read_comment    (self, encoding='utf-8') -> str
     def read_icc        (self) -> bytes
@@ -98,7 +101,6 @@ class ImageData(Image):
 
 
 def registerNs(namespace: str, prefix: str)
-def enableBMFF(enable=True)
 def set_log_level(level=2)
 
 def convert_exif_to_xmp(data: dict, encoding='utf-8') -> dict
@@ -106,8 +108,8 @@ def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
 
-__version__ = '2.12.0'
-__exiv2_version__ = '0.28.1'
+__version__ = '2.14.0'
+__exiv2_version__ = '0.28.3'
 ```
 
 ## class Image
@@ -151,8 +153,9 @@ __exiv2_version__ = '0.28.1'
     {'Xmp.dc.format': 'image/jpeg', 'Xmp.dc.rights': 'lang="x-default" TEST', 'Xmp.dc.subject': 'TEST', ...}
     >>> img.close()
     ```
+- 上例只读取元数据的 `tag` 和 `value` 。你可以调用 `img.read_xx_detail()` 获取更多信息，包括 `typeName`、`tagDesc`、`tagLabel` 。
 - 读取元数据的速度与元数据的数量成反比，不管图片的大小如何。
-- 调用 `Image.read_*()` 是安全的。这些方法永远不会影响图片文件（md5不变）。
+- 调用 `img.read_*()` 是安全的。这些方法永远不会影响图片文件（md5不变）。
 - 读取 XMP 元数据时，空白字符 `\v` 和 `\f` 会被替换为空格 ` ` 。
 
 ### modify_xx()
@@ -307,11 +310,6 @@ __exiv2_version__ = '0.28.1'
     {'lang="x-default"': 'test-中文-', 'lang="de-DE"': 'Hallo, Welt'}
     ```
 
-## BMFF
-
-- 访问 BMFF 文件（CR3、HEIF、HEIC 和 AVIF）的功能默认是禁用的，可以通过调用 `pyexiv2.enableBMFF()` 来启用。
-    > 注意：BMFF 文件可能涉及到专利权。pyexiv2 不负责识别任何此类专利权。pyexiv2 不对使用此代码所产生的法律后果负责。
-
 ## 日志
 
 - Exiv2 有 5 种处理日志的级别：
@@ -335,7 +333,7 @@ __exiv2_version__ = '0.28.1'
 
 ## convert
 
-- Exiv2 支持将某些 EXIF 或 IPTC 标签，转换成 XMP 标签，也支持反向转换。参考：<https://github.com/Exiv2/exiv2/blob/v0.28.1/src/convert.cpp#L313>
+- Exiv2 支持将某些 EXIF 或 IPTC 标签，转换成 XMP 标签，也支持反向转换。参考：<https://github.com/Exiv2/exiv2/blob/v0.28.3/src/convert.cpp#L313>
 - 示例：
     ```py
     >>> pyexiv2.convert_exif_to_xmp({'Exif.Image.Artist': 'test-中文-', 'Exif.Image.Rating': '4'})
