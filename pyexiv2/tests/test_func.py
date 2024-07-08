@@ -64,13 +64,28 @@ def test_read_exif():
     check_img_md5()
 
 
+def test_read_exif_detail():
+    diff_dict(data.EXIF_DETAIL, ENV.img.read_exif_detail())
+    check_img_md5()
+
+
 def test_read_iptc():
     diff_dict(data.IPTC, ENV.img.read_iptc())
     check_img_md5()
 
 
+def test_read_iptc_detail():
+    diff_dict(data.IPTC_DETAIL, ENV.img.read_iptc_detail())
+    check_img_md5()
+
+
 def test_read_xmp():
     diff_dict(data.XMP, ENV.img.read_xmp())
+    check_img_md5()
+
+
+def test_read_xmp_detail():
+    diff_dict(data.XMP_DETAIL, ENV.img.read_xmp_detail())
     check_img_md5()
 
 
