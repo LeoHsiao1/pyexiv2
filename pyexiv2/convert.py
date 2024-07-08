@@ -38,7 +38,7 @@ def _parse(table: list, encoding='utf-8') -> dict:
     """
     exiv2api is only responsible for returning the raw metadata, which is then parsed in Python:
     """
-    data = {}
+    dic = {}
     for line in table:
         tag, value, typeName = line
         tag   = tag.decode(encoding)
@@ -56,54 +56,39 @@ def _parse(table: list, encoding='utf-8') -> dict:
                 value  = {language: content for language, content in zip(fields[0::2], fields[1::2])}
 
         # Convert the values to a list of strings if the tag has multiple values
-        pre_value = data.get(tag)
+        pre_value = dic.get(tag)
         if pre_value == None:
-            data[tag] = value
+            dic[tag] = value
         elif isinstance(pre_value, str):
-            data[tag] = [pre_value, value]
+            dic[tag] = [pre_value, value]
         elif isinstance(pre_value, list):
-            data[tag].append(value)
+            dic[tag].append(value)
 
-    return data
+    return dic
 
 
 def _parse_detail(raw_data: list, encoding='utf-8') -> dict:
-    data = {}
+    table = []
+    dic_detail = {}
     for tag_detail in raw_data:
-        tag      = tag_detail.pop('tag', b'').decode(encoding)
-        value    = tag_detail.pop('value', b'').decode(encoding)
-        typeName = tag_detail.pop('typeName', '')
-        if typeName in ['XmpBag', 'XmpSeq']:
-            value = value.split(', ')
-        elif typeName in ['XmpText']:
-            # Handle nested array structures in XML. Refer to https://exiv2.org/manpage.html#set_xmp_struct
-            if value in ['type="Bag"', 'type="Seq"']:
-                value = ['']
-        elif typeName in ['LangAlt']:
-            # Refer to https://exiv2.org/manpage.html#langalt_values
-            if 'lang=' in value:
-                fields = re.split(r', (lang="\S+") ', ', ' + value)[1:]
-                value  = {language: content for language, content in zip(fields[0::2], fields[1::2])}
-
-        # Convert the values to a list of strings if the tag has multiple values
-        pre_tag_detail = data.get(tag)
-        if pre_tag_detail == None:
-            data[tag] = {}
-            data[tag]['value'] = value
-            data[tag]['typeName'] = typeName
-            data[tag].update(tag_detail)
-        elif isinstance(pre_tag_detail['value'], str):
-            pre_tag_detail['value'] = [pre_tag_detail['value'], value]
-        elif isinstance(pre_tag_detail['value'], list):
-            pre_tag_detail['value'].append(value)
-
-    return data
+        tag      = tag_detail.pop('tag', b'')
+        value    = tag_detail.pop('value', b'')
+        typeName = tag_detail.get('typeName', '')
+        table.append([tag, value, typeName])
+        tag = tag.decode(encoding)
+        # A tag may be repeated, so avoid saving tag_detail twice
+        if not dic_detail.get(tag):
+            dic_detail[tag] = tag_detail
+    dic = _parse(table, encoding)
+    for tag in dic.keys():
+        dic_detail[tag]['value'] = dic[tag]
+    return dic_detail
 
 
-def _dumps(data: dict) -> list:
+def _dumps(dic: dict) -> list:
     """ Convert the metadata from a dict into a text table. """
     table = []
-    for tag, value in data.items():
+    for tag, value in dic.items():
         tag      = str(tag)
         if value == None:
             typeName = '_delete'
@@ -172,4 +157,3 @@ def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict:
     """ Input XMP metadata, convert to IPTC metadata and return. It works like executing modify_xmp() then read_iptc(). """
     converted_data = exiv2api.convert_xmp_to_iptc(_dumps(data), encoding)
     return _parse(converted_data, encoding)
-
