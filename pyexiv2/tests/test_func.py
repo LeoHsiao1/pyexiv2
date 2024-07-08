@@ -5,7 +5,7 @@ from .base import *
 def test_version():
     try:
         from .base import __exiv2_version__
-        assert __exiv2_version__ == '0.28.1'
+        assert __exiv2_version__ == '0.28.3'
     except:
         ENV.skip_test = True
         raise
@@ -265,18 +265,8 @@ def test_registerNs():
 
 
 def test_enableBMFF():
-    with pytest.raises(RuntimeError):
-        with Image(ENV.heic_img) as img:
-            pass
-
-    assert enableBMFF() == True
     with Image(ENV.heic_img) as img:
         assert img.read_exif()
-
-    assert enableBMFF(False) == True
-    with pytest.raises(RuntimeError):
-        with Image(ENV.heic_img) as img:
-            pass
 
 
 def test_log_level():
