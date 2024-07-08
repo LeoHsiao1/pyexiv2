@@ -35,10 +35,14 @@ IPTC_TAGS_REPEATABLE = [
 
 
 def _parse(table: list, encoding='utf-8') -> dict:
-    """ Parse the metadata from a text table into a dict. """
+    """
+    exiv2api is only responsible for returning the raw metadata, which is then parsed in Python:
+    """
     data = {}
     for line in table:
-        tag, value, typeName = [field.decode(encoding) for field in line]
+        tag, value, typeName = line
+        tag   = tag.decode(encoding)
+        value = value.decode(encoding)
         if typeName in ['XmpBag', 'XmpSeq']:
             value = value.split(', ')
         elif typeName in ['XmpText']:
@@ -64,9 +68,6 @@ def _parse(table: list, encoding='utf-8') -> dict:
 
 
 def _parse_detail(raw_data: list, encoding='utf-8') -> dict:
-    """
-    exiv2api is only responsible for returning the raw metadata, which is then parsed in Python:
-    """
     data = {}
     for tag_detail in raw_data:
         tag      = tag_detail.pop('tag', b'').decode(encoding)

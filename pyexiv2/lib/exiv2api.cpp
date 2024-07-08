@@ -76,24 +76,19 @@ bool enableBMFF(bool enable)
 #endif
 
 // The result here should be stored by py::list, not py::dict. Because a tag can be repeated.
-#define read_block                                                     \
-    {                                                                  \
-        py::list table;                                                \
-        for (; i != end; ++i)                                          \
-        {                                                              \
-            py::list line;                                             \
-            line.append(py::bytes(i->key()));                          \
-                                                                       \
-            std::stringstream _value;                                  \
-            _value << i->value();                                      \
-            line.append(py::bytes(_value.str()));                      \
-                                                                       \
-            const char *typeName = i->typeName();                      \
-            line.append(py::bytes((typeName ? typeName : "Unknown"))); \
-            table.append(line);                                        \
-        }                                                              \
-        check_error_log();                                             \
-        return table;                                                  \
+#define read_block                                              \
+    {                                                           \
+        py::list result;                                        \
+        for (const auto &datum : data)                          \
+        {                                                       \
+            py::list line;                                      \
+            line.append(py::bytes(datum.key()));                \
+            line.append(py::bytes(datum.value().toString()));   \
+            line.append(py::str(datum.typeName()));             \
+            result.append(line);                                \
+        }                                                       \
+        check_error_log();                                      \
+        return result;                                          \
     }
 
 class Buffer{
@@ -177,9 +172,7 @@ public:
 
     py::object read_exif()
     {
-        Exiv2::ExifData &data         = img->exifData();
-        Exiv2::ExifData::iterator i   = data.begin();
-        Exiv2::ExifData::iterator end = data.end();
+        Exiv2::ExifData &data = img->exifData();
         read_block;
     }
 
@@ -205,9 +198,7 @@ public:
 
     py::object read_iptc()
     {
-        Exiv2::IptcData &data         = img->iptcData();
-        Exiv2::IptcData::iterator i   = data.begin();
-        Exiv2::IptcData::iterator end = data.end();
+        Exiv2::IptcData &data = img->iptcData();
         read_block;
     }
 
@@ -231,9 +222,7 @@ public:
 
     py::object read_xmp()
     {
-        Exiv2::XmpData &data         = img->xmpData();
-        Exiv2::XmpData::iterator i   = data.begin();
-        Exiv2::XmpData::iterator end = data.end();
+        Exiv2::XmpData &data = img->xmpData();
         read_block;
     }
 
@@ -515,7 +504,7 @@ public:
 py::object convert_exif_to_xmp(py::list table, py::str encoding)
 {
     Exiv2::ExifData exifData;
-    Exiv2::XmpData xmpData;
+    Exiv2::XmpData data;
 
     // Write metadata, which works like modify_exif()
     for (auto _line : table){
@@ -536,16 +525,14 @@ py::object convert_exif_to_xmp(py::list table, py::str encoding)
     }
 
     // Convert and read metadata, which works like read_xmp()
-    Exiv2::copyExifToXmp(exifData, xmpData);
-    Exiv2::XmpData::iterator i   = xmpData.begin();
-    Exiv2::XmpData::iterator end = xmpData.end();
+    Exiv2::copyExifToXmp(exifData, data);
     read_block;
 }
 
 py::object convert_iptc_to_xmp(py::list table, py::str encoding)
 {
     Exiv2::IptcData iptcData;
-    Exiv2::XmpData xmpData;
+    Exiv2::XmpData data;
 
     // Write metadata, which works like modify_iptc()
     for (auto _line : table){
@@ -578,16 +565,14 @@ py::object convert_iptc_to_xmp(py::list table, py::str encoding)
     }
 
     // Convert and read metadata, which works like read_xmp()
-    Exiv2::copyIptcToXmp(iptcData, xmpData);
-    Exiv2::XmpData::iterator i   = xmpData.begin();
-    Exiv2::XmpData::iterator end = xmpData.end();
+    Exiv2::copyIptcToXmp(iptcData, data);
     read_block;
 }
 
 py::object convert_xmp_to_exif(py::list table, py::str encoding)
 {
     Exiv2::XmpData xmpData;
-    Exiv2::ExifData exifData;
+    Exiv2::ExifData data;
 
     // Write metadata, which works like modify_xmp()
     for (auto _line : table){
@@ -618,16 +603,14 @@ py::object convert_xmp_to_exif(py::list table, py::str encoding)
     }
 
     // Convert and read metadata, which works like read_exif()
-    Exiv2::copyXmpToExif(xmpData, exifData);
-    Exiv2::ExifData::iterator i   = exifData.begin();
-    Exiv2::ExifData::iterator end = exifData.end();
+    Exiv2::copyXmpToExif(xmpData, data);
     read_block;
 }
 
 py::object convert_xmp_to_iptc(py::list table, py::str encoding)
 {
     Exiv2::XmpData xmpData;
-    Exiv2::IptcData iptcData;
+    Exiv2::IptcData data;
 
     // Write metadata, which works like modify_xmp()
     for (auto _line : table){
@@ -658,9 +641,7 @@ py::object convert_xmp_to_iptc(py::list table, py::str encoding)
     }
 
     // Convert and read metadata, which works like read_iptc()
-    Exiv2::copyXmpToIptc(xmpData, iptcData);
-    Exiv2::IptcData::iterator i   = iptcData.begin();
-    Exiv2::IptcData::iterator end = iptcData.end();
+    Exiv2::copyXmpToIptc(xmpData, data);
     read_block;
 }
 
