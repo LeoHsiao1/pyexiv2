@@ -49,45 +49,42 @@ rm -rf $DIST_DIR
 # mv $whl_name ${whl_name/-none-any/}
 
 make_wheels(){
-    for py_version in {6..12}
-    do
-        reset_workdir
-        rm -rf $TEST_DIR
-        cd $LIB_DIR
-        ls $EXIV2_LIB_FILES | grep -v $EXIV2_LIB_FILE | xargs rm -f
-        find . -maxdepth 1 -type d -name 'py3.*' | grep -v py3.${py_version}-${plat_type} | xargs rm -rf
-        cd $WORK_DIR
-        python3 setup.py bdist_wheel --python-tag cp3${py_version}  --plat-name ${plat_name}
-    done
+    reset_workdir
+    rm -rf $TEST_DIR
+    cd $LIB_DIR
+    ls $EXIV2_LIB_FILES | grep -v $EXIV2_LIB_FILE | xargs rm -f
+    find . -maxdepth 1 -type d -name 'py3.*' | grep -v py3.${py_version}-${plat_type} | xargs rm -rf
+    cd $WORK_DIR
+    python3 setup.py bdist_wheel --python-tag cp3${py_version}  --plat-name ${plat_name}
 }
 
 # Make wheel packages for Linux platform
 plat_type=linux
 plat_name=manylinux2014_x86_64
 EXIV2_LIB_FILE='libexiv2.so'
-make_wheels
+for py_version in {7..12}
+do
+    make_wheels
+done
 
 # Make wheel packages for MacOS platform
 plat_type=darwin
-plat_name=macosx_12_0_x86_64
+plat_name=macosx_14_0_arm64
 EXIV2_LIB_FILE='libexiv2.dylib'
-make_wheels
-# Add plat_name for MacOS platform
-# cd $DIST_DIR
-# for f in `ls | grep ${plat_name}`
-# do
-#     mv  $f  ${f/.whl/.macosx_13_0_x86_64.whl}
-# done
-plat_type=darwin
-plat_name=macosx_13_0_x86_64
-EXIV2_LIB_FILE='libexiv2.dylib'
-make_wheels
+for py_version in {8..12}
+do
+    make_wheels
+done
 
 # Make wheel packages for Windows platform
 plat_type=win
 plat_name=win_amd64
 EXIV2_LIB_FILE='exiv2.dll'
-make_wheels
+for py_version in {6..12}
+do
+    make_wheels
+done
+
 
 reset_workdir
 
