@@ -1,6 +1,6 @@
 from .lib import exiv2api
 from .convert import *
-from .convert import _parse, _dumps
+from .convert import _parse, _parse_detail, _dumps
 
 
 class Image:
@@ -55,6 +55,14 @@ class Image:
                 data[tag] = decode_ucs2(value)
         return data
 
+    def read_exif_detail(self, encoding='utf-8') -> dict:
+        data = _parse_detail(self.img.read_exif_detail(), encoding)
+        for tag in EXIF_TAGS_ENCODED_IN_UCS2:
+            tag_detail = data.get(tag)
+            if tag_detail:
+                tag_detail['value'] = decode_ucs2(tag_detail['value'])
+        return data
+
     def read_iptc(self, encoding='utf-8') -> dict:
         data = _parse(self.img.read_iptc(), encoding)
         # For repeatable tags, the value is converted to list type even if there are no multiple values.
@@ -64,8 +72,20 @@ class Image:
                 data[tag] = [value]
         return data
 
+    def read_iptc_detail(self, encoding='utf-8') -> dict:
+        data = _parse_detail(self.img.read_iptc_detail(), encoding)
+        # For repeatable tags, the value is converted to list type even if there are no multiple values.
+        for tag in IPTC_TAGS_REPEATABLE:
+            tag_detail = data.get(tag)
+            if tag_detail and isinstance(tag_detail['value'], str):
+                tag_detail['value'] = [tag_detail['value']]
+        return data
+
     def read_xmp(self, encoding='utf-8') -> dict:
         return _parse(self.img.read_xmp(), encoding)
+
+    def read_xmp_detail(self, encoding='utf-8') -> dict:
+        return _parse_detail(self.img.read_xmp_detail(), encoding)
 
     def read_raw_xmp(self, encoding='utf-8') -> str:
         return self.img.read_raw_xmp().decode(encoding)

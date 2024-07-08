@@ -75,6 +75,7 @@ bool enableBMFF(bool enable)
 }
 #endif
 
+// The result here should be stored by py::list, not py::dict. Because a tag can be repeated.
 #define read_block                                                     \
     {                                                                  \
         py::list table;                                                \
@@ -185,20 +186,21 @@ public:
     py::object read_exif_detail()
     {
         Exiv2::ExifData &data = img->exifData();
-        py::dict data_detail  = py::dict();
+        py::list result;
         for (const auto &datum : data)
         {
-            py::dict datum_detail    = py::dict();
-            datum_detail["idx"]      = py::int_(datum.idx());
-            datum_detail["ifdName"]  = py::str(datum.ifdName());
-            datum_detail["tagDesc"]  = py::str(datum.tagDesc());
-            datum_detail["tagLabel"] = py::str(datum.tagLabel());
-            datum_detail["typeName"] = py::str(datum.typeName());
-            datum_detail["value"]    = py::bytes(datum.value().toString());
-            data_detail[py::bytes(datum.key())] = datum_detail;
+            py::dict tag_detail    = py::dict();
+            tag_detail["tag"]      = py::bytes(datum.key());
+            tag_detail["idx"]      = py::int_(datum.idx());
+            tag_detail["ifdName"]  = py::str(datum.ifdName());
+            tag_detail["tagDesc"]  = py::str(datum.tagDesc());
+            tag_detail["tagLabel"] = py::str(datum.tagLabel());
+            tag_detail["typeName"] = py::str(datum.typeName());
+            tag_detail["value"]    = py::bytes(datum.value().toString());
+            result.append(tag_detail);
         }
         check_error_log();
-        return data_detail;
+        return result;
     }
 
     py::object read_iptc()
@@ -212,18 +214,19 @@ public:
     py::object read_iptc_detail()
     {
         Exiv2::IptcData &data = img->iptcData();
-        py::dict data_detail  = py::dict();
+        py::list result;
         for (const auto &datum : data)
         {
-            py::dict datum_detail    = py::dict();
-            datum_detail["tagDesc"]  = py::str(datum.tagDesc());
-            datum_detail["tagLabel"] = py::str(datum.tagLabel());
-            datum_detail["typeName"] = py::str(datum.typeName());
-            datum_detail["value"]    = py::bytes(datum.value().toString());
-            data_detail[py::bytes(datum.key())] = datum_detail;
+            py::dict tag_detail    = py::dict();
+            tag_detail["tag"]      = py::bytes(datum.key());
+            tag_detail["tagDesc"]  = py::str(datum.tagDesc());
+            tag_detail["tagLabel"] = py::str(datum.tagLabel());
+            tag_detail["typeName"] = py::str(datum.typeName());
+            tag_detail["value"]    = py::bytes(datum.value().toString());
+            result.append(tag_detail);
         }
         check_error_log();
-        return data_detail;
+        return result;
     }
 
     py::object read_xmp()
@@ -237,18 +240,19 @@ public:
     py::object read_xmp_detail()
     {
         Exiv2::XmpData &data = img->xmpData();
-        py::dict data_detail  = py::dict();
+        py::list result;
         for (const auto &datum : data)
         {
-            py::dict datum_detail    = py::dict();
-            datum_detail["tagDesc"]  = py::str(datum.tagDesc());
-            datum_detail["tagLabel"] = py::str(datum.tagLabel());
-            datum_detail["typeName"] = py::str(datum.typeName());
-            datum_detail["value"]    = py::bytes(datum.value().toString());
-            data_detail[py::bytes(datum.key())] = datum_detail;
+            py::dict tag_detail    = py::dict();
+            tag_detail["tag"]      = py::bytes(datum.key());
+            tag_detail["tagDesc"]  = py::str(datum.tagDesc());
+            tag_detail["tagLabel"] = py::str(datum.tagLabel());
+            tag_detail["typeName"] = py::str(datum.typeName());
+            tag_detail["value"]    = py::bytes(datum.value().toString());
+            result.append(tag_detail);
         }
         check_error_log();
-        return data_detail;
+        return result;
     }
 
     py::object read_raw_xmp()
