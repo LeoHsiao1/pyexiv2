@@ -129,7 +129,7 @@ __exiv2_version__ = '0.28.3'
     img = pyexiv2.Image(path, encoding='ISO-8859-1')
     ```
   - 另一个例子：中国地区的 Windows 电脑通常用 GBK 编码文件路径，因此它们不能被 utf-8 解码。
-  - 另一个方案：如果你不想指定每个图片文件名的 encoding ，你可以用 Python 的 `open()` 函数打开图片文件，然后用 [pyexiv2.ImageData](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial.md#class-imagedata) 解析图片。
+  - 另一个方案：如果你不想指定每个图片文件名的 encoding ，你可以用 Python 的 `open()` 函数打开图片文件，然后用 [pyexiv2.ImageData](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial-cn.md#class-imagedata) 解析图片。
 
 ### close()
 
@@ -164,7 +164,7 @@ __exiv2_version__ = '0.28.3'
     ```py
     >>> # 准备要修改的 XMP 数据
     >>> dict1 = {'Xmp.xmp.CreateDate': '2019-06-23T19:45:17.834',   # 给一个标签赋值。这将覆盖该标签的原始值，如果不存在该标签则添加它
-    ...          'Xmp.xmp.Rating': ''}                              # 赋值 None 会删除该标签
+    ...          'Xmp.xmp.Rating': None}                            # 赋值 None 会删除该标签
     >>> img.modify_xmp(dict1)
     >>> dict2 = img.read_xmp()       # 检查结果
     >>> dict2['Xmp.xmp.CreateDate']
@@ -205,7 +205,7 @@ __exiv2_version__ = '0.28.3'
 
 ### clear_xx()
 
-- 调用 `img.clear_exif()` 将删除图片的所有 EXIF 元数据。一旦清除元数据，pyexiv2 可能无法完全恢复它。
+- 调用 `img.clear_exif()` 将删除图片的所有 EXIF 元数据。一旦清除元数据，pyexiv2 可能无法完全恢复它。因为某些特殊的标签不能被 pyexiv2 修改。
 - `img.clear_iptc()` 和 `img.clear_xmp()` 的用法同理。
 
 ### comment
