@@ -15,11 +15,14 @@ void logHandler(int level, const char *msg)
     switch (level)
     {
     case Exiv2::LogMsg::debug:
-    case Exiv2::LogMsg::info:
-    case Exiv2::LogMsg::warn:
-        std::cout << msg << std::endl;
+        std::cout << "[debug] " << msg << std::endl;
         break;
-
+    case Exiv2::LogMsg::info:
+        std::cout << "[info] "  << msg << std::endl;
+        break;
+    case Exiv2::LogMsg::warn:
+        std::cout << "[warn] "  << msg << std::endl;
+        break;
     case Exiv2::LogMsg::error:
         // For unknown reasons, the exception thrown here cannot be caught by pybind11, so temporarily save it to error_log.
         // throw std::exception(msg);
