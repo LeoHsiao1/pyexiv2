@@ -168,7 +168,23 @@ public:
     py::object read_exif()
     {
         Exiv2::ExifData &data = img->exifData();
-        read_block;
+        py::list result;
+        for (const auto &datum : data)
+        {
+            py::list line;
+            line.append(py::bytes(datum.key()));
+            line.append(py::bytes(datum.value().toString()));
+            if (datum.typeSize() == 0) {
+                // Don't call py::str(datum.typeName()) on an unknown tag type. Otherwise, it raises a segmentation fault.
+                // https://github.com/LeoHsiao1/pyexiv2/issues/145
+                line.append(py::str("unknown"));
+            } else {
+                line.append(py::str(datum.typeName()));
+            }
+            result.append(line);
+        }
+        check_error_log();
+        return result;
     }
 
     py::object read_exif_detail()
@@ -183,7 +199,13 @@ public:
             tag_detail["ifdName"]  = py::str(datum.ifdName());
             tag_detail["tagDesc"]  = py::str(datum.tagDesc());
             tag_detail["tagLabel"] = py::str(datum.tagLabel());
-            tag_detail["typeName"] = py::str(datum.typeName());
+            if (datum.typeSize() == 0) {
+                // Don't call py::str(datum.typeName()) on an unknown tag type. Otherwise, it raises a segmentation fault.
+                // https://github.com/LeoHsiao1/pyexiv2/issues/145
+                tag_detail["typeName"] = py::str("unknown");
+            } else {
+                tag_detail["typeName"] = py::str(datum.typeName());
+            }
             tag_detail["value"]    = py::bytes(datum.value().toString());
             result.append(tag_detail);
         }
