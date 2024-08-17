@@ -193,12 +193,13 @@ public:
         py::list result;
         for (const auto &datum : data)
         {
-            py::dict tag_detail    = py::dict();
-            tag_detail["tag"]      = py::bytes(datum.key());
-            tag_detail["idx"]      = py::int_(datum.idx());
-            tag_detail["ifdName"]  = py::str(datum.ifdName());
-            tag_detail["tagDesc"]  = py::str(datum.tagDesc());
-            tag_detail["tagLabel"] = py::str(datum.tagLabel());
+            py::dict tag_detail     = py::dict();
+            tag_detail["idx"]       = py::int_(datum.idx());
+            tag_detail["ifdName"]   = py::str(datum.ifdName());
+            tag_detail["tag"]       = py::bytes(datum.key());
+            tag_detail["tagDesc"]   = py::str(datum.tagDesc());
+            tag_detail["tagLabel"]  = py::str(datum.tagLabel());
+            tag_detail["tagNumber"] = py::int_(datum.tag());
             if (datum.typeSize() == 0) {
                 // Don't call py::str(datum.typeName()) on an unknown tag type. Otherwise, it raises a segmentation fault.
                 // https://github.com/LeoHsiao1/pyexiv2/issues/145
@@ -225,12 +226,13 @@ public:
         py::list result;
         for (const auto &datum : data)
         {
-            py::dict tag_detail    = py::dict();
-            tag_detail["tag"]      = py::bytes(datum.key());
-            tag_detail["tagDesc"]  = py::str(datum.tagDesc());
-            tag_detail["tagLabel"] = py::str(datum.tagLabel());
-            tag_detail["typeName"] = py::str(datum.typeName());
-            tag_detail["value"]    = py::bytes(datum.value().toString());
+            py::dict tag_detail     = py::dict();
+            tag_detail["tag"]       = py::bytes(datum.key());
+            tag_detail["tagDesc"]   = py::str(datum.tagDesc());
+            tag_detail["tagLabel"]  = py::str(datum.tagLabel());
+            tag_detail["tagNumber"] = py::int_(datum.tag());
+            tag_detail["typeName"]  = py::str(datum.typeName());
+            tag_detail["value"]     = py::bytes(datum.value().toString());
             result.append(tag_detail);
         }
         check_error_log();
