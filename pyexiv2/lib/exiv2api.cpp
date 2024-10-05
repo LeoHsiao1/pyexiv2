@@ -143,6 +143,16 @@ public:
         return py::bytes((char *)io.mmap(), io.size());
     }
 
+    py::int_ get_pixel_width()
+    {
+        return img->pixelWidth();
+    }
+
+    py::int_ get_pixel_height()
+    {
+        return img->pixelHeight();
+    }
+
     std::string get_mime_type()
     {
         return img->mimeType();
@@ -683,6 +693,8 @@ PYBIND11_MODULE(exiv2api, m)
         .def(py::init<Buffer &>())
         .def("close_image"          , &Image::close_image)
         .def("get_bytes"            , &Image::get_bytes)
+        .def("get_pixel_width"      , &Image::get_pixel_width)
+        .def("get_pixel_height"     , &Image::get_pixel_height)
         .def("get_mime_type"        , &Image::get_mime_type)
         .def("get_access_mode"      , &Image::get_access_mode)
         .def("read_exif"            , &Image::read_exif)
