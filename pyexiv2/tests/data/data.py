@@ -12,6 +12,8 @@ with open(os.path.join(current_dir, 'rgb.icc'), 'rb') as f:
 with open(os.path.join(current_dir, '1-thumb.jpg'), 'rb') as f:
     EXIF_THUMB = f.read()
 
+PIXEL_WIDTH  = 200
+PIXEL_HEIGHT = 200
 MIME_TYPE   = 'image/jpeg'
 
 ACCESS_MODE = {
