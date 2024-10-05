@@ -49,6 +49,16 @@ def _test_chinese_path():
         os.remove(chinese_path)
 
 
+def test_get_pixel_width():
+    assert ENV.img.get_pixel_width() == data.PIXEL_WIDTH
+    check_img_md5()
+
+
+def test_get_pixel_height():
+    assert ENV.img.get_pixel_height() == data.PIXEL_HEIGHT
+    check_img_md5()
+
+
 def test_get_mime_type():
     assert ENV.img.get_mime_type() == data.MIME_TYPE
     check_img_md5()

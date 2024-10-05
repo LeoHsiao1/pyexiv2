@@ -33,6 +33,12 @@ class Image:
                 else:
                     setattr(self, attr, None)
 
+    def get_pixel_width(self) -> int:
+        return self._exiv2api_image.get_pixel_width()
+
+    def get_pixel_height(self) -> int:
+        return self._exiv2api_image.get_pixel_height()
+
     def get_mime_type(self) -> str:
         """ Get the MIME type of the image, such as 'image/jpeg'. """
         return self._exiv2api_image.get_mime_type()

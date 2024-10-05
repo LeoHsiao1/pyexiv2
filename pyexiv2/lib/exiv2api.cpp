@@ -15,11 +15,14 @@ void logHandler(int level, const char *msg)
     switch (level)
     {
     case Exiv2::LogMsg::debug:
-    case Exiv2::LogMsg::info:
-    case Exiv2::LogMsg::warn:
-        std::cout << msg << std::endl;
+        std::cout << "[debug] " << msg << std::endl;
         break;
-
+    case Exiv2::LogMsg::info:
+        std::cout << "[info] "  << msg << std::endl;
+        break;
+    case Exiv2::LogMsg::warn:
+        std::cout << "[warn] "  << msg << std::endl;
+        break;
     case Exiv2::LogMsg::error:
         // For unknown reasons, the exception thrown here cannot be caught by pybind11, so temporarily save it to error_log.
         // throw std::exception(msg);
@@ -140,6 +143,16 @@ public:
         return py::bytes((char *)io.mmap(), io.size());
     }
 
+    py::int_ get_pixel_width()
+    {
+        return img->pixelWidth();
+    }
+
+    py::int_ get_pixel_height()
+    {
+        return img->pixelHeight();
+    }
+
     std::string get_mime_type()
     {
         return img->mimeType();
@@ -165,7 +178,23 @@ public:
     py::object read_exif()
     {
         Exiv2::ExifData &data = img->exifData();
-        read_block;
+        py::list result;
+        for (const auto &datum : data)
+        {
+            py::list line;
+            line.append(py::bytes(datum.key()));
+            line.append(py::bytes(datum.value().toString()));
+            if (datum.typeSize() == 0) {
+                // Don't call py::str(datum.typeName()) on an unknown tag type. Otherwise, it raises a segmentation fault.
+                // https://github.com/LeoHsiao1/pyexiv2/issues/145
+                line.append(py::str("unknown"));
+            } else {
+                line.append(py::str(datum.typeName()));
+            }
+            result.append(line);
+        }
+        check_error_log();
+        return result;
     }
 
     py::object read_exif_detail()
@@ -174,13 +203,20 @@ public:
         py::list result;
         for (const auto &datum : data)
         {
-            py::dict tag_detail    = py::dict();
-            tag_detail["tag"]      = py::bytes(datum.key());
-            tag_detail["idx"]      = py::int_(datum.idx());
-            tag_detail["ifdName"]  = py::str(datum.ifdName());
-            tag_detail["tagDesc"]  = py::str(datum.tagDesc());
-            tag_detail["tagLabel"] = py::str(datum.tagLabel());
-            tag_detail["typeName"] = py::str(datum.typeName());
+            py::dict tag_detail     = py::dict();
+            tag_detail["idx"]       = py::int_(datum.idx());
+            tag_detail["ifdName"]   = py::str(datum.ifdName());
+            tag_detail["tag"]       = py::bytes(datum.key());
+            tag_detail["tagDesc"]   = py::str(datum.tagDesc());
+            tag_detail["tagLabel"]  = py::str(datum.tagLabel());
+            tag_detail["tagNumber"] = py::int_(datum.tag());
+            if (datum.typeSize() == 0) {
+                // Don't call py::str(datum.typeName()) on an unknown tag type. Otherwise, it raises a segmentation fault.
+                // https://github.com/LeoHsiao1/pyexiv2/issues/145
+                tag_detail["typeName"] = py::str("unknown");
+            } else {
+                tag_detail["typeName"] = py::str(datum.typeName());
+            }
             tag_detail["value"]    = py::bytes(datum.value().toString());
             result.append(tag_detail);
         }
@@ -200,12 +236,13 @@ public:
         py::list result;
         for (const auto &datum : data)
         {
-            py::dict tag_detail    = py::dict();
-            tag_detail["tag"]      = py::bytes(datum.key());
-            tag_detail["tagDesc"]  = py::str(datum.tagDesc());
-            tag_detail["tagLabel"] = py::str(datum.tagLabel());
-            tag_detail["typeName"] = py::str(datum.typeName());
-            tag_detail["value"]    = py::bytes(datum.value().toString());
+            py::dict tag_detail     = py::dict();
+            tag_detail["tag"]       = py::bytes(datum.key());
+            tag_detail["tagDesc"]   = py::str(datum.tagDesc());
+            tag_detail["tagLabel"]  = py::str(datum.tagLabel());
+            tag_detail["tagNumber"] = py::int_(datum.tag());
+            tag_detail["typeName"]  = py::str(datum.typeName());
+            tag_detail["value"]     = py::bytes(datum.value().toString());
             result.append(tag_detail);
         }
         check_error_log();
@@ -656,6 +693,8 @@ PYBIND11_MODULE(exiv2api, m)
         .def(py::init<Buffer &>())
         .def("close_image"          , &Image::close_image)
         .def("get_bytes"            , &Image::get_bytes)
+        .def("get_pixel_width"      , &Image::get_pixel_width)
+        .def("get_pixel_height"     , &Image::get_pixel_height)
         .def("get_mime_type"        , &Image::get_mime_type)
         .def("get_access_mode"      , &Image::get_access_mode)
         .def("read_exif"            , &Image::read_exif)
