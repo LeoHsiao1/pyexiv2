@@ -61,6 +61,9 @@ Language: [English](./Tutorial.md) | [中文](./Tutorial-cn.md)
 class Image:
     def __init__(self, filename, encoding='utf-8')
     def close(self)
+
+    def get_pixel_width (self) -> int
+    def get_pixel_height(self) -> int
     def get_mime_type   (self) -> str
     def get_access_mode (self) -> dict
 
@@ -108,7 +111,7 @@ def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
 
-__version__ = '2.14.0'
+__version__ = '2.15.0'
 __exiv2_version__ = '0.28.3'
 ```
 
