@@ -24,7 +24,7 @@ jobs:
         python-version: ${{ matrix.python_version }}
     - name: Install dependencies
       run: |
-        python -m pip install pyexiv2==2.15.1
+        python -m pip install pyexiv2==2.15.2
         python -m pip install pytest psutil
     - name: Test
       run: |
@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14]
+        os: [macos-15]
         python_version: [3.8, 3.9, '3.10', '3.11', '3.12']
     runs-on: ${{ matrix.os }}
     steps:
@@ -50,7 +50,7 @@ jobs:
         python-version: ${{ matrix.python_version }}
     - name: Install dependencies
       run: |
-        python -m pip install pyexiv2==2.15.1
+        python -m pip install pyexiv2==2.15.2
         python -m pip install pytest psutil
     - name: Test
       run: |
@@ -77,7 +77,7 @@ jobs:
         python-version: ${{ matrix.python_version }}
     - name: Install dependencies
       run: |
-        python -m pip install pyexiv2==2.15.1
+        python -m pip install pyexiv2==2.15.2
         python -m pip install pytest psutil
     - name: Test
       run: |
