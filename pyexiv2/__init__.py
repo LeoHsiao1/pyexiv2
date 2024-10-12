@@ -6,7 +6,7 @@ Read and write image metadata, including EXIF, IPTC, XMP, ICC Profile.
 from .core import *
 
 
-__version__ = '2.15.0'
+__version__ = '2.15.1'
 __exiv2_version__ = exiv2api.version()
 
 
