@@ -69,7 +69,7 @@ done
 
 # Make wheel packages for MacOS platform
 plat_type=darwin
-plat_name=macosx_15_0_arm64
+plat_name=macosx_14_0_arm64
 EXIV2_LIB_FILE='libexiv2.dylib'
 for py_version in {8..12}
 do
