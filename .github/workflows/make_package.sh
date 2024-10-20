@@ -62,7 +62,7 @@ make_wheels(){
 plat_type=linux
 plat_name=manylinux2014_x86_64
 EXIV2_LIB_FILE='libexiv2.so'
-for py_version in {7..12}
+for py_version in {7..13}
 do
     make_wheels
 done
@@ -71,7 +71,7 @@ done
 plat_type=darwin
 plat_name=macosx_14_0_arm64
 EXIV2_LIB_FILE='libexiv2.dylib'
-for py_version in {8..12}
+for py_version in {8..13}
 do
     make_wheels
 done
@@ -80,7 +80,7 @@ done
 plat_type=win
 plat_name=win_amd64
 EXIV2_LIB_FILE='exiv2.dll'
-for py_version in {6..12}
+for py_version in {6..13}
 do
     make_wheels
 done
