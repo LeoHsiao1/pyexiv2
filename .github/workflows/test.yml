@@ -11,7 +11,7 @@ on:
 jobs:
 
   job1:
-    name: Test on ubuntu
+    name: Test on Linux
     strategy:
       fail-fast: false
       matrix:
@@ -32,7 +32,7 @@ jobs:
         pytest -v
 
   job2:
-    name: Test
+    name: Test on MacOS
     strategy:
       fail-fast: false
       matrix:
@@ -54,7 +54,7 @@ jobs:
         pytest -v
 
   job3:
-    name: Test
+    name: Test on Windows
     strategy:
       fail-fast: false
       matrix:

@@ -15,7 +15,7 @@ env:
 
 jobs:
   job1:
-    name: Test package on ubuntu
+    name: Test package on Linux
     strategy:
       fail-fast: false
       matrix:
@@ -41,7 +41,7 @@ jobs:
         PYEXIV2_MODULE: pyexiv2
 
   job2:
-    name: Test package
+    name: Test package on MacOS
     strategy:
       fail-fast: false
       matrix:
@@ -68,7 +68,7 @@ jobs:
         PYEXIV2_MODULE: pyexiv2
 
   job3:
-    name: Test package
+    name: Test package on Windows
     strategy:
       fail-fast: false
       matrix:
