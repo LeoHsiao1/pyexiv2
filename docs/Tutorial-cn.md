@@ -53,7 +53,7 @@
       self._handle = _dlopen(self._name, mode)
   FileNotFoundError: Could not find module '...\lib\site-packages\pyexiv2\lib\exiv2.dll' (or one of its dependencies). Try using the full path with constructor syntax.
   ```
-  - 这是因为 exiv2.dll 文件不存在，或者你需要安装 [Microsoft Visual C++ 2015-2019](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019) 才能识别该文件。
+  - 这是因为 exiv2.dll 文件不存在，或者你需要安装 [Microsoft Visual C++ Redistributable for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) 才能识别该文件。
 
 ## API 列表
 
