@@ -25,7 +25,7 @@
 
 ## Compile steps on Linux
 
-1. Download [the release of Exiv2](https://www.exiv2.org/archive.html) :
+1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.5) :
     ```sh
     curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.5/exiv2-0.28.5-Linux64.tar.gz
     tar -zxvf exiv2-0.28.5-Linux64.tar.gz
@@ -63,7 +63,7 @@
 
 ## Compile steps on Darwin
 
-1. Download [the release of Exiv2](https://www.exiv2.org/archive.html) :
+1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.5) :
     ```sh
     curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.5/exiv2-0.28.5-Darwin.tar.gz
     tar -zxvf exiv2-0.28.5-Darwin.tar.gz
@@ -100,13 +100,13 @@
 
 ## Compile steps on Windows
 
-1. Download [the release of Exiv2](https://www.exiv2.org/archive.html) :
+1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.5) :
     ```sh
     curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.5/exiv2-0.28.5-2019msvc64.zip
     python -m zipfile -e exiv2-0.28.5-2019msvc64.zip .
     ```
 
-2. Install `Visual Studio 2019` (must use the same version of Visual Studio as the Exiv2 build) , and set the environment variables it needs.
+2. Install `Visual Studio 2022` (must use the same version of Visual Studio as the Exiv2 build) , and set the environment variables it needs.
 
 3. Prepare environment variables according to your download path:
     ```batch
