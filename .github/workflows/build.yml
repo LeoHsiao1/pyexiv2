@@ -19,7 +19,7 @@ jobs:
           - { os: ubuntu-22.04-arm, arch: aarch64, exiv2_build_suffix: Linux-aarch64 }
         python_version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
         exiv2_version: [0.28.5]
-    runs-on: ${{matrix.os}}
+    runs-on: ${{matrix.runner.os}}
     env:
       PLATFORM_NAME: linux
       EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
@@ -93,7 +93,7 @@ jobs:
           - { os: macos-14, arch: arm64, exiv2_build_suffix: Darwin-arm64 }
         python_version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
         exiv2_version: [0.28.5]
-    runs-on: ${{matrix.os}}
+    runs-on: ${{matrix.runner.os}}
     env:
       PLATFORM_NAME: darwin
       EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
@@ -167,7 +167,7 @@ jobs:
          - { os: windows-2022, arch: amd64, exiv2_build_suffix: 2022msvc-AMD64 }
         python_version: ['3.6', '3.7', '3.8', '3.9',  '3.10', '3.11', '3.12', '3.13']
         exiv2_version: [0.28.5]
-    runs-on: ${{matrix.os}}
+    runs-on: ${{matrix.runner.os}}
     env:
       PLATFORM_NAME: win
       EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
