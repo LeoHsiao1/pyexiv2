@@ -24,7 +24,7 @@ jobs:
       PLATFORM_NAME: linux
       EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
       EXIV2_VERSION: ${{matrix.exiv2_version}}
-      EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-${{exiv2_build_suffix}}
+      EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-${{matrix.runner.exiv2_build_suffix}}
       EXIV2_BUILD_EXT: .tar.gz
       PYTHON_VERSION: ${{matrix.python_version}}
     steps:
@@ -98,7 +98,7 @@ jobs:
       PLATFORM_NAME: darwin
       EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
       EXIV2_VERSION: ${{matrix.exiv2_version}}
-      EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-${{exiv2_build_suffix}}
+      EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-${{matrix.runner.exiv2_build_suffix}}
       EXIV2_BUILD_EXT: .tar.gz
       PYTHON_VERSION: ${{matrix.python_version}}
     steps:
@@ -172,7 +172,7 @@ jobs:
       PLATFORM_NAME: win
       EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
       EXIV2_VERSION: ${{matrix.exiv2_version}}
-      EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-${{exiv2_build_suffix}}
+      EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-${{matrix.runner.exiv2_build_suffix}}
       EXIV2_BUILD_EXT: .zip
       PYTHON_VERSION: ${{matrix.python_version}}
     steps:
