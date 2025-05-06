@@ -16,7 +16,7 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         python_version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
-        exiv2_version: [0.28.3]
+        exiv2_version: [0.28.5]
     runs-on: ${{matrix.os}}
     env:
       PLATFORM_NAME: linux
@@ -88,7 +88,7 @@ jobs:
       matrix:
         os: [macos-14]
         python_version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
-        exiv2_version: [0.28.3]
+        exiv2_version: [0.28.5]
     runs-on: ${{matrix.os}}
     env:
       PLATFORM_NAME: darwin
@@ -161,7 +161,7 @@ jobs:
       matrix:
         os: [windows-2019]
         python_version: ['3.6', '3.7', '3.8', '3.9',  '3.10', '3.11', '3.12', '3.13']
-        exiv2_version: [0.28.3]
+        exiv2_version: [0.28.5]
     runs-on: ${{matrix.os}}
     env:
       PLATFORM_NAME: win
