@@ -34,7 +34,6 @@ jobs:
         echo  EXIV2_BUILDS_URL=${EXIV2_URL}/${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT} >>  $GITHUB_ENV
         echo  EXIV2_DIR=`pwd`/${EXIV2_BUILD_NAME}                                 >>  $GITHUB_ENV
         echo  LIB_DIR=`pwd`/pyexiv2/lib                                           >>  $GITHUB_ENV
-        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION}-${PLATFORM_NAME}  >>  $GITHUB_ENV
 
     - uses: actions/checkout@v4
 
@@ -57,25 +56,21 @@ jobs:
     - name: Build
       run: |
         cd $LIB_DIR
-        rm -rf  $SUB_LIB_DIR
-        mkdir   $SUB_LIB_DIR
-        g++ exiv2api.cpp -o $SUB_LIB_DIR/exiv2api.so \
+        rm -f exiv2api.so
+        g++ exiv2api.cpp -o exiv2api.so \
             -O3 -Wall -std=c++11 -shared -fPIC \
             `python -m pybind11 --includes` \
             -I $EXIV2_DIR/include \
             -L $EXIV2_DIR/lib \
             -l exiv2
 
-    - name: Copy artifact
-      run: |
-        cp $SUB_LIB_DIR/exiv2api.so .
-
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
-          exiv2api.so
+          ${{LIB_DIR}}/libexiv2.so
+          ${{LIB_DIR}}/exiv2api.so
         retention-days: 7
 
     - name: Test
@@ -108,7 +103,6 @@ jobs:
         echo  EXIV2_BUILDS_URL=${EXIV2_URL}/${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT} >>  $GITHUB_ENV
         echo  EXIV2_DIR=`pwd`/${EXIV2_BUILD_NAME}                                 >>  $GITHUB_ENV
         echo  LIB_DIR=`pwd`/pyexiv2/lib                                           >>  $GITHUB_ENV
-        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION}-${PLATFORM_NAME}  >>  $GITHUB_ENV
 
     - uses: actions/checkout@v4
 
@@ -129,10 +123,9 @@ jobs:
 
     - name: Build
       run: |
-        cd      $LIB_DIR
-        rm -rf  $SUB_LIB_DIR
-        mkdir   $SUB_LIB_DIR
-        g++ exiv2api.cpp -o $SUB_LIB_DIR/exiv2api.so \
+        cd $LIB_DIR
+        rm -f exiv2api.so
+        g++ exiv2api.cpp -o exiv2api.so \
             -O3 -Wall -std=c++11 -shared -fPIC \
             `python -m pybind11 --includes` \
             -I $EXIV2_DIR/include \
@@ -140,16 +133,13 @@ jobs:
             -l exiv2 \
             -undefined dynamic_lookup
 
-    - name: Copy artifact
-      run: |
-        cp $SUB_LIB_DIR/exiv2api.so .
-
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
-          exiv2api.so
+          ${{LIB_DIR}}/libexiv2.dylib
+          ${{LIB_DIR}}/exiv2api.so
         retention-days: 7
 
     - name: Test
@@ -184,7 +174,6 @@ jobs:
         echo  set EXIV2_BUILDS_URL=%EXIV2_URL%/%EXIV2_BUILD_NAME%%EXIV2_BUILD_EXT%>> env.bat
         echo  set EXIV2_DIR=%CD%\%EXIV2_BUILD_NAME%>> env.bat
         echo  set LIB_DIR=%CD%\pyexiv2\lib>> env.bat
-        echo  set SUB_LIB_DIR=%CD%\pyexiv2\lib\py%PYTHON_VERSION%-%PLATFORM_NAME%>> env.bat
 
     - name: Download Exiv2 build
       shell: cmd
@@ -210,35 +199,30 @@ jobs:
       shell: cmd
       run: |
         call env.bat
-        cd          %LIB_DIR%
-        rmdir /s /q %SUB_LIB_DIR%
-        mkdir       %SUB_LIB_DIR%
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
         python -c "import sys; print(sys.exec_prefix)" > tmp.out
         set /p PY_HOME=<tmp.out
         del tmp.out
 
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        cd %LIB_DIR%
+        if exist exiv2api.pyd del exiv2api.pyd
+
         cl /MD /LD exiv2api.cpp /EHsc ^
             -I %EXIV2_DIR%\include ^
             -I %PY_HOME%\include ^
             -I %PY_HOME%\Lib\site-packages\pybind11\include ^
             /link %EXIV2_DIR%\lib\exiv2.lib ^
             %PY_HOME%\libs\python%PYTHON_VERSION:.=%.lib ^
-            /OUT:%SUB_LIB_DIR%\exiv2api.pyd
-
-    - name: Copy artifact
-      shell: cmd
-      run: |
-        call env.bat
-        copy %SUB_LIB_DIR%\exiv2api.pyd .
+            /OUT:exiv2api.pyd
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
-          exiv2api.pyd
+          ${{LIB_DIR}}/exiv2.dll
+          ${{LIB_DIR}}/exiv2api.pyd
         retention-days: 7
 
     - name: Test

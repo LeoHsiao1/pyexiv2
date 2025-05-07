@@ -5,7 +5,7 @@
 ## 安装
 
 - pyexiv2 是一个 Python 第三方库，基于 C++ 和 CPython(≥3.8) 开发。
-- 你可以执行 `pip install pyexiv2` 来安装 pyexiv2 。它为以下平台，提供了已编译的库文件：
+- 你可以执行 `pip install pyexiv2` 来安装 pyexiv2 。它为以下平台，提供了已编译的文件：
   - linux-x86_64
   - linux-aarch64
   - macos-x86_64

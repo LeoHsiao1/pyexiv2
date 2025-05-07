@@ -5,7 +5,7 @@ Language: [English](./Tutorial.md) | [中文](./Tutorial-cn.md)
 ## Installation
 
 - pyexiv2 is a third party library for Python, based on C++ and CPython(≥3.8).
-- You can execute `pip install pyexiv2` to install pyexiv2. It provides compiled library files for the following platforms:
+- You can execute `pip install pyexiv2` to install pyexiv2. It provides compiled files for the following platforms:
   - linux-x86_64
   - linux-aarch64
   - macos-x86_64
