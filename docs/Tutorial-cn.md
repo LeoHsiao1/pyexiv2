@@ -8,7 +8,7 @@
 - 你可以执行 `pip install pyexiv2` 来安装 pyexiv2 。它包含一些已编译的库文件，带有以下兼容条件：
   - 操作系统为 Linux、MacOS 或 Windows
   - CPU 架构为 AMD64
-  - Python 解释器为 CPython(≥3.6)
+  - Python 解释器为 CPython(≥3.8)
 - 如果你想在其它平台上运行 pyexiv2 ，你可以下载源代码然后编译它。参考 [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md)。
 
 ### 常见问题
@@ -20,7 +20,7 @@
       ...
       ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.so'))
       self._handle = _dlopen(self._name, mode)
-  OSError: /lib64/libm.so.6: version `GLIBC_2.32' not found (required by /usr/local/lib/python3.6/site-packages/pyexiv2/lib/libexiv2.so)
+  OSError: /lib64/libm.so.6: version `GLIBC_2.32' not found (required by /usr/local/lib/python3.8/site-packages/pyexiv2/lib/libexiv2.so)
   ```
   - 这是因为 pyexiv2 是使用较新版本的 GLIBC 库编译的。你需要升级你的 GLIBC 库，或者升级你的 Linux 发行版。
   - 你可以在自己电脑上执行 `ldd --version` 查看 GLIBC 库的版本。

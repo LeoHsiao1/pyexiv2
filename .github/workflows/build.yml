@@ -17,7 +17,7 @@ jobs:
         runner:
           - { os: ubuntu-22.04, exiv2_platform_name: Linux-x86_64 }
           - { os: ubuntu-22.04-arm, exiv2_platform_name: Linux-aarch64 }
-        python_version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+        python_version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
         exiv2_version: [0.28.5]
     runs-on: ${{matrix.runner.os}}
     env:
@@ -165,7 +165,7 @@ jobs:
       matrix:
         runner:
          - { os: windows-2022, exiv2_platform_name: 2022msvc-AMD64 }
-        python_version: ['3.6', '3.7', '3.8', '3.9',  '3.10', '3.11', '3.12', '3.13']
+        python_version: ['3.8', '3.9',  '3.10', '3.11', '3.12', '3.13']
         exiv2_version: [0.28.5]
     runs-on: ${{matrix.runner.os}}
     env:
