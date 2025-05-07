@@ -218,7 +218,7 @@ jobs:
         set /p PY_HOME=<tmp.out
         del tmp.out
 
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         cl /MD /LD exiv2api.cpp /EHsc ^
             -I %EXIV2_DIR%\include ^
             -I %PY_HOME%\include ^

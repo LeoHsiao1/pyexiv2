@@ -19,21 +19,23 @@
   2. Use Pybind11 to compile exiv2api.cpp into a Python module.
   3. Import the exiv2api module in the Python interpreter and call its API.
 - The build results of pyexiv2 is not compatible with different platforms, or even with different minor versions of the Python interpreter.
-- You can execute `pip install pyexiv2` to install pyexiv2. It contains some compiled library files.
-  - You can download the source code and compile it manually. Then modify the code in `./__init__.py` so that it can successfully execute `import exiv2api`.
-  - You can also fork the GitHub project and use [GitHub Action](../../.github/workflows/build.yml) to build.
+- How to get the compiled files of pyexiv2?
+  - You can execute `pip install pyexiv2` to install pyexiv2. It provides compiled library files for several common platforms such as Linux, MacOS and Windows.
+  - You can download the source code of pyexiv2 and compile it manually. Then modify the code in `./__init__.py` so that it can successfully execute `import exiv2api`.
+  - You can also fork [this GitHub project](https://github.com/LeoHsiao1/pyexiv2) and use [GitHub Action](https://github.com/LeoHsiao1/pyexiv2/blob/master/.github/workflows/build.yml) to compile it automatically.
+  - If you execute `git clone pyexiv2`, then these compiled files, which are stored in current directory `pyexiv2/lib/`, are outdated and can not be used. They should be replaced after compiling.
 
 ## Compile steps on Linux
 
 1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.5) :
     ```sh
-    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.5/exiv2-0.28.5-Linux64.tar.gz
-    tar -zxvf exiv2-0.28.5-Linux64.tar.gz
+    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.5/exiv2-0.28.5-Linux-x86_64.tar.gz
+    tar -zxvf exiv2-0.28.5-Linux-x86_64.tar.gz
     ```
 
 2. Prepare environment variables according to your download path:
     ```sh
-    EXIV2_DIR=??/exiv2-0.28.5-Linux64
+    EXIV2_DIR=??/exiv2-0.28.5-Linux-x86_64
     LIB_DIR=??/pyexiv2/lib/
     cp $EXIV2_DIR/lib/libexiv2.so.0.28.5  $EXIV2_DIR/lib/libexiv2.so
     cp $EXIV2_DIR/lib/libexiv2.so.0.28.5  $LIB_DIR/libexiv2.so
@@ -65,13 +67,13 @@
 
 1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.5) :
     ```sh
-    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.5/exiv2-0.28.5-Darwin.tar.gz
-    tar -zxvf exiv2-0.28.5-Darwin.tar.gz
+    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.5/exiv2-0.28.5-Darwin-x86_64.tar.gz
+    tar -zxvf exiv2-0.28.5-Darwin-x86_64.tar.gz
     ```
 
 2. Prepare environment variables according to your download path:
     ```sh
-    EXIV2_DIR=??/exiv2-0.28.5-Darwin
+    EXIV2_DIR=??/exiv2-0.28.5-Darwin-x86_64
     LIB_DIR=??/pyexiv2/lib
     cp ${EXIV2_DIR}/lib/libexiv2.0.28.5.dylib ${LIB_DIR}/libexiv2.dylib
     ```
@@ -102,16 +104,16 @@
 
 1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.5) :
     ```sh
-    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.5/exiv2-0.28.5-2019msvc64.zip
-    python -m zipfile -e exiv2-0.28.5-2019msvc64.zip .
+    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.5/exiv2-0.28.5-2022msvc-AMD64.zip
+    python -m zipfile -e exiv2-0.28.5-2022msvc-AMD64.zip .
     ```
 
 2. Install `Visual Studio 2022` (must use the same version of Visual Studio as the Exiv2 build) , and set the environment variables it needs.
 
 3. Prepare environment variables according to your download path:
     ```batch
-    "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
-    set  EXIV2_DIR=??\exiv2-0.28.5-2019msvc64
+    "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+    set  EXIV2_DIR=??\exiv2-0.28.5-2022msvc-AMD64
     set  LIB_DIR=??\pyexiv2\lib
     copy %EXIV2_DIR%\bin\exiv2.dll  %LIB_DIR%
     ```
