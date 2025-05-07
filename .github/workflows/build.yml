@@ -69,8 +69,9 @@ jobs:
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
-          ${{LIB_DIR}}/libexiv2.so
-          ${{LIB_DIR}}/exiv2api.so
+          pyexiv2/lib/libexiv2.so
+          pyexiv2/lib/exiv2api.so
+        if-no-files-found: error
         retention-days: 7
 
     - name: Test
@@ -139,8 +140,9 @@ jobs:
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
-          ${{LIB_DIR}}/libexiv2.dylib
-          ${{LIB_DIR}}/exiv2api.so
+          pyexiv2/lib/libexiv2.dylib
+          pyexiv2/lib/exiv2api.so
+        if-no-files-found: error
         retention-days: 7
 
     - name: Test
@@ -223,8 +225,9 @@ jobs:
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
-          ${{LIB_DIR}}/exiv2.dll
-          ${{LIB_DIR}}/exiv2api.pyd
+          pyexiv2\lib\exiv2.dll
+          pyexiv2\lib\exiv2api.pyd
+        if-no-files-found: error
         retention-days: 7
 
     - name: Test
