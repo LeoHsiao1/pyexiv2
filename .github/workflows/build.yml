@@ -76,7 +76,7 @@ jobs:
 
     - name: Test
       run: |
-        python pyexiv2\lib\tests\show_version.py
+        python pyexiv2/lib/tests/show_version.py
         python -m pytest -v
 
 
@@ -148,7 +148,7 @@ jobs:
     - name: Test
       run: |
         brew install inih
-        python pyexiv2\lib\tests\show_version.py
+        python pyexiv2/lib/tests/show_version.py
         python -m pytest -v
 
 
