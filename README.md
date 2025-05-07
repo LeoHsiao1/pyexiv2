@@ -18,7 +18,6 @@ Read and write image metadata, including [EXIF](https://en.wikipedia.org/wiki/Ex
 
 - Can't read the image larger than 2GB, or modify the image larger than 1GB. ([related issue](https://github.com/Exiv2/exiv2/issues/1248))
 - Not thread safe, because pyexiv2 uses some global variables in C++.
-- Currently, if you use ARM platform, you need to compile exiv2 and pyexiv2 manually, which is troublesome. ([related issue](https://github.com/LeoHsiao1/pyexiv2/issues/108))
 
 ## Tests
 
