@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  job1:
+  Linux:
     name: Build on Linux
     strategy:
       fail-fast: false
@@ -76,14 +76,14 @@ jobs:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
           exiv2api.so
-        retention-days: 1
+        retention-days: 7
 
     - name: Test
       run: |
         python -m pytest -v
 
 
-  job2:
+  MacOS:
     name: Build on MacOS
     strategy:
       fail-fast: false
@@ -150,7 +150,7 @@ jobs:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
           exiv2api.so
-        retention-days: 1
+        retention-days: 7
 
     - name: Test
       run: |
@@ -158,7 +158,7 @@ jobs:
         python -m pytest -v
 
 
-  job3:
+  Windows:
     name: Build on Windows
     strategy:
       fail-fast: false
@@ -203,6 +203,9 @@ jobs:
       run: |
         python -m pip install pybind11 pytest psutil
 
+    - name: Set up Visual Studio shell
+      uses: ilammy/msvc-dev-cmd@v1
+
     - name: Build
       shell: cmd
       run: |
@@ -236,7 +239,7 @@ jobs:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
           exiv2api.pyd
-        retention-days: 1
+        retention-days: 7
 
     - name: Test
       run: |
