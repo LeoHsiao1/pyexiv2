@@ -29,7 +29,7 @@ jobs:
         python -m pip install pytest psutil
     - name: Test
       run: |
-        pytest -v
+        pytest -sv
 
   job2:
     name: Test
@@ -51,7 +51,7 @@ jobs:
     - name: Test
       run: |
         brew install inih
-        pytest -v
+        pytest -sv
 
   job3:
     name: Test
@@ -72,4 +72,4 @@ jobs:
         python -m pip install pytest psutil
     - name: Test
       run: |
-        pytest -v
+        pytest -sv

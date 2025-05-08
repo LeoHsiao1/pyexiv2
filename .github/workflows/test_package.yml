@@ -36,7 +36,7 @@ jobs:
       run: |
         python -c "import os; os.remove('pyexiv2/__init__.py')"    # Disable pyexiv2 in the repository, to use only the installed pyexiv2
         python -c "from pyexiv2 import Image; print(Image.__doc__)"
-        pytest -v
+        pytest -sv
       env:
         PYEXIV2_MODULE: pyexiv2
 
@@ -63,7 +63,7 @@ jobs:
         brew install inih
         python -c "import os; os.remove('pyexiv2/__init__.py')"    # Disable pyexiv2 in the repository, to use only the installed pyexiv2
         python -c "from pyexiv2 import Image; print(Image.__doc__)"
-        pytest -v
+        pytest -sv
       env:
         PYEXIV2_MODULE: pyexiv2
 
@@ -89,6 +89,6 @@ jobs:
       run: |
         python -c "import os; os.remove('pyexiv2/__init__.py')"    # Disable pyexiv2 in the repository, to use only the installed pyexiv2
         python -c "from pyexiv2 import Image; print(Image.__doc__)"
-        pytest -v
+        pytest -sv
       env:
         PYEXIV2_MODULE: pyexiv2
