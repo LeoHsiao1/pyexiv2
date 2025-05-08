@@ -4,12 +4,14 @@
 
 ## 安装
 
-- pyexiv2 是一个 Python 第三方库，基于 C++ 和 Python 开发。
-- 你可以执行 `pip install pyexiv2` 来安装 pyexiv2 。它包含一些已编译的库文件，带有以下兼容条件：
-  - 操作系统为 Linux、MacOS 或 Windows
-  - CPU 架构为 AMD64
-  - Python 解释器为 CPython(≥3.6)
-- 如果你想在其它平台上运行 pyexiv2 ，你可以下载源代码然后编译它。参考 [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md)。
+- pyexiv2 是一个 Python 第三方库，基于 C++ 和 CPython(≥3.8) 开发。
+- 你可以执行 `pip install pyexiv2` 来安装 pyexiv2 。它为以下平台，提供了已编译的文件：
+  - linux-x86_64
+  - linux-aarch64
+  - macos-x86_64
+  - macos-arm64
+  - windows-amd64 (with Microsoft Visual C++ 2022)
+- 如果你使用其它平台，则需要下载 pyexiv2 的源代码，然后编译它。参考 [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md)。
 
 ### 常见问题
 
@@ -20,7 +22,7 @@
       ...
       ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.so'))
       self._handle = _dlopen(self._name, mode)
-  OSError: /lib64/libm.so.6: version `GLIBC_2.32' not found (required by /usr/local/lib/python3.6/site-packages/pyexiv2/lib/libexiv2.so)
+  OSError: /lib64/libm.so.6: version `GLIBC_2.32' not found (required by /usr/local/lib/python3.8/site-packages/pyexiv2/lib/libexiv2.so)
   ```
   - 这是因为 pyexiv2 是使用较新版本的 GLIBC 库编译的。你需要升级你的 GLIBC 库，或者升级你的 Linux 发行版。
   - 你可以在自己电脑上执行 `ldd --version` 查看 GLIBC 库的版本。
@@ -53,7 +55,7 @@
       self._handle = _dlopen(self._name, mode)
   FileNotFoundError: Could not find module '...\lib\site-packages\pyexiv2\lib\exiv2.dll' (or one of its dependencies). Try using the full path with constructor syntax.
   ```
-  - 这是因为 exiv2.dll 文件不存在，或者你需要安装 [Microsoft Visual C++ 2015-2019](https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2019) 才能识别该文件。
+  - 这是因为 exiv2.dll 文件不存在，或者你需要安装 [Microsoft Visual C++ Redistributable for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) 才能识别该文件。
 
 ## API 列表
 
@@ -112,7 +114,7 @@ def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
 
 __version__ = '2.15.3'
-__exiv2_version__ = '0.28.3'
+__exiv2_version__ = '0.28.5'
 ```
 
 ## class Image
@@ -336,7 +338,7 @@ __exiv2_version__ = '0.28.3'
 
 ## convert
 
-- Exiv2 支持将某些 EXIF 或 IPTC 标签，转换成 XMP 标签，也支持反向转换。参考：<https://github.com/Exiv2/exiv2/blob/v0.28.3/src/convert.cpp#L313>
+- Exiv2 支持将某些 EXIF 或 IPTC 标签，转换成 XMP 标签，也支持反向转换。参考：<https://github.com/Exiv2/exiv2/blob/v0.28.5/src/convert.cpp#L313>
 - 示例：
     ```py
     >>> pyexiv2.convert_exif_to_xmp({'Exif.Image.Artist': 'test-中文-', 'Exif.Image.Rating': '4'})

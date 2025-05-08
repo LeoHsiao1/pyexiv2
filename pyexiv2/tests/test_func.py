@@ -1,11 +1,17 @@
 from .base import *
 
 
-# First, test the most basic functionality: can it call exiv2
 def test_version():
     try:
+        print('stdout:')
+        print('pyexiv2.lib.lib_dir={}'.format(lib.lib_dir))
+
+        from .base import __version__
+        print('pyexiv2.__version__={}'.format(__version__))
+
         from .base import __exiv2_version__
-        assert __exiv2_version__ == '0.28.3'
+        print('pyexiv2.__exiv2_version__={}'.format(__exiv2_version__))
+        assert __exiv2_version__ == '0.28.5'
     except:
         ENV.skip_test = True
         raise

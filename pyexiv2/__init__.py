@@ -13,15 +13,16 @@ __exiv2_version__ = exiv2api.version()
 __all__ = [
   '__version__',
   '__exiv2_version__',
+  'lib',
 
-  # core.py
+  # from core.py
   'Image',
   'ImageData',
   'registerNs',
   'enableBMFF',
   'set_log_level',
 
-  # convert.py
+  # from convert.py
   'convert_exif_to_xmp',
   'convert_iptc_to_xmp',
   'convert_xmp_to_exif',

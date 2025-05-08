@@ -7,22 +7,25 @@ on:
     branches:
       - master
   workflow_dispatch:
+    inputs:
+      exiv2_version:
+        default: 0.28.5
 
 jobs:
-  job1:
-    name: Build on Linux
+  on_linux:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04]
-        python_version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
-        exiv2_version: [0.28.3]
-    runs-on: ${{matrix.os}}
+        runner:
+          - { os: ubuntu-22.04, exiv2_platform_name: Linux-x86_64 }
+          - { os: ubuntu-22.04-arm, exiv2_platform_name: Linux-aarch64 }
+        python_version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+    runs-on: ${{ matrix.runner.os }}
     env:
-      PLATFORM_NAME: linux
-      EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
-      EXIV2_VERSION: ${{matrix.exiv2_version}}
-      EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-Linux64
+      PLATFORM_NAME: ${{matrix.runner.exiv2_platform_name}}
+      EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{inputs.exiv2_version}}
+      EXIV2_VERSION: ${{inputs.exiv2_version}}
+      EXIV2_BUILD_NAME: exiv2-${{inputs.exiv2_version}}-${{matrix.runner.exiv2_platform_name}}
       EXIV2_BUILD_EXT: .tar.gz
       PYTHON_VERSION: ${{matrix.python_version}}
     steps:
@@ -32,7 +35,6 @@ jobs:
         echo  EXIV2_BUILDS_URL=${EXIV2_URL}/${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT} >>  $GITHUB_ENV
         echo  EXIV2_DIR=`pwd`/${EXIV2_BUILD_NAME}                                 >>  $GITHUB_ENV
         echo  LIB_DIR=`pwd`/pyexiv2/lib                                           >>  $GITHUB_ENV
-        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION}-${PLATFORM_NAME}  >>  $GITHUB_ENV
 
     - uses: actions/checkout@v4
 
@@ -55,46 +57,42 @@ jobs:
     - name: Build
       run: |
         cd $LIB_DIR
-        rm -rf  $SUB_LIB_DIR
-        mkdir   $SUB_LIB_DIR
-        g++ exiv2api.cpp -o $SUB_LIB_DIR/exiv2api.so \
+        rm -f exiv2api.so
+        g++ exiv2api.cpp -o exiv2api.so \
             -O3 -Wall -std=c++11 -shared -fPIC \
             `python -m pybind11 --includes` \
             -I $EXIV2_DIR/include \
             -L $EXIV2_DIR/lib \
             -l exiv2
 
-    - name: Copy artifact
-      run: |
-        cp $SUB_LIB_DIR/exiv2api.so .
-
-    - name: Upload artifact
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
-          exiv2api.so
-        retention-days: 1
+          pyexiv2/lib/libexiv2.so
+          pyexiv2/lib/exiv2api.so
+        if-no-files-found: error
+        retention-days: 3
 
     - name: Test
       run: |
-        python -m pytest -v
+        python -m pytest -sv
 
-
-  job2:
-    name: Build on MacOS
+  on_macos:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14]
+        runner:
+          - { os: macos-13, exiv2_platform_name: Darwin-x86_64 }
+          - { os: macos-14, exiv2_platform_name: Darwin-arm64 }
         python_version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
-        exiv2_version: [0.28.3]
-    runs-on: ${{matrix.os}}
+    runs-on: ${{ matrix.runner.os }}
     env:
-      PLATFORM_NAME: darwin
-      EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
-      EXIV2_VERSION: ${{matrix.exiv2_version}}
-      EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-Darwin
+      PLATFORM_NAME: ${{matrix.runner.exiv2_platform_name}}
+      EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{inputs.exiv2_version}}
+      EXIV2_VERSION: ${{inputs.exiv2_version}}
+      EXIV2_BUILD_NAME: exiv2-${{inputs.exiv2_version}}-${{matrix.runner.exiv2_platform_name}}
       EXIV2_BUILD_EXT: .tar.gz
       PYTHON_VERSION: ${{matrix.python_version}}
     steps:
@@ -104,7 +102,6 @@ jobs:
         echo  EXIV2_BUILDS_URL=${EXIV2_URL}/${EXIV2_BUILD_NAME}${EXIV2_BUILD_EXT} >>  $GITHUB_ENV
         echo  EXIV2_DIR=`pwd`/${EXIV2_BUILD_NAME}                                 >>  $GITHUB_ENV
         echo  LIB_DIR=`pwd`/pyexiv2/lib                                           >>  $GITHUB_ENV
-        echo  SUB_LIB_DIR=`pwd`/pyexiv2/lib/py${PYTHON_VERSION}-${PLATFORM_NAME}  >>  $GITHUB_ENV
 
     - uses: actions/checkout@v4
 
@@ -125,10 +122,9 @@ jobs:
 
     - name: Build
       run: |
-        cd      $LIB_DIR
-        rm -rf  $SUB_LIB_DIR
-        mkdir   $SUB_LIB_DIR
-        g++ exiv2api.cpp -o $SUB_LIB_DIR/exiv2api.so \
+        cd $LIB_DIR
+        rm -f exiv2api.so
+        g++ exiv2api.cpp -o exiv2api.so \
             -O3 -Wall -std=c++11 -shared -fPIC \
             `python -m pybind11 --includes` \
             -I $EXIV2_DIR/include \
@@ -136,38 +132,34 @@ jobs:
             -l exiv2 \
             -undefined dynamic_lookup
 
-    - name: Copy artifact
-      run: |
-        cp $SUB_LIB_DIR/exiv2api.so .
-
-    - name: Upload artifact
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
-          exiv2api.so
-        retention-days: 1
+          pyexiv2/lib/libexiv2.dylib
+          pyexiv2/lib/exiv2api.so
+        if-no-files-found: error
+        retention-days: 3
 
     - name: Test
       run: |
         brew install inih
-        python -m pytest -v
+        python -m pytest -sv
 
-
-  job3:
-    name: Build on Windows
+  on_windows:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019]
-        python_version: ['3.6', '3.7', '3.8', '3.9',  '3.10', '3.11', '3.12', '3.13']
-        exiv2_version: [0.28.3]
-    runs-on: ${{matrix.os}}
+        runner:
+         - { os: windows-2022, exiv2_platform_name: 2022msvc-AMD64 }
+        python_version: ['3.8', '3.9',  '3.10', '3.11', '3.12', '3.13']
+    runs-on: ${{ matrix.runner.os }}
     env:
-      PLATFORM_NAME: win
-      EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
-      EXIV2_VERSION: ${{matrix.exiv2_version}}
-      EXIV2_BUILD_NAME: exiv2-${{matrix.exiv2_version}}-2019msvc64
+      PLATFORM_NAME: ${{matrix.runner.exiv2_platform_name}}
+      EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{inputs.exiv2_version}}
+      EXIV2_VERSION: ${{inputs.exiv2_version}}
+      EXIV2_BUILD_NAME: exiv2-${{inputs.exiv2_version}}-${{matrix.runner.exiv2_platform_name}}
       EXIV2_BUILD_EXT: .zip
       PYTHON_VERSION: ${{matrix.python_version}}
     steps:
@@ -179,7 +171,6 @@ jobs:
         echo  set EXIV2_BUILDS_URL=%EXIV2_URL%/%EXIV2_BUILD_NAME%%EXIV2_BUILD_EXT%>> env.bat
         echo  set EXIV2_DIR=%CD%\%EXIV2_BUILD_NAME%>> env.bat
         echo  set LIB_DIR=%CD%\pyexiv2\lib>> env.bat
-        echo  set SUB_LIB_DIR=%CD%\pyexiv2\lib\py%PYTHON_VERSION%-%PLATFORM_NAME%>> env.bat
 
     - name: Download Exiv2 build
       shell: cmd
@@ -198,41 +189,40 @@ jobs:
       run: |
         python -m pip install pybind11 pytest psutil
 
+    - name: Set up Visual Studio shell
+      uses: ilammy/msvc-dev-cmd@v1
+
     - name: Build
       shell: cmd
       run: |
         call env.bat
-        cd          %LIB_DIR%
-        rmdir /s /q %SUB_LIB_DIR%
-        mkdir       %SUB_LIB_DIR%
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
         python -c "import sys; print(sys.exec_prefix)" > tmp.out
         set /p PY_HOME=<tmp.out
         del tmp.out
 
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        cd %LIB_DIR%
+        if exist exiv2api.pyd del exiv2api.pyd
+
         cl /MD /LD exiv2api.cpp /EHsc ^
             -I %EXIV2_DIR%\include ^
             -I %PY_HOME%\include ^
             -I %PY_HOME%\Lib\site-packages\pybind11\include ^
             /link %EXIV2_DIR%\lib\exiv2.lib ^
             %PY_HOME%\libs\python%PYTHON_VERSION:.=%.lib ^
-            /OUT:%SUB_LIB_DIR%\exiv2api.pyd
+            /OUT:exiv2api.pyd
 
-    - name: Copy artifact
-      shell: cmd
-      run: |
-        call env.bat
-        copy %SUB_LIB_DIR%\exiv2api.pyd .
-
-    - name: Upload artifact
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
         path: |
-          exiv2api.pyd
-        retention-days: 1
+          pyexiv2\lib\exiv2.dll
+          pyexiv2\lib\exiv2api.pyd
+        if-no-files-found: error
+        retention-days: 3
 
     - name: Test
       run: |
-        python -m pytest -v
+        python -m pytest -sv

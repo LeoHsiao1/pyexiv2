@@ -8,7 +8,7 @@ Read and write image metadata, including [EXIF](https://en.wikipedia.org/wiki/Ex
 ## Features
 
 - Base on C++ API of [Exiv2](https://exiv2.org/index.html) and wrapped with [pybind11](https://github.com/pybind/pybind11).
-- Supports running on 64bit Linux, MacOS and Windows, with CPython(≥3.6) interpreter.
+- Supports running on 64bit Linux, MacOS and Windows, with CPython(≥3.8) interpreter.
 - [Supports various image metadata](https://exiv2.org/metadata.html)
 - [Supports various image formats](https://exiv2.org/manpage.html#file_types)
 - Supports opening images based on the file path or from bytes data.
@@ -18,7 +18,6 @@ Read and write image metadata, including [EXIF](https://en.wikipedia.org/wiki/Ex
 
 - Can't read the image larger than 2GB, or modify the image larger than 1GB. ([related issue](https://github.com/Exiv2/exiv2/issues/1248))
 - Not thread safe, because pyexiv2 uses some global variables in C++.
-- Currently, if you use ARM platform, you need to compile exiv2 and pyexiv2 manually, which is troublesome. ([related issue](https://github.com/LeoHsiao1/pyexiv2/issues/108))
 
 ## Tests
 

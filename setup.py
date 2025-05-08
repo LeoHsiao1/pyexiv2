@@ -19,7 +19,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     # packages=['pyexiv2', 'docs'],
     package_data={'': ['*', '*/*']},
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     # install_requires=["pybind11"],
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
