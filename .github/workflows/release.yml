@@ -16,6 +16,8 @@ jobs:
   release:
     runs-on: ubuntu-22.04
     steps:
+    - uses: actions/checkout@v4
+
     - name: Download artifacts
       uses: actions/download-artifact@v4
       with:
