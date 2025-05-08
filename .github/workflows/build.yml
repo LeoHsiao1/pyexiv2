@@ -10,7 +10,6 @@ on:
 
 jobs:
   Linux:
-    name: Build on Linux
     strategy:
       fail-fast: false
       matrix:
@@ -19,7 +18,7 @@ jobs:
           - { os: ubuntu-22.04-arm, exiv2_platform_name: Linux-aarch64 }
         python_version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
         exiv2_version: [0.28.5]
-    runs-on: ${{matrix.runner.os}}
+    runs-on: ${{ matrix.runner.os }}
     env:
       PLATFORM_NAME: ${{matrix.runner.exiv2_platform_name}}
       EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
@@ -78,9 +77,7 @@ jobs:
       run: |
         python -m pytest -sv
 
-
   MacOS:
-    name: Build on MacOS
     strategy:
       fail-fast: false
       matrix:
@@ -89,7 +86,7 @@ jobs:
           - { os: macos-14, exiv2_platform_name: Darwin-arm64 }
         python_version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
         exiv2_version: [0.28.5]
-    runs-on: ${{matrix.runner.os}}
+    runs-on: ${{ matrix.runner.os }}
     env:
       PLATFORM_NAME: ${{matrix.runner.exiv2_platform_name}}
       EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
@@ -149,9 +146,7 @@ jobs:
         brew install inih
         python -m pytest -sv
 
-
   Windows:
-    name: Build on Windows
     strategy:
       fail-fast: false
       matrix:
@@ -159,7 +154,7 @@ jobs:
          - { os: windows-2022, exiv2_platform_name: 2022msvc-AMD64 }
         python_version: ['3.8', '3.9',  '3.10', '3.11', '3.12', '3.13']
         exiv2_version: [0.28.5]
-    runs-on: ${{matrix.runner.os}}
+    runs-on: ${{ matrix.runner.os }}
     env:
       PLATFORM_NAME: ${{matrix.runner.exiv2_platform_name}}
       EXIV2_URL: https://github.com/Exiv2/exiv2/releases/download/v${{matrix.exiv2_version}}
