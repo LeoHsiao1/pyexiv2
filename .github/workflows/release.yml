@@ -1,6 +1,6 @@
-# Make wheel packages for pyexiv2, and upload them. 
+# Make wheel packages for pyexiv2, and upload them.
 
-name: release
+name: Release
 
 on:
   workflow_dispatch:
@@ -19,13 +19,18 @@ jobs:
     - name: Download compiled files
       uses: actions/download-artifact@v4
       with:
-        # name: *
-        path: compiled/
         run-id: ${{ inputs.last_build_id }}
+        path: compiled/
+        # A token with actions:read permissions to download artifacts from another workflow run.
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: List compiled files
       run: |
         tree -sh compiled/
+
+    - name: Make wheels
+      run: |
+        ...todo
 
     - name: Upload wheels as artifacts
       uses: actions/upload-artifact@v4
