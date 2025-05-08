@@ -12,7 +12,7 @@ on:
         default: 0.28.5
 
 jobs:
-  Linux:
+  on_linux:
     strategy:
       fail-fast: false
       matrix:
@@ -65,7 +65,7 @@ jobs:
             -L $EXIV2_DIR/lib \
             -l exiv2
 
-    - name: Upload artifact
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
@@ -79,7 +79,7 @@ jobs:
       run: |
         python -m pytest -sv
 
-  MacOS:
+  on_macos:
     strategy:
       fail-fast: false
       matrix:
@@ -132,7 +132,7 @@ jobs:
             -l exiv2 \
             -undefined dynamic_lookup
 
-    - name: Upload artifact
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}
@@ -147,7 +147,7 @@ jobs:
         brew install inih
         python -m pytest -sv
 
-  Windows:
+  on_windows:
     strategy:
       fail-fast: false
       matrix:
@@ -213,7 +213,7 @@ jobs:
             %PY_HOME%\libs\python%PYTHON_VERSION:.=%.lib ^
             /OUT:exiv2api.pyd
 
-    - name: Upload artifact
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: py${{matrix.python_version}}-${{env.PLATFORM_NAME}}

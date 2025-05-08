@@ -11,7 +11,7 @@ on:
         default: 2.15.3
 
 jobs:
-  Linux:
+  on_linux:
     strategy:
       fail-fast: false
       matrix:
@@ -36,7 +36,7 @@ jobs:
       env:
         FROM_SOURCE_CODE_IMPORT_PYEXIV2: False
 
-  MacOS:
+  on_macos:
     strategy:
       fail-fast: false
       matrix:
@@ -62,7 +62,7 @@ jobs:
       env:
         FROM_SOURCE_CODE_IMPORT_PYEXIV2: False
 
-  Windows:
+  on_windows:
     strategy:
       fail-fast: false
       matrix:
