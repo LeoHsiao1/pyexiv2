@@ -4,12 +4,14 @@ Language: [English](./Tutorial.md) | [中文](./Tutorial-cn.md)
 
 ## Installation
 
-- pyexiv2 is a third party library for Python, based on C++ and Python.
-- You can execute `pip install pyexiv2` to install pyexiv2. It contains some compiled library files with the following compatibility conditions:
-  - The operating system is Linux, MacOS, or Windows
-  - The CPU architecture is AMD64
-  - The Python interpreter is CPython(≥3.6)
-- If you want to run pyexiv2 on another platform, You can download the source code and compile it. See [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md).
+- pyexiv2 is a third party library for Python, based on C++ and CPython(≥3.8).
+- You can execute `pip install pyexiv2` to install pyexiv2. It provides compiled files for the following platforms:
+  - linux-x86_64
+  - linux-aarch64
+  - macos-x86_64
+  - macos-arm64
+  - windows-amd64 (with Microsoft Visual C++ 2022)
+- If you are using another platform, you need to download the source code of pyexiv2 and compile it. See [pyexiv2/lib](https://github.com/LeoHsiao1/pyexiv2/blob/master/pyexiv2/lib/README.md).
 
 ### FAQ
 
@@ -112,7 +114,7 @@ def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
 
 __version__ = '2.15.3'
-__exiv2_version__ = '0.28.3'
+__exiv2_version__ = '0.28.5'
 ```
 
 ## class Image
@@ -336,7 +338,7 @@ __exiv2_version__ = '0.28.3'
 
 ## convert
 
-- Exiv2 supports converting some EXIF or IPTC tags to XMP tags, and also supports reverse conversion. Reference: <https://github.com/Exiv2/exiv2/blob/v0.28.3/src/convert.cpp#L313>
+- Exiv2 supports converting some EXIF or IPTC tags to XMP tags, and also supports reverse conversion. Reference: <https://github.com/Exiv2/exiv2/blob/v0.28.5/src/convert.cpp#L313>
 - For example:
     ```py
     >>> pyexiv2.convert_exif_to_xmp({'Exif.Image.Artist': 'test-中文-', 'Exif.Image.Rating': '4'})

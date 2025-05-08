@@ -14,7 +14,6 @@ from . import data
 
 class ENV:
     skip_test       = False
-    pyexiv2_module  = os.environ.get('PYEXIV2_MODULE', '..')
     test_dir        = os.path.dirname(__file__)
     data_dir        = os.path.join(test_dir, 'data')
     jpg_img         = os.path.join(data_dir, '1.jpg')
@@ -23,9 +22,9 @@ class ENV:
     test_img_copy   = os.path.join(test_dir, 'test-copy.jpg')
 
 
-if   ENV.pyexiv2_module == '..':
+if os.environ.get('FROM_SOURCE_CODE_IMPORT_PYEXIV2', 'True'):
     from ..      import *
-elif ENV.pyexiv2_module == 'pyexiv2':
+else:
     from pyexiv2 import *
 
 

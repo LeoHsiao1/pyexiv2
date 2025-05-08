@@ -1,27 +1,25 @@
-# Test the pyexiv2 packages uploaded to pypi.org .
+# Test pyexiv2 wheel packages uploaded to pypi.org .
 
 name: Test package
 
 on:
-  release:
-    types: [published]
+  # release:
+  #   types: [published]
   workflow_dispatch:
     inputs:
-      wheel_version:
+      pyexiv2_version:
         default: 2.15.3
 
-env:
-  wheel_version: ${{ inputs.wheel_version || '2.15.3' }}
-
 jobs:
-  job1:
-    name: Test package on ubuntu
+  on_linux:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04]
-        python_version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
-    runs-on: ${{ matrix.os }}
+        runner:
+          - { os: ubuntu-22.04, exiv2_platform_name: Linux-x86_64 }
+          - { os: ubuntu-22.04-arm, exiv2_platform_name: Linux-aarch64 }
+        python_version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+    runs-on: ${{ matrix.runner.os }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python_version }}
@@ -30,24 +28,23 @@ jobs:
         python-version: ${{ matrix.python_version }}
     - name: Install dependencies
       run: |
-        python -m pip install pyexiv2==${{ env.wheel_version }}
+        python -m pip install pyexiv2==${{ inputs.pyexiv2_version }}
         python -m pip install pytest psutil
     - name: Test
       run: |
-        python -c "import os; os.remove('pyexiv2/__init__.py')"    # Disable pyexiv2 in the repository, to use only the installed pyexiv2
-        python -c "from pyexiv2 import Image; print(Image.__doc__)"
-        pytest -v
+        pytest -sv
       env:
-        PYEXIV2_MODULE: pyexiv2
+        FROM_SOURCE_CODE_IMPORT_PYEXIV2: False
 
-  job2:
-    name: Test package
+  on_macos:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, macos-15]
+        runner:
+          - { os: macos-13, exiv2_platform_name: Darwin-x86_64 }
+          - { os: macos-14, exiv2_platform_name: Darwin-arm64 }
         python_version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runner.os }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python_version }}
@@ -56,25 +53,23 @@ jobs:
         python-version: ${{ matrix.python_version }}
     - name: Install dependencies
       run: |
-        python -m pip install pyexiv2==${{ env.wheel_version }}
+        python -m pip install pyexiv2==${{ inputs.pyexiv2_version }}
         python -m pip install pytest psutil
     - name: Test
       run: |
         brew install inih
-        python -c "import os; os.remove('pyexiv2/__init__.py')"    # Disable pyexiv2 in the repository, to use only the installed pyexiv2
-        python -c "from pyexiv2 import Image; print(Image.__doc__)"
-        pytest -v
+        pytest -sv
       env:
-        PYEXIV2_MODULE: pyexiv2
+        FROM_SOURCE_CODE_IMPORT_PYEXIV2: False
 
-  job3:
-    name: Test package
+  on_windows:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019]
-        python_version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
-    runs-on: ${{ matrix.os }}
+        runner:
+         - { os: windows-2022, exiv2_platform_name: 2022msvc-AMD64 }
+        python_version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+    runs-on: ${{ matrix.runner.os }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python_version }}
@@ -83,12 +78,10 @@ jobs:
         python-version: ${{ matrix.python_version }}
     - name: Install dependencies
       run: |
-        python -m pip install pyexiv2==${{ env.wheel_version }}
+        python -m pip install pyexiv2==${{ inputs.pyexiv2_version }}
         python -m pip install pytest psutil
     - name: Test
       run: |
-        python -c "import os; os.remove('pyexiv2/__init__.py')"    # Disable pyexiv2 in the repository, to use only the installed pyexiv2
-        python -c "from pyexiv2 import Image; print(Image.__doc__)"
-        pytest -v
+        pytest -sv
       env:
-        PYEXIV2_MODULE: pyexiv2
+        FROM_SOURCE_CODE_IMPORT_PYEXIV2: False
