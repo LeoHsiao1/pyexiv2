@@ -6,11 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       last_build_id:
-        description: Input the run id of workflows/build.yml, to download artifacts from it.
+        # description: Input the run id of workflows/build.yml, to download artifacts from it.
       upload_to_github:
         default: false
+        type: boolean
       # upload_to_pypi:
       #   default: false
+      #   type: boolean
 
 jobs:
   release:
@@ -92,7 +94,7 @@ jobs:
 
     - name: Upload wheels to GitHub
       uses: softprops/action-gh-release@v2
-      if: inputs.upload_to_github == 'true'
+      if: ${{ inputs.upload_to_github }}
       with:
         name: A draft for release
         draft: true
@@ -101,7 +103,7 @@ jobs:
           dist/*
 
     # - name: Upload wheels to PyPI
-    #   if: inputs.upload_to_pypi == 'true'
+    #   if: ${{ inputs.upload_to_pypi }}
     #   run: |
     #     python -m twine upload -u __token__ dist/*
     #     # Maybe the token should not be used, according to https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/#configuring-trusted-publishing
