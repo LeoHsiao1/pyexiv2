@@ -113,7 +113,7 @@ def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
 
-__version__ = '2.15.3'
+__version__ = '2.15.4'
 __exiv2_version__ = '0.28.5'
 ```
 
