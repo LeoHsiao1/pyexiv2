@@ -92,7 +92,7 @@ jobs:
 
     - name: Upload wheels to GitHub
       uses: softprops/action-gh-release@v2
-      if: inputs.upload_to_github == true
+      if: inputs.upload_to_github == 'true'
       with:
         name: A draft for release
         draft: true
@@ -101,6 +101,6 @@ jobs:
           dist/
 
     # - name: Upload wheels to PyPI
-    #   if: inputs.upload_to_pypi == true
+    #   if: inputs.upload_to_pypi == 'true'
     #   run: |
     #     python -m twine upload -u __token__ dist/*
