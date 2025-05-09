@@ -22,10 +22,10 @@ class ENV:
     test_img_copy   = os.path.join(test_dir, 'test-copy.jpg')
 
 
-if os.environ.get('FROM_SOURCE_CODE_IMPORT_PYEXIV2', 'True'):
-    from ..      import *
-else:
+if os.environ.get('FROM_SOURCE_CODE_IMPORT_PYEXIV2') == 'False':
     from pyexiv2 import *
+else:
+    from ..      import *
 
 
 def setup_function():
