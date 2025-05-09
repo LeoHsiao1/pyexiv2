@@ -32,9 +32,9 @@ jobs:
         python -m pip install pytest psutil
     - name: Test
       run: |
+        # Disable the pyexiv2 in current repository, to use the pyexiv2 installed by pip
+        python -c "import os; os.rename('pyexiv2/__init__.py', 'pyexiv2/disable__init__.py')"
         pytest -sv
-      env:
-        FROM_SOURCE_CODE_IMPORT_PYEXIV2: False
 
   on_macos:
     strategy:
@@ -58,9 +58,9 @@ jobs:
     - name: Test
       run: |
         brew install inih
+        # Disable the pyexiv2 in current repository, to use the pyexiv2 installed by pip
+        python -c "import os; os.rename('pyexiv2/__init__.py', 'pyexiv2/disable__init__.py')"
         pytest -sv
-      env:
-        FROM_SOURCE_CODE_IMPORT_PYEXIV2: False
 
   on_windows:
     strategy:
@@ -82,6 +82,6 @@ jobs:
         python -m pip install pytest psutil
     - name: Test
       run: |
+        # Disable the pyexiv2 in current repository, to use the pyexiv2 installed by pip
+        python -c "import os; os.rename('pyexiv2/__init__.py', 'pyexiv2/disable__init__.py')"
         pytest -sv
-      env:
-        FROM_SOURCE_CODE_IMPORT_PYEXIV2: False

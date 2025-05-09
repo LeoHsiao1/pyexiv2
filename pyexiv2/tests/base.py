@@ -10,6 +10,7 @@ import psutil
 import pytest
 
 from . import data
+from pyexiv2 import *
 
 
 class ENV:
@@ -20,12 +21,6 @@ class ENV:
     heic_img        = os.path.join(data_dir, '1.heic')
     test_img        = os.path.join(test_dir, 'test.jpg')
     test_img_copy   = os.path.join(test_dir, 'test-copy.jpg')
-
-
-if os.environ.get('FROM_SOURCE_CODE_IMPORT_PYEXIV2', 'True'):
-    from ..      import *
-else:
-    from pyexiv2 import *
 
 
 def setup_function():
