@@ -1,6 +1,6 @@
 # Test pyexiv2 wheel packages uploaded to pypi.org .
 
-name: Test package
+name: Test wheels
 
 on:
   # release:
