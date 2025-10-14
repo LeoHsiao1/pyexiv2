@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       pyexiv2_version:
-        default: 2.15.4
+        default: 2.15.5
 
 jobs:
   on_linux:
