@@ -11,7 +11,7 @@ def test_version():
 
         from .base import __exiv2_version__
         print('pyexiv2.__exiv2_version__={}'.format(__exiv2_version__))
-        assert __exiv2_version__ == '0.28.5'
+        assert __exiv2_version__ == '0.28.7'
     except:
         ENV.skip_test = True
         raise

@@ -25,18 +25,18 @@
 
 ## Compile steps on Linux
 
-1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.5) :
+1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.7) :
     ```sh
-    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.5/exiv2-0.28.5-Linux-x86_64.tar.gz
-    tar -zxvf exiv2-0.28.5-Linux-x86_64.tar.gz
+    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.7/exiv2-0.28.7-Linux-x86_64.tar.gz
+    tar -zxvf exiv2-0.28.7-Linux-x86_64.tar.gz
     ```
 
 2. Prepare environment variables according to your download path:
     ```sh
-    EXIV2_DIR=??/exiv2-0.28.5-Linux-x86_64
+    EXIV2_DIR=??/exiv2-0.28.7-Linux-x86_64
     LIB_DIR=??/pyexiv2/lib/
-    cp $EXIV2_DIR/lib/libexiv2.so.0.28.5  $EXIV2_DIR/lib/libexiv2.so
-    cp $EXIV2_DIR/lib/libexiv2.so.0.28.5  $LIB_DIR/libexiv2.so
+    cp $EXIV2_DIR/lib/libexiv2.so.0.28.7  $EXIV2_DIR/lib/libexiv2.so
+    cp $EXIV2_DIR/lib/libexiv2.so.0.28.7  $LIB_DIR/libexiv2.so
     ```
 
 3. Prepare the python interpreter:
@@ -59,17 +59,17 @@
 
 ## Compile steps on Darwin
 
-1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.5) :
+1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.7) :
     ```sh
-    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.5/exiv2-0.28.5-Darwin-x86_64.tar.gz
-    tar -zxvf exiv2-0.28.5-Darwin-x86_64.tar.gz
+    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.7/exiv2-0.28.7-Darwin-x86_64.tar.gz
+    tar -zxvf exiv2-0.28.7-Darwin-x86_64.tar.gz
     ```
 
 2. Prepare environment variables according to your download path:
     ```sh
-    EXIV2_DIR=??/exiv2-0.28.5-Darwin-x86_64
+    EXIV2_DIR=??/exiv2-0.28.7-Darwin-x86_64
     LIB_DIR=??/pyexiv2/lib
-    cp ${EXIV2_DIR}/lib/libexiv2.0.28.5.dylib ${LIB_DIR}/libexiv2.dylib
+    cp ${EXIV2_DIR}/lib/libexiv2.0.28.7.dylib ${LIB_DIR}/libexiv2.dylib
     ```
 
 3. Prepare the python interpreter:
@@ -93,10 +93,10 @@
 
 ## Compile steps on Windows
 
-1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.5) :
+1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.7) :
     ```sh
-    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.5/exiv2-0.28.5-2022msvc-AMD64.zip
-    python -m zipfile -e exiv2-0.28.5-2022msvc-AMD64.zip .
+    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.7/exiv2-0.28.7-2022msvc-AMD64.zip
+    python -m zipfile -e exiv2-0.28.7-2022msvc-AMD64.zip .
     ```
 
 2. Install `Visual Studio 2022` (must use the same version of Visual Studio as the Exiv2 build) , and set the environment variables it needs.
@@ -104,7 +104,7 @@
 3. Prepare environment variables according to your download path:
     ```batch
     "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
-    set  EXIV2_DIR=??\exiv2-0.28.5-2022msvc-AMD64
+    set  EXIV2_DIR=??\exiv2-0.28.7-2022msvc-AMD64
     set  LIB_DIR=??\pyexiv2\lib
     copy %EXIV2_DIR%\bin\exiv2.dll  %LIB_DIR%
     ```

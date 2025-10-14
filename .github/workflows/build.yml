@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       exiv2_version:
-        default: 0.28.5
+        default: 0.28.7
 
 jobs:
   on_linux:
@@ -20,7 +20,7 @@ jobs:
           - { os: ubuntu-22.04, exiv2_platform_name: Linux-x86_64 }
           - { os: ubuntu-22.04-arm, exiv2_platform_name: Linux-aarch64 }
         exiv2_version:
-          - ${{ inputs.EXIV2_VERSION || '0.28.5' }}
+          - ${{ inputs.EXIV2_VERSION || '0.28.7' }}
         python_version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
     runs-on: ${{ matrix.runner.os }}
     env:
@@ -89,7 +89,7 @@ jobs:
           - { os: macos-13, exiv2_platform_name: Darwin-x86_64 }
           - { os: macos-14, exiv2_platform_name: Darwin-arm64 }
         exiv2_version:
-          - ${{ inputs.EXIV2_VERSION || '0.28.5' }}
+          - ${{ inputs.EXIV2_VERSION || '0.28.7' }}
         python_version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
     runs-on: ${{ matrix.runner.os }}
     env:
@@ -158,7 +158,7 @@ jobs:
         runner:
          - { os: windows-2022, exiv2_platform_name: 2022msvc-AMD64 }
         exiv2_version:
-          - ${{ inputs.EXIV2_VERSION || '0.28.5' }}
+          - ${{ inputs.EXIV2_VERSION || '0.28.7' }}
         python_version: ['3.8', '3.9',  '3.10', '3.11', '3.12', '3.13', '3.14']
     runs-on: ${{ matrix.runner.os }}
     env:
