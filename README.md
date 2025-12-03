@@ -1,13 +1,13 @@
 # pyexiv2
 
-Read and write image metadata, including [EXIF](https://en.wikipedia.org/wiki/Exif), [IPTC](https://en.wikipedia.org/wiki/International_Press_Telecommunications_Council), [XMP](https://en.wikipedia.org/wiki/Extensible_Metadata_Platform), [ICC Profile](https://en.wikipedia.org/wiki/ICC_profile).
+A Python library for reading and writing image metadata, including [EXIF](https://en.wikipedia.org/wiki/Exif), [IPTC](https://en.wikipedia.org/wiki/International_Press_Telecommunications_Council), [XMP](https://en.wikipedia.org/wiki/Extensible_Metadata_Platform), [ICC Profile](https://en.wikipedia.org/wiki/ICC_profile).
 - Install: `pip install pyexiv2`
 - [Source code on GitHub](https://github.com/LeoHsiao1/pyexiv2)
 - [Tutorial](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial.md) | [中文教程](https://github.com/LeoHsiao1/pyexiv2/blob/master/docs/Tutorial-cn.md)
 
 ## Features
 
-- Base on C++ API of [Exiv2](https://exiv2.org/index.html) and wrapped with [pybind11](https://github.com/pybind/pybind11).
+- Based on C++ API of [Exiv2](https://exiv2.org/index.html) and wrapped with [pybind11](https://github.com/pybind/pybind11).
 - Supports running on 64bit Linux, MacOS and Windows, with CPython(≥3.8) interpreter.
 - [Supports various image metadata](https://exiv2.org/metadata.html)
 - [Supports various image formats](https://exiv2.org/manpage.html#file_types)
