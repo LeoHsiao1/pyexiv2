@@ -19,6 +19,13 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     # packages=['pyexiv2', 'docs'],
     package_data={'': ['*', '*/*']},
+    ext_modules=[
+        setuptools.Extension(
+            name="pyexiv2.lib.exiv2api",
+            sources=["pyexiv2/lib/exiv2api.cpp"],
+            libraries=["exiv2"],
+        ),
+    ],
     python_requires='>=3.8',
     # install_requires=["pybind11"],
     classifiers=[
