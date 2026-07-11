@@ -67,10 +67,10 @@ jobs:
                 plat_name=manylinux2014_aarch64
             elif [ ${exiv2_platform_name} == Darwin-x86_64 ]
             then
-                plat_name=macosx_13_0_x86_64
+                plat_name=macosx_15_0_x86_64
             elif [ ${exiv2_platform_name} == Darwin-arm64 ]
             then
-                plat_name=macosx_14_0_arm64
+                plat_name=macosx_15_0_arm64
             elif [ ${exiv2_platform_name} == 2022msvc-AMD64 ]
             then
                 plat_name=win_amd64
