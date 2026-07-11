@@ -6,6 +6,11 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - "*.md"
   workflow_dispatch:
     inputs:
       exiv2_version:
