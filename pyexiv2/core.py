@@ -1,6 +1,6 @@
 from .lib import exiv2api
 from .convert import *
-from .convert import _parse, _parse_detail, _dumps
+from .convert import _parse_key, _parse_detail, _dumps
 
 
 class Image:
@@ -54,7 +54,7 @@ class Image:
         return dic
 
     def read_exif(self, encoding='utf-8') -> dict:
-        data = _parse(self._exiv2api_image.read_exif(), encoding)
+        data = _parse_key(self._exiv2api_image.read_exif(), encoding)
         for tag in EXIF_TAGS_ENCODED_IN_UCS2:
             value = data.get(tag)
             if value:
@@ -70,7 +70,7 @@ class Image:
         return data
 
     def read_iptc(self, encoding='utf-8') -> dict:
-        data = _parse(self._exiv2api_image.read_iptc(), encoding)
+        data = _parse_key(self._exiv2api_image.read_iptc(), encoding)
         # For repeatable tags, the value is converted to list type even if there are no multiple values.
         for tag in IPTC_TAGS_REPEATABLE:
             value = data.get(tag)
@@ -88,7 +88,7 @@ class Image:
         return data
 
     def read_xmp(self, encoding='utf-8') -> dict:
-        return _parse(self._exiv2api_image.read_xmp(), encoding)
+        return _parse_key(self._exiv2api_image.read_xmp(), encoding)
 
     def read_xmp_detail(self, encoding='utf-8') -> dict:
         return _parse_detail(self._exiv2api_image.read_xmp_detail(), encoding)

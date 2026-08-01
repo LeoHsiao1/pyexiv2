@@ -34,10 +34,7 @@ IPTC_TAGS_REPEATABLE = [
 ]
 
 
-def _parse(table: list, encoding='utf-8') -> dict:
-    """
-    exiv2api is only responsible for returning the raw metadata, which is then parsed in Python:
-    """
+def _parse_value(table: list, encoding='utf-8') -> dict:
     dic = {}
     for line in table:
         tag, value, typeName = line
@@ -67,19 +64,33 @@ def _parse(table: list, encoding='utf-8') -> dict:
     return dic
 
 
+def _parse_key(raw_data: list, encoding='utf-8') -> dict:
+    table = []
+    dic_detail = {}
+    for _datum in raw_data:
+        tag      = _datum.pop('tag', b'')
+        value    = _datum.pop('value', b'')
+        typeName = _datum.get('typeName', '')
+        table.append([tag, value, typeName])
+    dic = _parse_value(table, encoding)
+    for tag in dic.keys():
+        dic_detail[tag] = dic[tag]
+    return dic_detail
+
+
 def _parse_detail(raw_data: list, encoding='utf-8') -> dict:
     table = []
     dic_detail = {}
-    for tag_detail in raw_data:
-        tag      = tag_detail.pop('tag', b'')
-        value    = tag_detail.pop('value', b'')
-        typeName = tag_detail.get('typeName', '')
+    for _datum in raw_data:
+        tag      = _datum.pop('tag', b'')
+        value    = _datum.pop('value', b'')
+        typeName = _datum.get('typeName', '')
         table.append([tag, value, typeName])
         tag = tag.decode(encoding)
-        # A tag may be repeated, so avoid saving tag_detail twice
+        # A tag may be repeated, so avoid saving _datum twice
         if not dic_detail.get(tag):
-            dic_detail[tag] = tag_detail
-    dic = _parse(table, encoding)
+            dic_detail[tag] = _datum
+    dic = _parse_value(table, encoding)
     for tag in dic.keys():
         dic_detail[tag]['value'] = dic[tag]
     return dic_detail
@@ -138,22 +149,22 @@ def convert_exif_to_xmp(data: dict, encoding='utf-8') -> dict:
         if value:
             data[tag] = encode_ucs2(value)
     converted_data = exiv2api.convert_exif_to_xmp(_dumps(data), encoding)
-    return _parse(converted_data, encoding)
+    return _parse_key(converted_data, encoding)
 
 
 def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict:
     """ Input IPTC metadata, convert to XMP metadata and return. It works like executing modify_iptc() then read_xmp(). """
     converted_data = exiv2api.convert_iptc_to_xmp(_dumps(data), encoding)
-    return _parse(converted_data, encoding)
+    return _parse_key(converted_data, encoding)
 
 
 def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict:
     """ Input XMP metadata, convert to EXIF metadata and return. It works like executing modify_xmp() then read_exif(). """
     converted_data = exiv2api.convert_xmp_to_exif(_dumps(data), encoding)
-    return _parse(converted_data, encoding)
+    return _parse_key(converted_data, encoding)
 
 
 def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict:
     """ Input XMP metadata, convert to IPTC metadata and return. It works like executing modify_xmp() then read_iptc(). """
     converted_data = exiv2api.convert_xmp_to_iptc(_dumps(data), encoding)
-    return _parse(converted_data, encoding)
+    return _parse_key(converted_data, encoding)
