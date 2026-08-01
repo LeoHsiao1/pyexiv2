@@ -39,13 +39,14 @@ def _parse_value(table: list, encoding='utf-8') -> dict:
     for line in table:
         tag, value, typeName = line
         tag   = tag.decode(encoding)
-        value = value.decode(encoding)
-        if typeName in ['XmpBag', 'XmpSeq']:
-            value = value.split(', ')
-        elif typeName in ['XmpText']:
+        if isinstance(value, (list, tuple)):
+            value = [i.decode(encoding) for i in value]
+        else:
+            value = value.decode(encoding)
+        if typeName in ['XmpText']:
             # Handle nested array structures in XML. Refer to https://exiv2.org/manpage.html#set_xmp_struct
             if value in ['type="Bag"', 'type="Seq"']:
-                value = ['']
+                value = ''
         elif typeName in ['LangAlt']:
             # Refer to https://exiv2.org/manpage.html#langalt_values
             if 'lang=' in value:

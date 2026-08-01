@@ -534,7 +534,7 @@ XMP_DETAIL = {
         'tagLabel': 'Original Document ID'
     },
     'Xmp.xmpMM.History': {
-        'value': [''],
+        'value': '',
         'typeName': 'XmpText',
         'tagDesc': 'An ordered array of high-level user actions that resulted in this resource. It is intended to give human readers a general indication of the steps taken to make the changes from the previous version to this one. The list should be at an abstract level; it is not intended to be an exhaustive keystroke or other detailed history.',
         'tagLabel': 'History'

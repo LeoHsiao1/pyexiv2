@@ -303,12 +303,6 @@ __exiv2_version__ = '0.28.8'
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1', 'tag2', 'tag3']
     ```
-    对于这些标签，pyexiv2 使用 `", "` 作为多个值的分隔符。因此，它可能会自动分割你想写入的字符串。例如：
-    ```py
-    >>> img.modify_xmp({'Xmp.dc.subject': 'tag1,tag2, tag3'})
-    >>> img.read_xmp()['Xmp.dc.subject']
-    ['tag1,tag2', 'tag3']
-    ```
 - XMP 的 LangAlt 类型的标签有多种语言的值，它们会被转换成一个字典。例如：
     ```py
     >>> img.read_xmp()['Xmp.dc.title']

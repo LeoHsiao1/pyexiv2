@@ -252,7 +252,21 @@ public:
             py::dict _datum    = py::dict();
             _datum["tag"]      = py::bytes(datum.key());
             _datum["typeName"] = py::str(datum.typeName());
-            _datum["value"]    = py::bytes(datum.value().toString());
+            std::string typeName = datum.typeName();
+            if (typeName == "XmpBag" || typeName == "XmpSeq")
+            {
+                size_t n = datum.count();
+                py::list values;
+                for (size_t i = 0; i < n; ++i)
+                {
+                    values.append(py::bytes(datum.toString(i)));
+                }
+                _datum["value"] = values;
+            }
+            else
+            {
+                _datum["value"] = py::bytes(datum.value().toString());
+            }
             result.append(_datum);
         }
         check_error_log();
@@ -270,7 +284,21 @@ public:
             _datum["tagDesc"]  = py::str(datum.tagDesc());
             _datum["tagLabel"] = py::str(datum.tagLabel());
             _datum["typeName"] = py::str(datum.typeName());
-            _datum["value"]    = py::bytes(datum.value().toString());
+            std::string typeName = datum.typeName();
+            if (typeName == "XmpBag" || typeName == "XmpSeq")
+            {
+                size_t n = datum.count();
+                py::list values;
+                for (size_t i = 0; i < n; ++i)
+                {
+                    values.append(py::bytes(datum.toString(i)));
+                }
+                _datum["value"] = values;
+            }
+            else
+            {
+                _datum["value"] = py::bytes(datum.value().toString());
+            }
             result.append(_datum);
         }
         check_error_log();
@@ -565,7 +593,21 @@ py::object convert_exif_to_xmp(py::list table, py::str encoding)
         py::dict _datum    = py::dict();
         _datum["tag"]      = py::bytes(datum.key());
         _datum["typeName"] = py::str(datum.typeName());
-        _datum["value"]    = py::bytes(datum.value().toString());
+        std::string typeName = datum.typeName();
+        if (typeName == "XmpBag" || typeName == "XmpSeq")
+        {
+            size_t n = datum.count();
+            py::list values;
+            for (size_t i = 0; i < n; ++i)
+            {
+                values.append(py::bytes(datum.toString(i)));
+            }
+            _datum["value"] = values;
+        }
+        else
+        {
+            _datum["value"] = py::bytes(datum.value().toString());
+        }
         result.append(_datum);
     }
     check_error_log();
@@ -615,7 +657,21 @@ py::object convert_iptc_to_xmp(py::list table, py::str encoding)
         py::dict _datum    = py::dict();
         _datum["tag"]      = py::bytes(datum.key());
         _datum["typeName"] = py::str(datum.typeName());
-        _datum["value"]    = py::bytes(datum.value().toString());
+        std::string typeName = datum.typeName();
+        if (typeName == "XmpBag" || typeName == "XmpSeq")
+        {
+            size_t n = datum.count();
+            py::list values;
+            for (size_t i = 0; i < n; ++i)
+            {
+                values.append(py::bytes(datum.toString(i)));
+            }
+            _datum["value"] = values;
+        }
+        else
+        {
+            _datum["value"] = py::bytes(datum.value().toString());
+        }
         result.append(_datum);
     }
     check_error_log();
