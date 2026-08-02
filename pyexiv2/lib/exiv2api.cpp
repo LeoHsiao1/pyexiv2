@@ -432,29 +432,27 @@ public:
                 xmpData.erase(key_pos);
                 key_pos = xmpData.findKey(Exiv2::XmpKey(key));
             }
-            if      (typeName == "_delete")
+            if (typeName == "_delete")
                 continue;
-            else if (typeName == "string")
+            Exiv2::Value::UniquePtr value;
+            if (typeName == "string")
             {
-                Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpText);
-                std::string item_str = py::bytes(line[1].attr("encode")(encoding));
-                value->read(item_str);
-                xmpData.add(Exiv2::XmpKey(key), value.get());
-            }
-            else if (typeName == "auto")
-            {
-                std::string value = py::bytes(line[1].attr("encode")(encoding));
-                xmpData[key] = value;
+                value = Exiv2::Value::create(Exiv2::xmpText);
+                value->read(py::bytes(line[1].attr("encode")(encoding)));
             }
             else if (typeName == "array")
             {
-                Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpSeq);
-                for (auto item: line[1]){
-                    std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
-                    value->read(item_str);
-                }
-                xmpData.add(Exiv2::XmpKey(key), value.get());
+                value = Exiv2::Value::create(Exiv2::xmpSeq);
+                for (auto item: line[1])
+                    value->read(py::bytes(py::str(item).attr("encode")(encoding)));
             }
+            else if (typeName == "dict")
+            {
+                value = Exiv2::Value::create(Exiv2::langAlt);
+                for (auto item: line[1])
+                    value->read(py::bytes(py::str(item).attr("encode")(encoding)));
+            }
+            xmpData.add(Exiv2::XmpKey(key), value.get());
         }
         img->setXmpData(xmpData);
         img->writeMetadata();
@@ -702,29 +700,27 @@ py::object convert_xmp_to_exif(py::list table, py::str encoding)
             xmpData.erase(key_pos);
             key_pos = xmpData.findKey(Exiv2::XmpKey(key));
         }
-        if      (typeName == "_delete")
+        if (typeName == "_delete")
             continue;
-        else if (typeName == "string")
+        Exiv2::Value::UniquePtr value;
+        if (typeName == "string")
         {
-            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpText);
-            std::string item_str = py::bytes(line[1].attr("encode")(encoding));
-            value->read(item_str);
-            xmpData.add(Exiv2::XmpKey(key), value.get());
-        }
-        else if (typeName == "auto")
-        {
-            std::string value = py::bytes(line[1].attr("encode")(encoding));
-            xmpData[key] = value;
+            value = Exiv2::Value::create(Exiv2::xmpText);
+            value->read(py::bytes(line[1].attr("encode")(encoding)));
         }
         else if (typeName == "array")
         {
-            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpSeq);
-            for (auto item: line[1]){
-                std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
-                value->read(item_str);
-            }
-            xmpData.add(Exiv2::XmpKey(key), value.get());
+            value = Exiv2::Value::create(Exiv2::xmpSeq);
+            for (auto item: line[1])
+                value->read(py::bytes(py::str(item).attr("encode")(encoding)));
         }
+        else if (typeName == "dict")
+        {
+            value = Exiv2::Value::create(Exiv2::langAlt);
+            for (auto item: line[1])
+                value->read(py::bytes(py::str(item).attr("encode")(encoding)));
+        }
+        xmpData.add(Exiv2::XmpKey(key), value.get());
     }
 
     // Convert and read metadata, which works like read_exif()
@@ -759,29 +755,27 @@ py::object convert_xmp_to_iptc(py::list table, py::str encoding)
             xmpData.erase(key_pos);
             key_pos = xmpData.findKey(Exiv2::XmpKey(key));
         }
-        if      (typeName == "_delete")
+        if (typeName == "_delete")
             continue;
-        else if (typeName == "string")
+        Exiv2::Value::UniquePtr value;
+        if (typeName == "string")
         {
-            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpText);
-            std::string item_str = py::bytes(line[1].attr("encode")(encoding));
-            value->read(item_str);
-            xmpData.add(Exiv2::XmpKey(key), value.get());
-        }
-        else if (typeName == "auto")
-        {
-            std::string value = py::bytes(line[1].attr("encode")(encoding));
-            xmpData[key] = value;
+            value = Exiv2::Value::create(Exiv2::xmpText);
+            value->read(py::bytes(line[1].attr("encode")(encoding)));
         }
         else if (typeName == "array")
         {
-            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpSeq);
-            for (auto item: line[1]){
-                std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
-                value->read(item_str);
-            }
-            xmpData.add(Exiv2::XmpKey(key), value.get());
+            value = Exiv2::Value::create(Exiv2::xmpSeq);
+            for (auto item: line[1])
+                value->read(py::bytes(py::str(item).attr("encode")(encoding)));
         }
+        else if (typeName == "dict")
+        {
+            value = Exiv2::Value::create(Exiv2::langAlt);
+            for (auto item: line[1])
+                value->read(py::bytes(py::str(item).attr("encode")(encoding)));
+        }
+        xmpData.add(Exiv2::XmpKey(key), value.get());
     }
 
     // Convert and read metadata, which works like read_iptc()

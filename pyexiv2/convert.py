@@ -105,8 +105,8 @@ def _dumps(dic: dict) -> list:
             typeName = 'array'
             value    = list(value)
         elif isinstance(value, dict):
-            typeName = 'auto'
-            value    = ', '.join(['{} {}'.format(k,v) for k,v in value.items()])
+            typeName = 'dict'
+            value    = ['{} {}'.format(k,v) for k,v in value.items()]
         else:
             typeName = 'string'
             value    = str(value)
