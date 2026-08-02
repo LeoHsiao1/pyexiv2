@@ -71,19 +71,35 @@ py::str version()
 }
 
 // The result here should be stored by py::list, not py::dict. Because a tag can be repeated.
-#define read_block                                              \
-    {                                                           \
-        py::list result;                                        \
-        for (const auto &datum : data)                          \
-        {                                                       \
-            py::list line;                                      \
-            line.append(py::bytes(datum.key()));                \
-            line.append(py::bytes(datum.value().toString()));   \
-            line.append(py::str(datum.typeName()));             \
-            result.append(line);                                \
-        }                                                       \
-        check_error_log();                                      \
-        return result;                                          \
+#define read_block                                                  \
+    {                                                               \
+        py::list result;                                            \
+        for (const auto &datum : data)                              \
+        {                                                           \
+            if (datum.typeId() == Exiv2::xmpBag ||                  \
+                datum.typeId() == Exiv2::xmpSeq ||                  \
+                datum.typeId() == Exiv2::xmpAlt)                    \
+            {                                                       \
+                for (size_t i = 0; i < datum.count(); ++i)          \
+                {                                                   \
+                    py::list line;                                  \
+                    line.append(py::bytes(datum.key()));            \
+                    line.append(py::bytes(datum.toString(i)));      \
+                    line.append(py::str(datum.typeName()));         \
+                    result.append(line);                            \
+                }                                                   \
+            }                                                       \
+            else                                                    \
+            {                                                       \
+                py::list line;                                      \
+                line.append(py::bytes(datum.key()));                \
+                line.append(py::bytes(datum.value().toString()));   \
+                line.append(py::str(datum.typeName()));             \
+                result.append(line);                                \
+            }                                                       \
+        }                                                           \
+        check_error_log();                                          \
+        return result;                                              \
     }
 
 class Buffer{
