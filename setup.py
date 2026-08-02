@@ -1,10 +1,21 @@
 # -*- coding: utf-8 -*-
 import setuptools
-
+import os
 
 with open('README.md', encoding='utf-8') as f:
     readme_md = f.read()
 
+# determine whether to compile exiv2api.cpp
+if os.path.exists('pyexiv2/lib/exiv2api.pyd') or os.path.exists('pyexiv2/lib/exiv2api.so'):
+    ext_modules = []
+else:
+    ext_modules = [
+        setuptools.Extension(
+            name="pyexiv2.lib.exiv2api",
+            sources=["pyexiv2/lib/exiv2api.cpp"],
+            libraries=["exiv2"],
+        ),
+    ]
 
 setuptools.setup(
     name='pyexiv2',
@@ -19,13 +30,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     # packages=['pyexiv2', 'docs'],
     package_data={'': ['*', '*/*']},
-    ext_modules=[
-        setuptools.Extension(
-            name="pyexiv2.lib.exiv2api",
-            sources=["pyexiv2/lib/exiv2api.cpp"],
-            libraries=["exiv2"],
-        ),
-    ],
+    ext_modules=ext_modules,
     python_requires='>=3.8',
     # install_requires=["pybind11"],
     classifiers=[
