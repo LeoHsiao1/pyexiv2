@@ -436,6 +436,13 @@ public:
                 continue;
             else if (typeName == "string")
             {
+                Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpText);
+                std::string item_str = py::bytes(line[1].attr("encode")(encoding));
+                value->read(item_str);
+                xmpData.add(Exiv2::XmpKey(key), value.get());
+            }
+            else if (typeName == "auto")
+            {
                 std::string value = py::bytes(line[1].attr("encode")(encoding));
                 xmpData[key] = value;
             }
@@ -691,11 +698,20 @@ py::object convert_xmp_to_exif(py::list table, py::str encoding)
         std::string key = py::bytes(line[0].attr("encode")(encoding));
         std::string typeName = py::bytes(line[2].attr("encode")(encoding));
         Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
-        if (key_pos != xmpData.end())
+        while (key_pos != xmpData.end()){
             xmpData.erase(key_pos);
+            key_pos = xmpData.findKey(Exiv2::XmpKey(key));
+        }
         if      (typeName == "_delete")
             continue;
         else if (typeName == "string")
+        {
+            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpText);
+            std::string item_str = py::bytes(line[1].attr("encode")(encoding));
+            value->read(item_str);
+            xmpData.add(Exiv2::XmpKey(key), value.get());
+        }
+        else if (typeName == "auto")
         {
             std::string value = py::bytes(line[1].attr("encode")(encoding));
             xmpData[key] = value;
@@ -739,11 +755,20 @@ py::object convert_xmp_to_iptc(py::list table, py::str encoding)
         std::string key = py::bytes(line[0].attr("encode")(encoding));
         std::string typeName = py::bytes(line[2].attr("encode")(encoding));
         Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
-        if (key_pos != xmpData.end())
+        while (key_pos != xmpData.end()){
             xmpData.erase(key_pos);
+            key_pos = xmpData.findKey(Exiv2::XmpKey(key));
+        }
         if      (typeName == "_delete")
             continue;
         else if (typeName == "string")
+        {
+            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpText);
+            std::string item_str = py::bytes(line[1].attr("encode")(encoding));
+            value->read(item_str);
+            xmpData.add(Exiv2::XmpKey(key), value.get());
+        }
+        else if (typeName == "auto")
         {
             std::string value = py::bytes(line[1].attr("encode")(encoding));
             xmpData[key] = value;

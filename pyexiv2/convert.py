@@ -43,11 +43,7 @@ def _parse_value(table: list, encoding='utf-8') -> dict:
             value = [i.decode(encoding) for i in value]
         else:
             value = value.decode(encoding)
-        if typeName in ['XmpText']:
-            # Handle nested array structures in XML. Refer to https://exiv2.org/manpage.html#set_xmp_struct
-            if value in ['type="Bag"', 'type="Seq"']:
-                value = ''
-        elif typeName in ['LangAlt']:
+        if typeName in ['LangAlt']:
             # Refer to https://exiv2.org/manpage.html#langalt_values
             if 'lang=' in value:
                 fields = re.split(r', (lang="\S+") ', ', ' + value)[1:]
@@ -109,7 +105,7 @@ def _dumps(dic: dict) -> list:
             typeName = 'array'
             value    = list(value)
         elif isinstance(value, dict):
-            typeName = 'string'
+            typeName = 'auto'
             value    = ', '.join(['{} {}'.format(k,v) for k,v in value.items()])
         else:
             typeName = 'string'
