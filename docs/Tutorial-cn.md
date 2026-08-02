@@ -113,8 +113,8 @@ def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
 
-__version__ = '2.15.5'
-__exiv2_version__ = '0.28.7'
+__version__ = '2.16.0'
+__exiv2_version__ = '0.28.8'
 ```
 
 ## class Image
@@ -303,12 +303,6 @@ __exiv2_version__ = '0.28.7'
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1', 'tag2', 'tag3']
     ```
-    对于这些标签，pyexiv2 使用 `", "` 作为多个值的分隔符。因此，它可能会自动分割你想写入的字符串。例如：
-    ```py
-    >>> img.modify_xmp({'Xmp.dc.subject': 'tag1,tag2, tag3'})
-    >>> img.read_xmp()['Xmp.dc.subject']
-    ['tag1,tag2', 'tag3']
-    ```
 - XMP 的 LangAlt 类型的标签有多种语言的值，它们会被转换成一个字典。例如：
     ```py
     >>> img.read_xmp()['Xmp.dc.title']
@@ -338,7 +332,7 @@ __exiv2_version__ = '0.28.7'
 
 ## convert
 
-- Exiv2 支持将某些 EXIF 或 IPTC 标签，转换成 XMP 标签，也支持反向转换。参考：<https://github.com/Exiv2/exiv2/blob/v0.28.7/src/convert.cpp#L313>
+- Exiv2 支持将某些 EXIF 或 IPTC 标签，转换成 XMP 标签，也支持反向转换。参考：<https://github.com/Exiv2/exiv2/blob/v0.28.8/src/convert.cpp#L313>
 - 示例：
     ```py
     >>> pyexiv2.convert_exif_to_xmp({'Exif.Image.Artist': 'test-中文-', 'Exif.Image.Rating': '4'})

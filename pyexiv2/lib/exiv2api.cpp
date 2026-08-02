@@ -70,22 +70,6 @@ py::str version()
     return Exiv2::version();
 }
 
-// The result here should be stored by py::list, not py::dict. Because a tag can be repeated.
-#define read_block                                              \
-    {                                                           \
-        py::list result;                                        \
-        for (const auto &datum : data)                          \
-        {                                                       \
-            py::list line;                                      \
-            line.append(py::bytes(datum.key()));                \
-            line.append(py::bytes(datum.value().toString()));   \
-            line.append(py::str(datum.typeName()));             \
-            result.append(line);                                \
-        }                                                       \
-        check_error_log();                                      \
-        return result;                                          \
-    }
-
 class Buffer{
 public:
     char *data;
@@ -181,17 +165,17 @@ public:
         py::list result;
         for (const auto &datum : data)
         {
-            py::list line;
-            line.append(py::bytes(datum.key()));
-            line.append(py::bytes(datum.value().toString()));
+            py::dict _datum     = py::dict();
+            _datum["tag"]       = py::bytes(datum.key());
             if (datum.typeSize() == 0) {
                 // Don't call py::str(datum.typeName()) on an unknown tag type. Otherwise, it raises a segmentation fault.
                 // https://github.com/LeoHsiao1/pyexiv2/issues/145
-                line.append(py::str("unknown"));
+                _datum["typeName"] = py::str("unknown");
             } else {
-                line.append(py::str(datum.typeName()));
+                _datum["typeName"] = py::str(datum.typeName());
             }
-            result.append(line);
+            _datum["value"]    = py::bytes(datum.value().toString());
+            result.append(_datum);
         }
         check_error_log();
         return result;
@@ -203,22 +187,22 @@ public:
         py::list result;
         for (const auto &datum : data)
         {
-            py::dict tag_detail     = py::dict();
-            tag_detail["idx"]       = py::int_(datum.idx());
-            tag_detail["ifdName"]   = py::str(datum.ifdName());
-            tag_detail["tag"]       = py::bytes(datum.key());
-            tag_detail["tagDesc"]   = py::str(datum.tagDesc());
-            tag_detail["tagLabel"]  = py::str(datum.tagLabel());
-            tag_detail["tagNumber"] = py::int_(datum.tag());
+            py::dict _datum     = py::dict();
+            _datum["idx"]       = py::int_(datum.idx());
+            _datum["ifdName"]   = py::str(datum.ifdName());
+            _datum["tag"]       = py::bytes(datum.key());
+            _datum["tagDesc"]   = py::str(datum.tagDesc());
+            _datum["tagLabel"]  = py::str(datum.tagLabel());
+            _datum["tagNumber"] = py::int_(datum.tag());
             if (datum.typeSize() == 0) {
                 // Don't call py::str(datum.typeName()) on an unknown tag type. Otherwise, it raises a segmentation fault.
                 // https://github.com/LeoHsiao1/pyexiv2/issues/145
-                tag_detail["typeName"] = py::str("unknown");
+                _datum["typeName"] = py::str("unknown");
             } else {
-                tag_detail["typeName"] = py::str(datum.typeName());
+                _datum["typeName"] = py::str(datum.typeName());
             }
-            tag_detail["value"]    = py::bytes(datum.value().toString());
-            result.append(tag_detail);
+            _datum["value"]    = py::bytes(datum.value().toString());
+            result.append(_datum);
         }
         check_error_log();
         return result;
@@ -227,7 +211,17 @@ public:
     py::object read_iptc()
     {
         Exiv2::IptcData &data = img->iptcData();
-        read_block;
+        py::list result;
+        for (const auto &datum : data)
+        {
+            py::dict _datum     = py::dict();
+            _datum["tag"]       = py::bytes(datum.key());
+            _datum["typeName"]  = py::str(datum.typeName());
+            _datum["value"]     = py::bytes(datum.value().toString());
+            result.append(_datum);
+        }
+        check_error_log();
+        return result;
     }
 
     py::object read_iptc_detail()
@@ -236,14 +230,14 @@ public:
         py::list result;
         for (const auto &datum : data)
         {
-            py::dict tag_detail     = py::dict();
-            tag_detail["tag"]       = py::bytes(datum.key());
-            tag_detail["tagDesc"]   = py::str(datum.tagDesc());
-            tag_detail["tagLabel"]  = py::str(datum.tagLabel());
-            tag_detail["tagNumber"] = py::int_(datum.tag());
-            tag_detail["typeName"]  = py::str(datum.typeName());
-            tag_detail["value"]     = py::bytes(datum.value().toString());
-            result.append(tag_detail);
+            py::dict _datum     = py::dict();
+            _datum["tag"]       = py::bytes(datum.key());
+            _datum["tagDesc"]   = py::str(datum.tagDesc());
+            _datum["tagLabel"]  = py::str(datum.tagLabel());
+            _datum["tagNumber"] = py::int_(datum.tag());
+            _datum["typeName"]  = py::str(datum.typeName());
+            _datum["value"]     = py::bytes(datum.value().toString());
+            result.append(_datum);
         }
         check_error_log();
         return result;
@@ -252,7 +246,31 @@ public:
     py::object read_xmp()
     {
         Exiv2::XmpData &data = img->xmpData();
-        read_block;
+        py::list result;
+        for (const auto &datum : data)
+        {
+            py::dict _datum    = py::dict();
+            _datum["tag"]      = py::bytes(datum.key());
+            _datum["typeName"] = py::str(datum.typeName());
+            std::string typeName = datum.typeName();
+            if (typeName == "XmpBag" || typeName == "XmpSeq")
+            {
+                size_t n = datum.count();
+                py::list values;
+                for (size_t i = 0; i < n; ++i)
+                {
+                    values.append(py::bytes(datum.toString(i)));
+                }
+                _datum["value"] = values;
+            }
+            else
+            {
+                _datum["value"] = py::bytes(datum.value().toString());
+            }
+            result.append(_datum);
+        }
+        check_error_log();
+        return result;
     }
 
     py::object read_xmp_detail()
@@ -261,13 +279,27 @@ public:
         py::list result;
         for (const auto &datum : data)
         {
-            py::dict tag_detail    = py::dict();
-            tag_detail["tag"]      = py::bytes(datum.key());
-            tag_detail["tagDesc"]  = py::str(datum.tagDesc());
-            tag_detail["tagLabel"] = py::str(datum.tagLabel());
-            tag_detail["typeName"] = py::str(datum.typeName());
-            tag_detail["value"]    = py::bytes(datum.value().toString());
-            result.append(tag_detail);
+            py::dict _datum    = py::dict();
+            _datum["tag"]      = py::bytes(datum.key());
+            _datum["tagDesc"]  = py::str(datum.tagDesc());
+            _datum["tagLabel"] = py::str(datum.tagLabel());
+            _datum["typeName"] = py::str(datum.typeName());
+            std::string typeName = datum.typeName();
+            if (typeName == "XmpBag" || typeName == "XmpSeq")
+            {
+                size_t n = datum.count();
+                py::list values;
+                for (size_t i = 0; i < n; ++i)
+                {
+                    values.append(py::bytes(datum.toString(i)));
+                }
+                _datum["value"] = values;
+            }
+            else
+            {
+                _datum["value"] = py::bytes(datum.value().toString());
+            }
+            result.append(_datum);
         }
         check_error_log();
         return result;
@@ -400,22 +432,27 @@ public:
                 xmpData.erase(key_pos);
                 key_pos = xmpData.findKey(Exiv2::XmpKey(key));
             }
-            if      (typeName == "_delete")
+            if (typeName == "_delete")
                 continue;
-            else if (typeName == "string")
+            Exiv2::Value::UniquePtr value;
+            if (typeName == "string")
             {
-                std::string value = py::bytes(line[1].attr("encode")(encoding));
-                xmpData[key] = value;
+                value = Exiv2::Value::create(Exiv2::xmpText);
+                value->read(py::bytes(line[1].attr("encode")(encoding)));
             }
             else if (typeName == "array")
             {
-                Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpSeq);
-                for (auto item: line[1]){
-                    std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
-                    value->read(item_str);
-                }
-                xmpData.add(Exiv2::XmpKey(key), value.get());
+                value = Exiv2::Value::create(Exiv2::xmpSeq);
+                for (auto item: line[1])
+                    value->read(py::bytes(py::str(item).attr("encode")(encoding)));
             }
+            else if (typeName == "dict")
+            {
+                value = Exiv2::Value::create(Exiv2::langAlt);
+                for (auto item: line[1])
+                    value->read(py::bytes(py::str(item).attr("encode")(encoding)));
+            }
+            xmpData.add(Exiv2::XmpKey(key), value.get());
         }
         img->setXmpData(xmpData);
         img->writeMetadata();
@@ -555,7 +592,31 @@ py::object convert_exif_to_xmp(py::list table, py::str encoding)
 
     // Convert and read metadata, which works like read_xmp()
     Exiv2::copyExifToXmp(exifData, data);
-    read_block;
+    py::list result;
+    for (const auto &datum : data)
+    {
+        py::dict _datum    = py::dict();
+        _datum["tag"]      = py::bytes(datum.key());
+        _datum["typeName"] = py::str(datum.typeName());
+        std::string typeName = datum.typeName();
+        if (typeName == "XmpBag" || typeName == "XmpSeq")
+        {
+            size_t n = datum.count();
+            py::list values;
+            for (size_t i = 0; i < n; ++i)
+            {
+                values.append(py::bytes(datum.toString(i)));
+            }
+            _datum["value"] = values;
+        }
+        else
+        {
+            _datum["value"] = py::bytes(datum.value().toString());
+        }
+        result.append(_datum);
+    }
+    check_error_log();
+    return result;
 }
 
 py::object convert_iptc_to_xmp(py::list table, py::str encoding)
@@ -595,7 +656,31 @@ py::object convert_iptc_to_xmp(py::list table, py::str encoding)
 
     // Convert and read metadata, which works like read_xmp()
     Exiv2::copyIptcToXmp(iptcData, data);
-    read_block;
+    py::list result;
+    for (const auto &datum : data)
+    {
+        py::dict _datum    = py::dict();
+        _datum["tag"]      = py::bytes(datum.key());
+        _datum["typeName"] = py::str(datum.typeName());
+        std::string typeName = datum.typeName();
+        if (typeName == "XmpBag" || typeName == "XmpSeq")
+        {
+            size_t n = datum.count();
+            py::list values;
+            for (size_t i = 0; i < n; ++i)
+            {
+                values.append(py::bytes(datum.toString(i)));
+            }
+            _datum["value"] = values;
+        }
+        else
+        {
+            _datum["value"] = py::bytes(datum.value().toString());
+        }
+        result.append(_datum);
+    }
+    check_error_log();
+    return result;
 }
 
 py::object convert_xmp_to_exif(py::list table, py::str encoding)
@@ -611,29 +696,46 @@ py::object convert_xmp_to_exif(py::list table, py::str encoding)
         std::string key = py::bytes(line[0].attr("encode")(encoding));
         std::string typeName = py::bytes(line[2].attr("encode")(encoding));
         Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
-        if (key_pos != xmpData.end())
+        while (key_pos != xmpData.end()){
             xmpData.erase(key_pos);
-        if      (typeName == "_delete")
+            key_pos = xmpData.findKey(Exiv2::XmpKey(key));
+        }
+        if (typeName == "_delete")
             continue;
-        else if (typeName == "string")
+        Exiv2::Value::UniquePtr value;
+        if (typeName == "string")
         {
-            std::string value = py::bytes(line[1].attr("encode")(encoding));
-            xmpData[key] = value;
+            value = Exiv2::Value::create(Exiv2::xmpText);
+            value->read(py::bytes(line[1].attr("encode")(encoding)));
         }
         else if (typeName == "array")
         {
-            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpSeq);
-            for (auto item: line[1]){
-                std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
-                value->read(item_str);
-            }
-            xmpData.add(Exiv2::XmpKey(key), value.get());
+            value = Exiv2::Value::create(Exiv2::xmpSeq);
+            for (auto item: line[1])
+                value->read(py::bytes(py::str(item).attr("encode")(encoding)));
         }
+        else if (typeName == "dict")
+        {
+            value = Exiv2::Value::create(Exiv2::langAlt);
+            for (auto item: line[1])
+                value->read(py::bytes(py::str(item).attr("encode")(encoding)));
+        }
+        xmpData.add(Exiv2::XmpKey(key), value.get());
     }
 
     // Convert and read metadata, which works like read_exif()
     Exiv2::copyXmpToExif(xmpData, data);
-    read_block;
+    py::list result;
+    for (const auto &datum : data)
+    {
+        py::dict _datum    = py::dict();
+        _datum["tag"]      = py::bytes(datum.key());
+        _datum["typeName"] = py::str(datum.typeName());
+        _datum["value"]    = py::bytes(datum.value().toString());
+        result.append(_datum);
+    }
+    check_error_log();
+    return result;
 }
 
 py::object convert_xmp_to_iptc(py::list table, py::str encoding)
@@ -649,29 +751,46 @@ py::object convert_xmp_to_iptc(py::list table, py::str encoding)
         std::string key = py::bytes(line[0].attr("encode")(encoding));
         std::string typeName = py::bytes(line[2].attr("encode")(encoding));
         Exiv2::XmpData::iterator key_pos = xmpData.findKey(Exiv2::XmpKey(key));
-        if (key_pos != xmpData.end())
+        while (key_pos != xmpData.end()){
             xmpData.erase(key_pos);
-        if      (typeName == "_delete")
+            key_pos = xmpData.findKey(Exiv2::XmpKey(key));
+        }
+        if (typeName == "_delete")
             continue;
-        else if (typeName == "string")
+        Exiv2::Value::UniquePtr value;
+        if (typeName == "string")
         {
-            std::string value = py::bytes(line[1].attr("encode")(encoding));
-            xmpData[key] = value;
+            value = Exiv2::Value::create(Exiv2::xmpText);
+            value->read(py::bytes(line[1].attr("encode")(encoding)));
         }
         else if (typeName == "array")
         {
-            Exiv2::Value::UniquePtr value = Exiv2::Value::create(Exiv2::xmpSeq);
-            for (auto item: line[1]){
-                std::string item_str = py::bytes(py::str(item).attr("encode")(encoding));
-                value->read(item_str);
-            }
-            xmpData.add(Exiv2::XmpKey(key), value.get());
+            value = Exiv2::Value::create(Exiv2::xmpSeq);
+            for (auto item: line[1])
+                value->read(py::bytes(py::str(item).attr("encode")(encoding)));
         }
+        else if (typeName == "dict")
+        {
+            value = Exiv2::Value::create(Exiv2::langAlt);
+            for (auto item: line[1])
+                value->read(py::bytes(py::str(item).attr("encode")(encoding)));
+        }
+        xmpData.add(Exiv2::XmpKey(key), value.get());
     }
 
     // Convert and read metadata, which works like read_iptc()
     Exiv2::copyXmpToIptc(xmpData, data);
-    read_block;
+    py::list result;
+    for (const auto &datum : data)
+    {
+        py::dict _datum    = py::dict();
+        _datum["tag"]      = py::bytes(datum.key());
+        _datum["typeName"] = py::str(datum.typeName());
+        _datum["value"]    = py::bytes(datum.value().toString());
+        result.append(_datum);
+    }
+    check_error_log();
+    return result;
 }
 
 // Declare the API that needs to be mapped, to convert this CPP file into a Python module.

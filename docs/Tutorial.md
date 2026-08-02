@@ -113,8 +113,8 @@ def convert_iptc_to_xmp(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
 
-__version__ = '2.15.5'
-__exiv2_version__ = '0.28.7'
+__version__ = '2.16.0'
+__exiv2_version__ = '0.28.8'
 ```
 
 ## class Image
@@ -303,12 +303,6 @@ __exiv2_version__ = '0.28.7'
     >>> img.read_xmp()['Xmp.dc.subject']
     ['tag1', 'tag2', 'tag3']
     ```
-    For these tags, pyexiv2 uses `", "` as a separator for multiple values. So it might automatically split the string you want to write. For example:
-    ```py
-    >>> img.modify_xmp({'Xmp.dc.subject': 'tag1,tag2, tag3'})
-    >>> img.read_xmp()['Xmp.dc.subject']
-    ['tag1,tag2', 'tag3']
-    ```
 - XMP tags of type LangAlt have values in multiple languages, they are converted to a dict. For example:
     ```py
     >>> img.read_xmp()['Xmp.dc.title']
@@ -338,7 +332,7 @@ __exiv2_version__ = '0.28.7'
 
 ## convert
 
-- Exiv2 supports converting some EXIF or IPTC tags to XMP tags, and also supports reverse conversion. Reference: <https://github.com/Exiv2/exiv2/blob/v0.28.7/src/convert.cpp#L313>
+- Exiv2 supports converting some EXIF or IPTC tags to XMP tags, and also supports reverse conversion. Reference: <https://github.com/Exiv2/exiv2/blob/v0.28.8/src/convert.cpp#L313>
 - For example:
     ```py
     >>> pyexiv2.convert_exif_to_xmp({'Exif.Image.Artist': 'test-中文-', 'Exif.Image.Rating': '4'})
