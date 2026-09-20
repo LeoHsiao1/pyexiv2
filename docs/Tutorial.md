@@ -114,7 +114,7 @@ def convert_xmp_to_exif(data: dict, encoding='utf-8') -> dict
 def convert_xmp_to_iptc(data: dict, encoding='utf-8') -> dict
 
 __version__ = '2.16.0'
-__exiv2_version__ = '0.28.8'
+__exiv2_version__ = '0.28.9'
 ```
 
 ## class Image
@@ -332,7 +332,7 @@ __exiv2_version__ = '0.28.8'
 
 ## convert
 
-- Exiv2 supports converting some EXIF or IPTC tags to XMP tags, and also supports reverse conversion. Reference: <https://github.com/Exiv2/exiv2/blob/v0.28.8/src/convert.cpp#L313>
+- Exiv2 supports converting some EXIF or IPTC tags to XMP tags, and also supports reverse conversion. Reference: <https://github.com/Exiv2/exiv2/blob/v0.28.9/src/convert.cpp#L313>
 - For example:
     ```py
     >>> pyexiv2.convert_exif_to_xmp({'Exif.Image.Artist': 'test-中文-', 'Exif.Image.Rating': '4'})
