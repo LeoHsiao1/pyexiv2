@@ -65,9 +65,9 @@ jobs:
             elif [ ${exiv2_platform_name} == Linux-aarch64 ]
             then
                 plat_name=manylinux2014_aarch64
-            elif [ ${exiv2_platform_name} == Darwin-x86_64 ]
-            then
-                plat_name=macosx_15_0_x86_64
+            # elif [ ${exiv2_platform_name} == Darwin-x86_64 ]
+            # then
+            #     plat_name=macosx_15_0_x86_64
             elif [ ${exiv2_platform_name} == Darwin-arm64 ]
             then
                 plat_name=macosx_15_0_arm64

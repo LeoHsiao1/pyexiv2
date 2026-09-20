@@ -61,13 +61,13 @@
 
 1. Download [the release of Exiv2](https://github.com/Exiv2/exiv2/releases/tag/v0.28.9) :
     ```sh
-    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.9/exiv2-0.28.9-Darwin-x86_64.tar.gz
-    tar -zxvf exiv2-0.28.9-Darwin-x86_64.tar.gz
+    curl -O https://github.com/Exiv2/exiv2/releases/download/v0.28.9/exiv2-0.28.9-Darwin-arm64.tar.gz
+    tar -zxvf exiv2-0.28.9-Darwin-arm64.tar.gz
     ```
 
 2. Prepare environment variables according to your download path:
     ```sh
-    EXIV2_DIR=??/exiv2-0.28.9-Darwin-x86_64
+    EXIV2_DIR=??/exiv2-0.28.9-Darwin-arm64
     LIB_DIR=??/pyexiv2/lib
     cp ${EXIV2_DIR}/lib/libexiv2.0.28.9.dylib ${LIB_DIR}/libexiv2.dylib
     ```
