@@ -1,15 +1,14 @@
 import os
 import sys
 import ctypes
-import platform
 
 # Recognize the Python interpreter
-if platform.architecture()[0] != '64bit':
+if sys.maxsize <= 2**32:
     raise RuntimeError('pyexiv2 can only run on 64-bit python3 interpreter.')
 
 # Recognize the system
 lib_dir     = os.path.dirname(__file__)
-sys_name    = platform.system() or 'Unknown'
+sys_name    = {'linux': 'Linux', 'darwin': 'Darwin', 'win32': 'Windows'}.get(sys.platform, sys.platform)
 if sys_name == 'Linux':
     ctypes.CDLL(os.path.join(lib_dir, 'libexiv2.so'))
     
