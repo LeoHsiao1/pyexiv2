@@ -19,7 +19,7 @@ else:
 
 setuptools.setup(
     name='pyexiv2',
-    version='2.16.0',    # need to set the variable in 'pyexiv2/__init__.py'
+    version='2.16.1',    # need to set the variable in 'pyexiv2/__init__.py'
     author='LeoHsiao',
     author_email='leohsiao@foxmail.com',
     description='Read and write image metadata, including EXIF, IPTC, XMP, ICC Profile.',
