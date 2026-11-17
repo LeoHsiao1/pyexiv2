@@ -70,24 +70,16 @@ py::str version()
     return Exiv2::version();
 }
 
+/* Points to the content of a bytes object from Python, without copying it.
+   The binding keeps that object alive as long as the Buffer exists. */
 class Buffer{
 public:
     char *data;
-    long size;
+    Py_ssize_t size;
 
-    Buffer(const char *data_, long size_){
-        size = size_;
-        data = (char *)calloc(size, sizeof(char));
-        if(data == NULL)
-            throw std::runtime_error("Failed to allocate memory.");
-        memcpy(data, data_, size);
-    }
-
-    void destroy(){
-        if(data){
-            free(data);
-            data = NULL;
-        }
+    Buffer(py::bytes data_){
+        if (PyBytes_AsStringAndSize(data_.ptr(), &data, &size) != 0)
+            throw py::error_already_set();
     }
 
     py::bytes dump(){
@@ -98,6 +90,7 @@ public:
 class Image{
 public:
     Exiv2::Image::UniquePtr img;
+    bool reads_from_buffer = false;
 
     Image(const char *filename){
         img = Exiv2::ImageFactory::open(filename);
@@ -112,6 +105,7 @@ public:
         if (img.get() == 0)
             throw Exiv2::Error(Exiv2::ErrorCode::kerErrorMessage, "Can not open this image.");
         img->readMetadata();
+        reads_from_buffer = true;
         check_error_log();
     }
 
@@ -119,6 +113,22 @@ public:
     {
         img.reset();
         check_error_log();
+    }
+
+    /* Every write must go through this function.
+       An image opened from a Buffer is read straight from the bytes object of the caller.
+       TIFF-based formats update tags in place through io.mmap(true), which would alter that immutable object.
+       So exiv2 gets its own copy before the first write. */
+    void write_metadata()
+    {
+        if (reads_from_buffer) {
+            Exiv2::BasicIo &io = img->io();
+            Exiv2::MemIo copy;
+            copy.write(io.mmap(), io.size());
+            io.transfer(copy);
+            reads_from_buffer = false;
+        }
+        img->writeMetadata();
     }
 
     py::bytes get_bytes()
@@ -378,7 +388,7 @@ public:
         }
 
         img->setExifData(exifData);  // Save metadata to images in memory
-        img->writeMetadata();        // Save metadata from memory to disk
+        write_metadata();            // Save metadata from memory to disk
         check_error_log();
     }
 
@@ -414,7 +424,7 @@ public:
             }
         }
         img->setIptcData(iptcData);
-        img->writeMetadata();
+        write_metadata();
         check_error_log();
     }
 
@@ -455,7 +465,7 @@ public:
             xmpData.add(Exiv2::XmpKey(key), value.get());
         }
         img->setXmpData(xmpData);
-        img->writeMetadata();
+        write_metadata();
         check_error_log();
     }
 
@@ -463,7 +473,7 @@ public:
     {
         std::string data_str = py::bytes(data.attr("encode")(encoding));
         img->setXmpPacket(data_str);
-        img->writeMetadata();
+        write_metadata();
         (void)img->writeXmpFromPacket();   // Refresh the parsed XMP data in memory
         check_error_log();
     }
@@ -472,7 +482,7 @@ public:
     {
         std::string data_str = py::bytes(data.attr("encode")(encoding));
         img->setComment(data_str);
-        img->writeMetadata();
+        write_metadata();
         check_error_log();
     }
 
@@ -480,7 +490,7 @@ public:
     {
         Exiv2::DataBuf buf((Exiv2::byte *) data, size);
         img->setIccProfile(std::move(buf));
-        img->writeMetadata();
+        write_metadata();
         check_error_log();
     }
 
@@ -488,42 +498,42 @@ public:
     {
         Exiv2::ExifThumb exifThumb(img->exifData());
         exifThumb.setJpegThumbnail((Exiv2::byte *) data, size);
-        img->writeMetadata();
+        write_metadata();
         check_error_log();
     }
 
     void clear_exif()
     {
         img->clearExifData();
-        img->writeMetadata();
+        write_metadata();
         check_error_log();
     }
 
     void clear_iptc()
     {
         img->clearIptcData();
-        img->writeMetadata();
+        write_metadata();
         check_error_log();
     }
 
     void clear_xmp()
     {
         img->clearXmpData();
-        img->writeMetadata();
+        write_metadata();
         check_error_log();
     }
 
     void clear_comment()
     {
         img->clearComment();
-        img->writeMetadata();
+        write_metadata();
         check_error_log();
     }
 
     void clear_icc()
     {
         img->clearIccProfile();
-        img->writeMetadata();
+        write_metadata();
         check_error_log();
     }
 
@@ -531,7 +541,7 @@ public:
     {
         Exiv2::ExifThumb exifThumb(img->exifData());
         exifThumb.erase();
-        img->writeMetadata();
+        write_metadata();
         check_error_log();
     }
 
@@ -561,7 +571,7 @@ public:
         if (xmp) {
             another_image.img->setXmpPacket(img->xmpPacket());
         }
-        another_image.img->writeMetadata();
+        another_image.write_metadata();
         check_error_log();
     }
 
@@ -802,14 +812,13 @@ PYBIND11_MODULE(exiv2api, m)
     m.def("registerNs"   , &Exiv2::XmpProperties::registerNs);
     m.def("set_log_level", &set_log_level);
     py::class_<Buffer>(m, "Buffer")
-        .def(py::init<const char *  , long>())
+        .def(py::init<py::bytes>()  , py::keep_alive<1, 2>())
         .def_readonly("data"        , &Buffer::data)
         .def_readonly("size"        , &Buffer::size)
-        .def("destroy"              , &Buffer::destroy)
         .def("dump"                 , &Buffer::dump);
     py::class_<Image>(m, "Image")
         .def(py::init<const char *>())
-        .def(py::init<Buffer &>())
+        .def(py::init<Buffer &>()   , py::keep_alive<1, 2>())
         .def("close_image"          , &Image::close_image)
         .def("get_bytes"            , &Image::get_bytes)
         .def("get_pixel_width"      , &Image::get_pixel_width)
